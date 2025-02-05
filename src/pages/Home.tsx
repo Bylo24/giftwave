@@ -42,7 +42,7 @@ const Home = () => {
           </div>
         </div>
 
-        {/* Welcome Section */}
+      {/* Welcome Section */}
         <div className="text-center space-y-1">
           <h1 className="text-xl font-semibold text-gray-900">
             Welcome to GiftWave!
@@ -52,8 +52,8 @@ const Home = () => {
           </p>
         </div>
 
-        {/* Action Cards */}
-        <div className="space-y-4">
+      {/* Action Cards */}
+      <div className="space-y-4">
           <Card 
             className="p-6 space-y-4 cursor-pointer hover:bg-gray-50 transition-colors"
             onClick={() => navigate("/gift")}
@@ -97,11 +97,11 @@ const Home = () => {
             </div>
           </Card>
 
-          {/* FAQ Section */}
-          <Card className="p-4">
-            <h3 className="font-medium mb-4">Frequently Asked Questions</h3>
-            <ScrollArea className="h-[200px] w-full rounded-md">
-              <div className="space-y-4 pr-4">
+        {/* FAQ Section */}
+        <Card className="p-4">
+          <h3 className="font-medium mb-4">Frequently Asked Questions</h3>
+          <ScrollArea className="h-[200px] w-full rounded-md">
+            <div className="space-y-4 pr-4">
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm">How does GiftWave work?</h4>
                   <p className="text-sm text-gray-500">
@@ -126,16 +126,16 @@ const Home = () => {
                     Yes! GiftWave works globally, allowing you to send gifts to friends and family anywhere in the world.
                   </p>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Are there any fees?</h4>
-                  <p className="text-sm text-gray-500">
-                    GiftWave is free to use! You only pay for the value of the gifts you send.
-                  </p>
-                </div>
+              
+              <div className="space-y-2">
+                <h4 className="font-medium text-sm">Are there any fees?</h4>
+                <p className="text-sm text-gray-500">
+                  GiftWave keeps things simple! We charge a small fee to ensure secure transactions, high-quality video messages, and a seamless gifting experience. This helps us keep the platform running smoothly while adding those special touches that make your gifts feel truly personal.
+                </p>
               </div>
-            </ScrollArea>
-          </Card>
-        </div>
+            </div>
+          </ScrollArea>
+        </Card>
       </div>
 
       {/* Bottom Navigation */}
