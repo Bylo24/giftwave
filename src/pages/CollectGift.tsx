@@ -21,12 +21,16 @@ const CollectGift = () => {
     messageVideo: new File([], "mock-video.mp4"),
     memories: [
       {
-        image: "/placeholder.svg",
+        id: "1",
+        imageUrl: "/placeholder.svg",
         caption: "Remember this day?",
+        date: new Date()
       },
       {
-        image: "/placeholder.svg",
+        id: "2",
+        imageUrl: "/placeholder.svg",
         caption: "Such a great moment!",
+        date: new Date()
       },
     ],
   };
@@ -59,11 +63,14 @@ const CollectGift = () => {
     return (
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
-          theme={mockGift.theme}
-          amount={mockGift.amount}
           messageVideo={mockGift.messageVideo}
+          amount={mockGift.amount}
           memories={mockGift.memories}
           onComplete={handleAnimationComplete}
+          memory={{
+            caption: "",
+            date: new Date()
+          }}
         />
       </div>
     );
