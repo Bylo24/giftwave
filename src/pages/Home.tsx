@@ -9,8 +9,8 @@ const Home = () => {
     <div className="min-h-screen bg-white pb-16">
       {/* Search Header */}
       <div className="p-4 space-y-4">
-        <div className="flex items-center">
-          <div className="flex-1 max-w-[85%] relative">
+        <div className="flex items-center justify-between gap-4">
+          <div className="relative flex-1 max-w-[85%]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input 
               className="pl-10 bg-gray-50" 
