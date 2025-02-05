@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { EmailAuthForm } from "./EmailAuthForm";
 import { GoogleAuthButton } from "./GoogleAuthButton";
-import { AnonymousAuthButton } from "./AnonymousAuthButton";
 import { AuthToggle } from "./AuthToggle";
 
 export const LoginForm = () => {
@@ -35,10 +34,7 @@ export const LoginForm = () => {
           </div>
         </div>
 
-        <div className="grid gap-4">
-          <GoogleAuthButton isLoading={isLoading} />
-          <AnonymousAuthButton isLoading={isLoading} />
-        </div>
+        <GoogleAuthButton isLoading={isLoading} />
 
         <AuthToggle
           isSignUp={isSignUp}
