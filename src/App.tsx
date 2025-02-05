@@ -7,6 +7,7 @@ import { LoginForm } from "./components/auth/LoginForm";
 import { PhoneVerification } from "./components/auth/PhoneVerification";
 import { CodeVerification } from "./components/auth/CodeVerification";
 import { AccountSetup } from "./components/auth/AccountSetup";
+import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 
 function App() {
@@ -19,7 +20,8 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<LoginForm />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<LoginForm />} />
             <Route path="/verify" element={<PhoneVerification />} />
             <Route path="/verify-code" element={<CodeVerification />} />
             <Route path="/setup" element={<AccountSetup />} />
