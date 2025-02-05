@@ -1,16 +1,58 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 export const CodeVerification = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [code, setCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    const storedPhone = sessionStorage.getItem('verifying_phone');
+    if (!storedPhone) {
+      navigate('/verify');
+      return;
+    }
+    setPhoneNumber(storedPhone);
+  }, [navigate]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/setup");
+    if (!user || !phoneNumber) return;
+
+    setIsLoading(true);
+    try {
+      // In a real implementation, you would verify the code here
+      // For now, we'll simulate verification
+      
+      const { error } = await supabase
+        .from('profiles')
+        .update({ 
+          phone_verified: true,
+          phone_number: phoneNumber 
+        })
+        .eq('id', user.id);
+
+      if (error) throw error;
+
+      // Clear the stored phone number
+      sessionStorage.removeItem('verifying_phone');
+      
+      toast.success("Phone number verified successfully!");
+      navigate('/profile');
+    } catch (error: any) {
+      console.error('Error:', error);
+      toast.error(error.message || "Failed to verify code");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -27,7 +69,7 @@ export const CodeVerification = () => {
         <p className="text-sm text-gray-500">
           We sent it to:
           <br />
-          +1 123 456 789
+          {phoneNumber}
         </p>
       </div>
 
@@ -40,9 +82,25 @@ export const CodeVerification = () => {
             value={code}
             onChange={(e) => setCode(e.target.value)}
             className="w-full text-center text-2xl tracking-widest"
+            disabled={isLoading}
           />
-          <button className="text-primary text-sm">Resend code</button>
+          <button 
+            type="button"
+            onClick={() => toast.success("New code sent!")}
+            className="text-primary text-sm"
+            disabled={isLoading}
+          >
+            Resend code
+          </button>
         </div>
+
+        <Button 
+          type="submit" 
+          className="w-full bg-primary hover:bg-primary/90"
+          disabled={isLoading || code.length !== 4}
+        >
+          {isLoading ? "Verifying..." : "Verify"}
+        </Button>
       </form>
     </div>
   );
