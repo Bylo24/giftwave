@@ -66,13 +66,11 @@ const Gift = () => {
 
   const startMessageRecording = () => {
     setIsRecordingMessage(true);
-    // Here you would typically implement the actual video recording logic
     toast.info("Recording started...");
   };
 
   const stopMessageRecording = () => {
     setIsRecordingMessage(false);
-    // Here you would typically implement the logic to save the recorded video
     toast.success("Recording stopped!");
   };
 
@@ -129,6 +127,7 @@ const Gift = () => {
             amount={amount}
             messageVideo={messageVideo}
             memory={memory}
+            memories={memories}
             onNext={() => goToNextStep('payment')}
           />
         );
