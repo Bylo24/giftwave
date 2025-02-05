@@ -55,7 +55,7 @@ const Home = () => {
         <div className="space-y-4">
           <Card 
             className="p-6 space-y-4 cursor-pointer hover:bg-gray-50 transition-colors"
-            onClick={() => navigate("/pay")}
+            onClick={() => navigate("/gift")}
           >
             <div className="flex justify-center">
               <Gift className="h-12 w-12 text-primary" />
@@ -64,6 +64,21 @@ const Home = () => {
               <h2 className="font-medium">Send someone a gift</h2>
               <p className="text-sm text-gray-500">
                 Show them you care with a thoughtful gift
+              </p>
+            </div>
+          </Card>
+
+          <Card 
+            className="p-6 space-y-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => navigate("/my-gifts")}
+          >
+            <div className="flex justify-center">
+              <Gift className="h-12 w-12 text-secondary" />
+            </div>
+            <div className="text-center space-y-2">
+              <h2 className="font-medium">See my gifts</h2>
+              <p className="text-sm text-gray-500">
+                View all your sent and received gifts
               </p>
             </div>
           </Card>

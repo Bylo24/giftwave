@@ -7,8 +7,8 @@ export function BottomNav() {
   
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
-    { icon: Gift, label: "Gift", path: "/gift", isCenter: true },
     { icon: Wallet, label: "Wallet", path: "/wallet" },
+    { icon: Gift, label: "Gift", path: "/gift", isCenter: true },
     { icon: Gift, label: "My Gifts", path: "/my-gifts" },
     { icon: User, label: "Profile", path: "/profile" },
   ];
