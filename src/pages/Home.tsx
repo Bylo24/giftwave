@@ -22,7 +22,7 @@ const Home = () => {
         {/* Welcome Section */}
         <div className="text-center space-y-1">
           <h1 className="text-xl font-semibold text-gray-900">
-            Welcome to Swift Pay!
+            Welcome to GiftWave!
           </h1>
           <p className="text-sm text-gray-500">
             What would you like to do first?
@@ -36,7 +36,7 @@ const Home = () => {
               <Gift className="h-12 w-12 text-primary" />
             </div>
             <div className="text-center space-y-2">
-              <h2 className="font-medium">Make your first payment</h2>
+              <h2 className="font-medium">Make your first gift</h2>
               <p className="text-sm text-gray-500">
                 Send someone a gift
               </p>
