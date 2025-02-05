@@ -13,6 +13,8 @@ import PromoCode from "./pages/PromoCode";
 import Wallet from "./pages/Wallet";
 import SearchResults from "./pages/SearchResults";
 import Gift from "./pages/Gift";
+import MyGifts from "./pages/MyGifts";
+import Profile from "./pages/Profile";
 
 function App() {
   const queryClient = new QueryClient();
@@ -33,6 +35,8 @@ function App() {
             <Route path="/wallet" element={<Wallet />} />
             <Route path="/search" element={<SearchResults />} />
             <Route path="/gift" element={<Gift />} />
+            <Route path="/my-gifts" element={<MyGifts />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
