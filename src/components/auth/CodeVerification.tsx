@@ -13,6 +13,8 @@ export const CodeVerification = () => {
   const [code, setCode] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [resendTimer, setResendTimer] = useState(60);
+  const [canResend, setCanResend] = useState(false);
 
   useEffect(() => {
     const storedPhone = sessionStorage.getItem('verifying_phone');
@@ -22,6 +24,18 @@ export const CodeVerification = () => {
     }
     setPhoneNumber(storedPhone);
   }, [navigate]);
+
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (resendTimer > 0 && !canResend) {
+      interval = setInterval(() => {
+        setResendTimer((prev) => prev - 1);
+      }, 1000);
+    } else if (resendTimer === 0 && !canResend) {
+      setCanResend(true);
+    }
+    return () => clearInterval(interval);
+  }, [resendTimer, canResend]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +64,26 @@ export const CodeVerification = () => {
     } catch (error: any) {
       console.error('Error:', error);
       toast.error(error.message || "Failed to verify code");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (!canResend || !phoneNumber) return;
+    
+    try {
+      // Here you would implement the actual code resending logic
+      // For now, we'll simulate it with a delay
+      setIsLoading(true);
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      toast.success("New verification code sent!");
+      setCanResend(false);
+      setResendTimer(60);
+    } catch (error: any) {
+      console.error('Error:', error);
+      toast.error("Failed to resend code. Please try again.");
     } finally {
       setIsLoading(false);
     }
@@ -84,14 +118,27 @@ export const CodeVerification = () => {
             className="w-full text-center text-2xl tracking-widest"
             disabled={isLoading}
           />
-          <button 
-            type="button"
-            onClick={() => toast.success("New code sent!")}
-            className="text-primary text-sm"
-            disabled={isLoading}
-          >
-            Resend code
-          </button>
+          <div className="flex items-center justify-between">
+            <button 
+              type="button"
+              onClick={handleResendCode}
+              className={`text-sm ${canResend ? 'text-primary hover:text-primary/90' : 'text-gray-400'}`}
+              disabled={!canResend || isLoading}
+            >
+              {canResend ? (
+                "Resend code"
+              ) : (
+                `Resend code in ${resendTimer}s`
+              )}
+            </button>
+            <button 
+              type="button"
+              onClick={() => navigate('/verify')}
+              className="text-sm text-primary hover:text-primary/90"
+            >
+              Change phone number
+            </button>
+          </div>
         </div>
 
         <Button 
