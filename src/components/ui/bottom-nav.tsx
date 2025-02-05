@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Home, Wallet, DollarSign, User } from "lucide-react";
+import { Home, Wallet, Gift, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export function BottomNav() {
