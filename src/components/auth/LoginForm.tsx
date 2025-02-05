@@ -22,7 +22,7 @@ export const LoginForm = () => {
 
         <div className="space-y-4">
           <Button
-            onClick={() => navigate("/signup")}
+            onClick={() => navigate("/setup")}
             className="w-full bg-primary hover:bg-primary/90"
           >
             Create account
