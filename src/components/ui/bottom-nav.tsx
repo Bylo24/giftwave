@@ -7,7 +7,7 @@ export function BottomNav() {
   
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
-    { icon: Gift, label: "Gift", path: "/pay", isCenter: true },
+    { icon: Gift, label: "Gift", path: "/gift", isCenter: true },
     { icon: Wallet, label: "Wallet", path: "/wallet" },
   ];
 
@@ -16,7 +16,7 @@ export function BottomNav() {
       {/* Profile button in top right */}
       <Link
         to="/profile"
-        className="fixed top-4 right-4 flex flex-col items-center justify-center text-xs text-gray-500"
+        className="fixed top-4 right-4 z-50 flex flex-col items-center justify-center text-xs text-gray-500"
       >
         <User className="h-6 w-6" />
       </Link>
