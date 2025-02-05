@@ -1,11 +1,20 @@
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Wallet = () => {
   return (
     <div className="min-h-screen bg-white pb-16">
       <div className="p-4 pt-16 space-y-6">
+        {/* Greeting */}
+        <div className="text-center mb-4">
+          <h1 className="text-xl font-medium text-gray-800">
+            Hey <Link to="/profile" className="text-primary hover:underline">John Doe</Link>,
+          </h1>
+          <p className="text-gray-600">here's your balance</p>
+        </div>
+
         {/* Balance Card */}
         <Card className="p-6 bg-primary text-white">
           <div className="flex items-center gap-3 mb-4">
