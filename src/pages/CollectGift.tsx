@@ -18,7 +18,7 @@ const CollectGift = () => {
     queryKey: ['gift', giftId],
     queryFn: async () => {
       console.log("Fetching gift:", giftId);
-      const { data, error } = await supabase
+      const { data: giftData, error: giftError } = await supabase
         .from('gifts')
         .select(`
           *,
@@ -27,13 +27,34 @@ const CollectGift = () => {
         .eq('id', giftId)
         .single();
 
-      if (error) {
-        console.error("Error fetching gift:", error);
-        throw error;
+      if (giftError) {
+        console.error("Error fetching gift:", giftError);
+        throw giftError;
       }
 
-      console.log("Fetched gift:", data);
-      return data;
+      // Fetch associated memories
+      const { data: memoriesData, error: memoriesError } = await supabase
+        .from('gift_memories')
+        .select('*')
+        .eq('gift_id', giftId);
+
+      if (memoriesError) {
+        console.error("Error fetching memories:", memoriesError);
+        throw memoriesError;
+      }
+
+      // Format memories to match the expected type
+      const formattedMemories = memoriesData.map(memory => ({
+        id: memory.id,
+        imageUrl: memory.image_url,
+        caption: memory.caption,
+        date: new Date(memory.date)
+      }));
+
+      return {
+        ...giftData,
+        memories: formattedMemories
+      };
     },
   });
 
@@ -53,14 +74,13 @@ const CollectGift = () => {
     return <GiftNotFound />;
   }
 
-  // Show animation for both initial view and replay
   if (!isAnimationComplete || isReplay) {
     return (
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
           messageVideo={gift.message_video_url}
           amount={gift.amount.toString()}
-          memories={[]} // We'll implement memories in a separate update
+          memories={gift.memories || []}
           onComplete={handleAnimationComplete}
           memory={{
             caption: "",
