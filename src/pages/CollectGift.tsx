@@ -93,7 +93,7 @@ const CollectGift = () => {
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
           messageVideo={gift.message_video_url}
-          amount={gift.amount}
+          amount={gift.amount.toString()}
           memories={[]} // We'll implement memories in a separate update
           onComplete={handleAnimationComplete}
           memory={{

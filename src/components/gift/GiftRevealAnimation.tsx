@@ -6,7 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 interface GiftRevealAnimationProps {
-  messageVideo: File | null;
+  messageVideo: File | string | null;
   amount: string;
   memory: {
     caption: string;
@@ -60,6 +60,12 @@ export const GiftRevealAnimation = ({
     navigate('/login');
   };
 
+  const getVideoUrl = () => {
+    if (!messageVideo) return '';
+    if (typeof messageVideo === 'string') return messageVideo;
+    return URL.createObjectURL(messageVideo);
+  };
+
   return (
     <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
       <AnimatePresence mode="wait">
@@ -71,7 +77,7 @@ export const GiftRevealAnimation = ({
             className="w-full max-w-2xl aspect-video"
           >
             <video
-              src={URL.createObjectURL(messageVideo)}
+              src={getVideoUrl()}
               className="w-full h-full object-cover rounded-lg"
               autoPlay
               onEnded={() => setVideoEnded(true)}
