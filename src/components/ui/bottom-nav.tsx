@@ -8,7 +8,7 @@ export function BottomNav() {
   const navItems = [
     { icon: Home, label: "Home", path: "/" },
     { icon: Wallet, label: "Wallet", path: "/wallet" },
-    { icon: DollarSign, label: "Pay/Request", path: "/pay" },
+    { icon: DollarSign, label: "Pay", path: "/pay" },
     { icon: User, label: "Profile", path: "/profile" },
   ];
 
