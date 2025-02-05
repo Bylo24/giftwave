@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
-import { demoGifts } from "@/utils/demoGifts";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 const CollectGift = () => {
   const { giftId } = useParams();
@@ -17,7 +18,38 @@ const CollectGift = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
 
-  const gift = giftId ? demoGifts[giftId] : null;
+  const { data: gift, isLoading } = useQuery({
+    queryKey: ['gift', giftId],
+    queryFn: async () => {
+      console.log("Fetching gift:", giftId);
+      const { data, error } = await supabase
+        .from('gifts')
+        .select(`
+          *,
+          sender:profiles(full_name)
+        `)
+        .eq('id', giftId)
+        .single();
+
+      if (error) {
+        console.error("Error fetching gift:", error);
+        throw error;
+      }
+
+      console.log("Fetched gift:", data);
+      return data;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-muted-foreground">Loading gift...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!gift) {
     return (
@@ -60,9 +92,9 @@ const CollectGift = () => {
     return (
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
-          messageVideo={gift.messageVideo}
+          messageVideo={gift.message_video_url}
           amount={gift.amount}
-          memories={gift.memories}
+          memories={[]} // We'll implement memories in a separate update
           onComplete={handleAnimationComplete}
           memory={{
             caption: "",
