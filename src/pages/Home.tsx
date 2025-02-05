@@ -16,7 +16,7 @@ const Home = () => {
           <div className="relative flex-1 max-w-[85%]">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input 
-              className="pl-10 bg-gray-50" 
+              className="pl-10 bg-gray-50 cursor-text" 
               placeholder="Search profiles or add contacts" 
             />
           </div>
@@ -34,7 +34,10 @@ const Home = () => {
 
         {/* Action Cards */}
         <div className="space-y-4">
-          <Card className="p-6 space-y-4">
+          <Card 
+            className="p-6 space-y-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => navigate("/pay")}
+          >
             <div className="flex justify-center">
               <Gift className="h-12 w-12 text-primary" />
             </div>
@@ -43,7 +46,14 @@ const Home = () => {
               <p className="text-sm text-gray-500">
                 Send someone a gift
               </p>
-              <Button variant="outline" className="w-full">
+              <Button 
+                variant="outline" 
+                className="w-full"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigate("/pay");
+                }}
+              >
                 Get started
               </Button>
             </div>
