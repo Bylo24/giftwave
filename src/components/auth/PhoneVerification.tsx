@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Select,
@@ -20,6 +20,27 @@ export const PhoneVerification = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [countryCode, setCountryCode] = useState("+1");
   const [isLoading, setIsLoading] = useState(false);
+  const [currentPhone, setCurrentPhone] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchCurrentPhone = async () => {
+      if (!user) return;
+      
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('phone_number')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error fetching phone:', error);
+      } else if (data?.phone_number) {
+        setCurrentPhone(data.phone_number);
+      }
+    };
+
+    fetchCurrentPhone();
+  }, [user]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -35,7 +56,10 @@ export const PhoneVerification = () => {
       // First, update the phone number in the profiles table
       const { error: updateError } = await supabase
         .from('profiles')
-        .update({ phone_number: fullPhoneNumber })
+        .update({ 
+          phone_number: fullPhoneNumber,
+          phone_verified: false // Reset verification status
+        })
         .eq('id', user.id);
 
       if (updateError) throw updateError;
@@ -64,9 +88,16 @@ export const PhoneVerification = () => {
       </button>
 
       <div className="space-y-2">
-        <h1 className="text-2xl font-semibold">Enter your phone number</h1>
+        <h1 className="text-2xl font-semibold">
+          {currentPhone ? "Change phone number" : "Add phone number"}
+        </h1>
+        {currentPhone && (
+          <p className="text-sm text-gray-500">
+            Current phone: {currentPhone}
+          </p>
+        )}
         <p className="text-sm text-gray-500">
-          We'll text you a code so we can confirm that it's you.
+          We'll text you a code to verify this number.
         </p>
       </div>
 
