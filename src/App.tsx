@@ -8,6 +8,7 @@ import { PhoneVerification } from "./components/auth/PhoneVerification";
 import { CodeVerification } from "./components/auth/CodeVerification";
 import { AccountSetup } from "./components/auth/AccountSetup";
 import { RequireAuth } from "./components/auth/RequireAuth";
+import { UpdatePhone } from "./components/profile/UpdatePhone";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PromoCode from "./pages/PromoCode";
@@ -37,6 +38,7 @@ function App() {
               <Route path="/verify" element={<PhoneVerification />} />
               <Route path="/verify-code" element={<CodeVerification />} />
               <Route path="/setup" element={<AccountSetup />} />
+              <Route path="/update-phone" element={<UpdatePhone />} />
               
               {/* Protected Routes */}
               <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
