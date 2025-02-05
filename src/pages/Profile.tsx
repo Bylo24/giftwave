@@ -3,11 +3,13 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Mail, Phone, User, Users } from "lucide-react";
+import { Camera, Mail, Phone, User, Users, Heart } from "lucide-react";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { toast } from "sonner";
+import { useNavigate } from "react-router-dom";
 
 const Profile = () => {
+  const navigate = useNavigate();
   const [profileImage, setProfileImage] = useState<string | null>(null);
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -94,10 +96,18 @@ const Profile = () => {
 
           <Button 
             className="w-full bg-gradient-to-r from-[#D946EF] to-[#9b87f5] hover:opacity-90 text-white"
-            onClick={() => console.log("View friends")}
+            onClick={() => navigate("/friends")}
           >
             <Users className="w-5 h-5 mr-2" />
             My Friends
+          </Button>
+
+          <Button 
+            className="w-full bg-gradient-to-r from-pink-500 to-purple-500 hover:opacity-90 text-white"
+            onClick={() => navigate("/my-gifts")}
+          >
+            <Heart className="w-5 h-5 mr-2" />
+            My Memories
           </Button>
         </Card>
       </div>

@@ -8,18 +8,18 @@ import { AmountStep } from "@/components/gift/AmountStep";
 import { PreviewStep } from "@/components/gift/PreviewStep";
 import { toast } from "sonner";
 
-type Step = 'recipient' | 'message' | 'amount' | 'preview' | 'payment' | 'memory' | 'animation';
+type Step = 'recipient' | 'message' | 'amount' | 'preview' | 'payment' | 'memory';
 
 const Gift = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>('recipient');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
-  const [memoryVideo, setMemoryVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
   const [messageStream, setMessageStream] = useState<MediaStream | null>(null);
   const [amount, setAmount] = useState('');
   const [memoryCaption, setMemoryCaption] = useState('');
+  const [memoryImage, setMemoryImage] = useState<File | null>(null);
 
   const startMessageRecording = async () => {
     try {
@@ -41,11 +41,29 @@ const Gift = () => {
     }
   };
 
+  const handlePayment = async () => {
+    // Implement payment logic here
+    toast.success('Payment successful!');
+    setCurrentStep('memory');
+  };
+
+  const handleMemoryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setMemoryImage(file);
+      toast.success('Memory image uploaded!');
+    }
+  };
+
   const nextStep = () => {
-    const steps: Step[] = ['recipient', 'message', 'amount', 'preview', 'payment', 'memory', 'animation'];
+    const steps: Step[] = ['recipient', 'message', 'amount', 'preview', 'payment', 'memory'];
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
+    } else {
+      // Complete the gifting process
+      toast.success('Gift sent successfully!');
+      navigate('/my-gifts');
     }
   };
 
@@ -102,7 +120,7 @@ const Gift = () => {
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
             Create a Gift
           </h1>
         </div>
