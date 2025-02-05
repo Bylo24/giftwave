@@ -3,6 +3,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { giftThemes, ThemeType } from "@/utils/giftThemes";
+import { useState } from "react";
+import { GiftRevealAnimation } from "./GiftRevealAnimation";
+import { toast } from "sonner";
 
 interface GiftMemory {
   caption: string;
@@ -27,10 +30,29 @@ export const PreviewStep = ({
   memory,
   onNext 
 }: PreviewStepProps) => {
+  const [showAnimation, setShowAnimation] = useState(false);
   const selectedTheme = giftThemes[theme] || giftThemes.birthday;
+
+  const handlePreview = () => {
+    setShowAnimation(true);
+  };
+
+  const handleAnimationComplete = () => {
+    setShowAnimation(false);
+    toast.success("Gift preview complete!");
+  };
 
   return (
     <div className="space-y-6 animate-fade-in max-w-md mx-auto">
+      {showAnimation && (
+        <GiftRevealAnimation
+          messageVideo={messageVideo}
+          amount={amount}
+          memory={memory}
+          onComplete={handleAnimationComplete}
+        />
+      )}
+
       <Card className={`p-6 space-y-6 bg-gradient-to-br ${selectedTheme.colors.secondary}`}>
         <div className="flex items-center gap-3 mb-4">
           <div className={`p-3 bg-opacity-10 rounded-full ${selectedTheme.animations[0]}`}>
@@ -92,12 +114,21 @@ export const PreviewStep = ({
           </div>
         </Card>
 
-        <Button
-          className={`w-full bg-gradient-to-r ${selectedTheme.colors.primary} hover:opacity-90 transition-opacity text-white`}
-          onClick={onNext}
-        >
-          Continue to Payment
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            className={`flex-1 bg-gradient-to-r ${selectedTheme.colors.primary} hover:opacity-90 transition-opacity text-white`}
+            onClick={handlePreview}
+          >
+            Preview Animation
+          </Button>
+
+          <Button
+            className={`flex-1 bg-gradient-to-r ${selectedTheme.colors.primary} hover:opacity-90 transition-opacity text-white`}
+            onClick={onNext}
+          >
+            Continue to Payment
+          </Button>
+        </div>
       </Card>
     </div>
   );
