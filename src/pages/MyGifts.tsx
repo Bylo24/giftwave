@@ -22,16 +22,19 @@ const MyGifts = () => {
 
       console.log("User profile:", profile);
 
-      // Then fetch both sent and received gifts
+      // Then fetch gifts with sender profile information
       const { data: giftsData, error: giftsError } = await supabase
         .from('gifts')
         .select(`
           *,
-          sender:profiles!gifts_sender_id_fkey(full_name)
+          sender:sender_id (
+            full_name
+          )
         `)
         .or(`sender_id.eq.${user?.id}${profile?.phone_number ? `,recipient_phone.eq.${profile.phone_number}` : ''}`);
 
       if (giftsError) {
+        console.error("Error fetching gifts:", giftsError);
         toast.error("Failed to load gifts");
         throw giftsError;
       }
