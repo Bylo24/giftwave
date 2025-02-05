@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -42,20 +41,10 @@ const Home = () => {
               <Gift className="h-12 w-12 text-primary" />
             </div>
             <div className="text-center space-y-2">
-              <h2 className="font-medium">Make your first gift</h2>
+              <h2 className="font-medium">Send someone a gift</h2>
               <p className="text-sm text-gray-500">
-                Send someone a gift
+                Show them you care with a thoughtful gift
               </p>
-              <Button 
-                variant="outline" 
-                className="w-full"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigate("/pay");
-                }}
-              >
-                Get started
-              </Button>
             </div>
           </Card>
 

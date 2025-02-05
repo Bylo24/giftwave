@@ -10,6 +10,7 @@ import { AccountSetup } from "./components/auth/AccountSetup";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PromoCode from "./pages/PromoCode";
+import Wallet from "./pages/Wallet";
 
 function App() {
   const queryClient = new QueryClient();
@@ -27,6 +28,7 @@ function App() {
             <Route path="/verify-code" element={<CodeVerification />} />
             <Route path="/setup" element={<AccountSetup />} />
             <Route path="/promo" element={<PromoCode />} />
+            <Route path="/wallet" element={<Wallet />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
