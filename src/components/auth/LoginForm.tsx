@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Github, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
@@ -18,24 +18,23 @@ export const LoginForm = () => {
     setIsLoading(true);
 
     try {
-      const { error } = isSignUp
-        ? await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              emailRedirectTo: `${window.location.origin}/home`,
-            },
-          })
-        : await supabase.auth.signInWithPassword({
-            email,
-            password,
-          });
-
-      if (error) throw error;
-
       if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/verify`,
+          },
+        });
+        if (error) throw error;
         toast.success("Check your email for the confirmation link!");
+        navigate("/verify");
       } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+        if (error) throw error;
         toast.success("Successfully logged in!");
         navigate("/home");
       }
@@ -46,10 +45,10 @@ export const LoginForm = () => {
     }
   };
 
-  const handleOAuthLogin = async (provider: "google" | "github") => {
+  const handleGoogleLogin = async () => {
     try {
       const { error } = await supabase.auth.signInWithOAuth({
-        provider,
+        provider: "google",
         options: {
           redirectTo: `${window.location.origin}/home`,
         },
@@ -114,7 +113,7 @@ export const LoginForm = () => {
         <div className="grid gap-4">
           <Button
             variant="outline"
-            onClick={() => handleOAuthLogin("google")}
+            onClick={handleGoogleLogin}
             disabled={isLoading}
           >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
@@ -136,14 +135,6 @@ export const LoginForm = () => {
               />
             </svg>
             Continue with Google
-          </Button>
-          <Button
-            variant="outline"
-            onClick={() => handleOAuthLogin("github")}
-            disabled={isLoading}
-          >
-            <Github className="mr-2 h-4 w-4" />
-            Continue with GitHub
           </Button>
         </div>
 
