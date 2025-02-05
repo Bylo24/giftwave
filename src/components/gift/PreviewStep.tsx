@@ -20,14 +20,15 @@ interface PreviewStepProps {
 }
 
 export const PreviewStep = ({ 
-  theme,
+  theme = 'birthday', // Provide a default theme
   phoneNumber, 
   amount, 
   messageVideo,
   memory,
   onNext 
 }: PreviewStepProps) => {
-  const selectedTheme = giftThemes[theme];
+  // Ensure we have a valid theme or fallback to birthday theme
+  const selectedTheme = giftThemes[theme] || giftThemes.birthday;
 
   return (
     <Card className={`p-6 space-y-6 bg-gradient-to-br ${selectedTheme.colors.secondary}`}>
