@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Image, Camera, MessageCircle, Calendar } from "lucide-react";
+import { Image, Camera, MessageCircle, Calendar, Plus } from "lucide-react";
 import { toast } from "sonner";
 
 interface Memory {
@@ -15,9 +15,18 @@ interface Memory {
 interface MemoryReplayScreenProps {
   memories: Memory[];
   onAddMemory: (memory: Omit<Memory, "id">) => void;
+  onNext: () => void;
 }
 
-export const MemoryReplayScreen = ({ memories, onAddMemory }: MemoryReplayScreenProps) => {
+const CAPTION_SUGGESTIONS = [
+  "my favourite moment with you",
+  "something I wish to forget",
+  "that time we laughed until we cried",
+  "a memory I'll cherish forever",
+  "the day everything changed"
+];
+
+export const MemoryReplayScreen = ({ memories, onAddMemory, onNext }: MemoryReplayScreenProps) => {
   const [newCaption, setNewCaption] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -52,26 +61,25 @@ export const MemoryReplayScreen = ({ memories, onAddMemory }: MemoryReplayScreen
     setNewCaption("");
     setSelectedImage(null);
     setPreviewUrl(null);
-    toast.success("Memory added successfully!");
   };
 
   return (
     <div className="space-y-6 animate-fade-in">
-      <Card className="p-6 space-y-4 bg-gradient-to-br from-purple-50 to-pink-50">
+      <Card className="p-6 space-y-4 bg-gradient-to-br from-blue-50 to-white">
         <div className="flex items-center gap-3 mb-4">
-          <div className="p-3 bg-purple-500/10 rounded-full">
-            <Image className="h-6 w-6 text-purple-500" />
+          <div className="p-3 bg-blue-500/10 rounded-full">
+            <Image className="h-6 w-6 text-blue-500" />
           </div>
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Memory Replay
+          <h2 className="text-2xl font-bold text-blue-600">
+            Add Memories
           </h2>
         </div>
 
         {/* Upload Section */}
-        <Card className="p-4 cursor-pointer hover:shadow-lg transition-shadow border-2 border-purple-500/20">
+        <Card className="p-4 cursor-pointer hover:shadow-lg transition-shadow border-2 border-blue-500/20">
           <label className="flex flex-col items-center gap-3 cursor-pointer">
-            <div className="p-3 bg-purple-500/10 rounded-full">
-              <Camera className="h-6 w-6 text-purple-500" />
+            <div className="p-3 bg-blue-500/10 rounded-full">
+              <Camera className="h-6 w-6 text-blue-500" />
             </div>
             <div className="text-center">
               <p className="font-medium">Upload Photo</p>
@@ -100,23 +108,33 @@ export const MemoryReplayScreen = ({ memories, onAddMemory }: MemoryReplayScreen
         {/* Caption Input */}
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5 text-purple-500" />
+            <MessageCircle className="h-5 w-5 text-blue-500" />
             <label className="font-medium">Add a Caption</label>
           </div>
           <Textarea
-            placeholder="Write something about this memory..."
+            placeholder={`Write something meaningful like... "${CAPTION_SUGGESTIONS[Math.floor(Math.random() * CAPTION_SUGGESTIONS.length)]}"`}
             value={newCaption}
             onChange={(e) => setNewCaption(e.target.value)}
-            className="min-h-[100px] border-2 border-purple-500/20 focus:border-purple-500/40"
+            className="min-h-[100px] border-2 border-blue-500/20 focus:border-blue-500/40"
           />
         </div>
 
-        <Button
-          onClick={handleAddMemory}
-          className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity"
-        >
-          Add Memory
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={handleAddMemory}
+            className="flex-1 bg-blue-500 hover:bg-blue-600 transition-colors"
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add Memory
+          </Button>
+          
+          <Button
+            onClick={onNext}
+            className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 hover:opacity-90 transition-opacity"
+          >
+            Continue
+          </Button>
+        </div>
       </Card>
 
       {/* Memories List */}
@@ -124,7 +142,7 @@ export const MemoryReplayScreen = ({ memories, onAddMemory }: MemoryReplayScreen
         {memories.map((memory) => (
           <Card
             key={memory.id}
-            className="p-4 hover:shadow-lg transition-shadow animate-fade-in"
+            className="p-4 hover:shadow-lg transition-shadow animate-fade-in bg-white"
           >
             {memory.imageUrl && (
               <div className="relative aspect-video rounded-lg overflow-hidden mb-3">

@@ -12,7 +12,7 @@ import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
-type Step = 'theme' | 'memory' | 'recipient' | 'message' | 'amount' | 'preview' | 'payment' | 'replay';
+type Step = 'theme' | 'memory' | 'amount' | 'recipient' | 'message' | 'preview' | 'payment' | 'replay';
 
 interface GiftMemory {
   caption: string;
@@ -34,8 +34,6 @@ const Gift = () => {
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>('birthday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
-  const [isRecordingMessage, setIsRecordingMessage] = useState(false);
-  const [messageStream, setMessageStream] = useState<MediaStream | null>(null);
   const [amount, setAmount] = useState('');
   const [memory, setMemory] = useState<GiftMemory>({
     caption: '',
@@ -56,53 +54,13 @@ const Gift = () => {
     setCurrentStep(nextStep);
   };
 
-  const startMessageRecording = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      setMessageStream(stream);
-      setIsRecordingMessage(true);
-      toast.success('Recording started!');
-    } catch (error) {
-      toast.error('Unable to access camera and microphone');
-    }
-  };
-
-  const stopMessageRecording = () => {
-    if (messageStream) {
-      messageStream.getTracks().forEach(track => track.stop());
-      setMessageStream(null);
-      setIsRecordingMessage(false);
-      toast.success('Recording stopped!');
-    }
-  };
-
-  const handlePayment = async () => {
-    try {
-      // Simulated payment process
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success('Payment successful!');
-      navigate('/my-gifts');
-    } catch (error) {
-      toast.error('Payment failed. Please try again.');
-    }
-  };
-
   const handleAddMemory = (newMemory: Omit<Memory, "id">) => {
     const memoryWithId = {
       ...newMemory,
       id: crypto.randomUUID(),
     };
-    setMemories([...memories, memoryWithId]);
-  };
-
-  const nextStep = () => {
-    const steps: Step[] = ['theme', 'recipient', 'message', 'amount', 'memory', 'preview', 'payment', 'replay'];
-    const currentIndex = steps.indexOf(currentStep);
-    if (currentIndex < steps.length - 1) {
-      setCurrentStep(steps[currentIndex + 1]);
-    } else {
-      handlePayment();
-    }
+    setMemories(prev => [...prev, memoryWithId]);
+    toast.success("Memory added successfully!");
   };
 
   const renderStep = () => {
@@ -112,26 +70,15 @@ const Gift = () => {
           <ThemeStep
             selectedTheme={selectedTheme}
             setSelectedTheme={setSelectedTheme}
-            onNext={nextStep}
+            onNext={() => goToNextStep('memory')}
           />
         );
-      case 'recipient':
+      case 'memory':
         return (
-          <RecipientStep
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
-            onNext={nextStep}
-          />
-        );
-      case 'message':
-        return (
-          <MessageStep
-            messageVideo={messageVideo}
-            setMessageVideo={setMessageVideo}
-            isRecordingMessage={isRecordingMessage}
-            startMessageRecording={startMessageRecording}
-            stopMessageRecording={stopMessageRecording}
-            onNext={nextStep}
+          <MemoryReplayScreen
+            memories={memories}
+            onAddMemory={handleAddMemory}
+            onNext={() => goToNextStep('amount')}
           />
         );
       case 'amount':
@@ -139,15 +86,23 @@ const Gift = () => {
           <AmountStep
             amount={amount}
             setAmount={setAmount}
-            onNext={nextStep}
+            onNext={() => goToNextStep('recipient')}
           />
         );
-      case 'memory':
+      case 'recipient':
         return (
-          <MemoryStep
-            memory={memory}
-            setMemory={setMemory}
-            onNext={nextStep}
+          <RecipientStep
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            onNext={() => goToNextStep('message')}
+          />
+        );
+      case 'message':
+        return (
+          <MessageStep
+            messageVideo={messageVideo}
+            setMessageVideo={setMessageVideo}
+            onNext={() => goToNextStep('preview')}
           />
         );
       case 'preview':
@@ -158,14 +113,7 @@ const Gift = () => {
             amount={amount}
             messageVideo={messageVideo}
             memory={memory}
-            onNext={nextStep}
-          />
-        );
-      case 'replay':
-        return (
-          <MemoryReplayScreen
-            memories={memories}
-            onAddMemory={handleAddMemory}
+            onNext={() => goToNextStep('payment')}
           />
         );
       default:
