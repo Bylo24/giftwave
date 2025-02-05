@@ -4,6 +4,7 @@ import { BottomNav } from "@/components/ui/bottom-nav";
 import { Search, Gift, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -94,6 +95,45 @@ const Home = () => {
               <h3 className="font-medium">Enter your promo code</h3>
               <p className="text-sm text-gray-500">Have a code? Enter it here</p>
             </div>
+          </Card>
+
+          {/* FAQ Section */}
+          <Card className="p-4">
+            <h3 className="font-medium mb-4">Frequently Asked Questions</h3>
+            <ScrollArea className="h-[200px] w-full rounded-md">
+              <div className="space-y-4 pr-4">
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">How does GiftWave work?</h4>
+                  <p className="text-sm text-gray-500">
+                    GiftWave lets you send digital gifts to your friends and family. Choose a gift, add a personal message, and we'll deliver it instantly!
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">What types of gifts can I send?</h4>
+                  <p className="text-sm text-gray-500">
+                    You can send digital gift cards, custom messages, and even schedule future gifts for special occasions.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">How do I redeem a gift?</h4>
+                  <p className="text-sm text-gray-500">
+                    When you receive a gift, you'll get a notification. Simply click on the gift to view and redeem it instantly.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Can I send gifts internationally?</h4>
+                  <p className="text-sm text-gray-500">
+                    Yes! GiftWave works globally, allowing you to send gifts to friends and family anywhere in the world.
+                  </p>
+                </div>
+                <div className="space-y-2">
+                  <h4 className="font-medium text-sm">Are there any fees?</h4>
+                  <p className="text-sm text-gray-500">
+                    GiftWave is free to use! You only pay for the value of the gifts you send.
+                  </p>
+                </div>
+              </div>
+            </ScrollArea>
           </Card>
         </div>
       </div>
