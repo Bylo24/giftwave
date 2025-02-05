@@ -32,7 +32,7 @@ export const AccountSetup = () => {
         <h1 className="text-2xl font-semibold">Let's set up your account</h1>
         <p className="text-sm text-gray-500">
           We need your legal name to make sure it's really you. To add a preferred
-          name, go to Settings > Edit Profile.
+          name, go to Settings {'>'}  Edit Profile.
         </p>
       </div>
 
