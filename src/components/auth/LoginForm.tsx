@@ -2,36 +2,101 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
+import { Github, Mail } from "lucide-react";
 
 export const LoginForm = () => {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isSignUp, setIsSignUp] = useState(true);
 
-  const handlePhoneLogin = (e: React.FormEvent) => {
+  const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
-    navigate("/verify");
+    setIsLoading(true);
+
+    try {
+      const { error } = isSignUp
+        ? await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              emailRedirectTo: `${window.location.origin}/home`,
+            },
+          })
+        : await supabase.auth.signInWithPassword({
+            email,
+            password,
+          });
+
+      if (error) throw error;
+
+      if (isSignUp) {
+        toast.success("Check your email for the confirmation link!");
+      } else {
+        toast.success("Successfully logged in!");
+        navigate("/home");
+      }
+    } catch (error: any) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleOAuthLogin = async (provider: "google" | "github") => {
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: `${window.location.origin}/home`,
+        },
+      });
+      if (error) throw error;
+    } catch (error: any) {
+      toast.error(error.message);
+    }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center animate-fade-in bg-background">
       <div className="w-full max-w-md mx-auto p-6 space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold">GiftWave</h1>
-          <p className="text-sm text-gray-500">Your Gifting Companion</p>
+          <h1 className="text-2xl font-semibold">Welcome to GiftWave</h1>
+          <p className="text-sm text-gray-500">
+            {isSignUp ? "Create an account" : "Sign in to your account"}
+          </p>
         </div>
 
-        <form onSubmit={handlePhoneLogin} className="space-y-4">
-          <div className="space-y-2">
-            <Input
-              type="tel"
-              placeholder="Phone number"
-              value={phoneNumber}
-              onChange={(e) => setPhoneNumber(e.target.value)}
-              className="w-full"
-            />
-          </div>
-          <Button type="submit" className="w-full bg-primary hover:bg-primary/90">
-            Continue with phone
+        <form onSubmit={handleEmailAuth} className="space-y-4">
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            disabled={isLoading}
+          />
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            disabled={isLoading}
+          />
+          <Button
+            type="submit"
+            className="w-full"
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              "Loading..."
+            ) : isSignUp ? (
+              "Sign up with email"
+            ) : (
+              "Sign in with email"
+            )}
           </Button>
         </form>
 
@@ -47,7 +112,11 @@ export const LoginForm = () => {
         </div>
 
         <div className="grid gap-4">
-          <Button variant="outline" className="w-full" onClick={() => {}}>
+          <Button
+            variant="outline"
+            onClick={() => handleOAuthLogin("google")}
+            disabled={isLoading}
+          >
             <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
               <path
                 d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -68,16 +137,27 @@ export const LoginForm = () => {
             </svg>
             Continue with Google
           </Button>
+          <Button
+            variant="outline"
+            onClick={() => handleOAuthLogin("github")}
+            disabled={isLoading}
+          >
+            <Github className="mr-2 h-4 w-4" />
+            Continue with GitHub
+          </Button>
         </div>
 
         <div className="text-center text-sm">
-          <span className="text-muted-foreground">Don't have an account? </span>
+          <span className="text-muted-foreground">
+            {isSignUp ? "Already have an account? " : "Don't have an account? "}
+          </span>
           <Button
             variant="link"
             className="p-0 h-auto font-semibold"
-            onClick={() => navigate("/setup")}
+            onClick={() => setIsSignUp(!isSignUp)}
+            disabled={isLoading}
           >
-            Sign up
+            {isSignUp ? "Sign in" : "Sign up"}
           </Button>
         </div>
       </div>
