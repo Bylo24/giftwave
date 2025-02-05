@@ -6,53 +6,67 @@ import { BottomNav } from "@/components/ui/bottom-nav";
 import { ArrowLeft, Video, Upload, Camera, Phone, Gift as GiftIcon, DollarSign, Eye, CreditCard, MessageSquare } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { Textarea } from "@/components/ui/textarea";
 
-type Step = 'recipient' | 'video' | 'amount' | 'preview' | 'payment' | 'memory' | 'animation';
+type Step = 'recipient' | 'message' | 'amount' | 'preview' | 'payment' | 'memory' | 'animation';
 
 const Gift = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>('recipient');
   const [phoneNumber, setPhoneNumber] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [isRecording, setIsRecording] = useState(false);
-  const [mediaStream, setMediaStream] = useState<MediaStream | null>(null);
+  const [messageVideo, setMessageVideo] = useState<File | null>(null);
+  const [memoryVideo, setMemoryVideo] = useState<File | null>(null);
+  const [isRecordingMessage, setIsRecordingMessage] = useState(false);
+  const [messageStream, setMessageStream] = useState<MediaStream | null>(null);
   const [amount, setAmount] = useState('');
-  const [caption, setCaption] = useState('');
+  const [memoryCaption, setMemoryCaption] = useState('');
 
-  const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMessageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.type.startsWith('video/')) {
-        setSelectedFile(file);
-        toast.success('Video uploaded successfully!');
+        setMessageVideo(file);
+        toast.success('Video message uploaded successfully!');
       } else {
         toast.error('Please upload a video file');
       }
     }
   };
 
-  const startRecording = async () => {
+  const handleMemoryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      if (file.type.startsWith('video/')) {
+        setMemoryVideo(file);
+        toast.success('Memory video uploaded successfully!');
+      } else {
+        toast.error('Please upload a video file');
+      }
+    }
+  };
+
+  const startMessageRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-      setMediaStream(stream);
-      setIsRecording(true);
+      setMessageStream(stream);
+      setIsRecordingMessage(true);
       toast.success('Recording started!');
     } catch (error) {
       toast.error('Unable to access camera and microphone');
     }
   };
 
-  const stopRecording = () => {
-    if (mediaStream) {
-      mediaStream.getTracks().forEach(track => track.stop());
-      setMediaStream(null);
-      setIsRecording(false);
+  const stopMessageRecording = () => {
+    if (messageStream) {
+      messageStream.getTracks().forEach(track => track.stop());
+      setMessageStream(null);
+      setIsRecordingMessage(false);
       toast.success('Recording stopped!');
     }
   };
 
   const nextStep = () => {
-    const steps: Step[] = ['recipient', 'video', 'amount', 'preview', 'payment', 'memory', 'animation'];
+    const steps: Step[] = ['recipient', 'message', 'amount', 'preview', 'payment', 'memory', 'animation'];
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
@@ -85,13 +99,16 @@ const Gift = () => {
           </div>
         );
 
-      case 'video':
+      case 'message':
         return (
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
               <Video className="h-6 w-6 text-primary" />
-              <h2 className="text-lg font-medium">Record Message</h2>
+              <h2 className="text-lg font-medium">Record Message for Recipient</h2>
             </div>
+            <p className="text-sm text-gray-500">
+              Record a personal video message that will be played when they receive the gift
+            </p>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <Card className="p-4 cursor-pointer hover:bg-gray-50 transition-colors">
                 <label className="flex flex-col items-center gap-3 cursor-pointer">
@@ -99,25 +116,25 @@ const Gift = () => {
                     <Upload className="h-6 w-6 text-primary" />
                   </div>
                   <div className="text-center">
-                    <p className="font-medium">Upload Video</p>
+                    <p className="font-medium">Upload Message</p>
                     <p className="text-sm text-gray-500">Max size: 100MB</p>
                   </div>
                   <input
                     type="file"
                     accept="video/*"
                     className="hidden"
-                    onChange={handleFileUpload}
+                    onChange={handleMessageUpload}
                   />
                 </label>
               </Card>
 
               <Card 
                 className="p-4 cursor-pointer hover:bg-gray-50 transition-colors"
-                onClick={isRecording ? stopRecording : startRecording}
+                onClick={isRecordingMessage ? stopMessageRecording : startMessageRecording}
               >
                 <div className="flex flex-col items-center gap-3">
                   <div className="p-3 bg-pink-50 rounded-full">
-                    {isRecording ? (
+                    {isRecordingMessage ? (
                       <Video className="h-6 w-6 text-red-500" />
                     ) : (
                       <Camera className="h-6 w-6 text-pink-500" />
@@ -125,10 +142,10 @@ const Gift = () => {
                   </div>
                   <div className="text-center">
                     <p className="font-medium">
-                      {isRecording ? 'Stop Recording' : 'Record Video'}
+                      {isRecordingMessage ? 'Stop Recording' : 'Record Message'}
                     </p>
                     <p className="text-sm text-gray-500">
-                      {isRecording ? 'Recording in progress...' : 'Create a new memory'}
+                      {isRecordingMessage ? 'Recording in progress...' : 'Create a new message'}
                     </p>
                   </div>
                 </div>
@@ -138,7 +155,7 @@ const Gift = () => {
               className="w-full" 
               onClick={nextStep}
             >
-              {selectedFile || isRecording ? 'Continue' : 'Skip Video Message'}
+              {messageVideo || isRecordingMessage ? 'Continue' : 'Skip Message'}
             </Button>
           </div>
         );
@@ -190,7 +207,8 @@ const Gift = () => {
               <div className="space-y-3">
                 <p className="font-medium">Recipient: {phoneNumber}</p>
                 <p className="font-medium">Amount: ${amount}</p>
-                {selectedFile && <p className="font-medium">Video message attached</p>}
+                {messageVideo && <p className="font-medium">Video message attached</p>}
+                {memoryVideo && <p className="font-medium">Memory video attached</p>}
               </div>
             </Card>
             <Button className="w-full" onClick={nextStep}>
@@ -232,16 +250,39 @@ const Gift = () => {
           <div className="space-y-4">
             <div className="flex items-center gap-3 mb-4">
               <MessageSquare className="h-6 w-6 text-primary" />
-              <h2 className="text-lg font-medium">Add Memory</h2>
+              <h2 className="text-lg font-medium">Add a Memory</h2>
             </div>
-            <Input
-              placeholder="Add a caption..."
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-              className="mb-4"
+            <p className="text-sm text-gray-500">
+              Upload a special memory that will be played after your message
+            </p>
+            <Card className="p-4">
+              <label className="flex flex-col items-center gap-3 cursor-pointer">
+                <div className="p-3 bg-purple-50 rounded-full">
+                  <Upload className="h-6 w-6 text-purple-500" />
+                </div>
+                <div className="text-center">
+                  <p className="font-medium">Upload Memory Video</p>
+                  <p className="text-sm text-gray-500">Share a special moment</p>
+                </div>
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="hidden"
+                  onChange={handleMemoryUpload}
+                />
+              </label>
+            </Card>
+            <Textarea
+              placeholder="Add a caption to your memory..."
+              value={memoryCaption}
+              onChange={(e) => setMemoryCaption(e.target.value)}
+              className="min-h-[100px]"
             />
-            <Button className="w-full" onClick={nextStep}>
-              Finish Gift
+            <Button 
+              className="w-full" 
+              onClick={nextStep}
+            >
+              {memoryVideo ? 'Continue' : 'Skip Memory'}
             </Button>
           </div>
         );
@@ -260,6 +301,9 @@ const Gift = () => {
             </Button>
           </div>
         );
+
+      default:
+        return null;
     }
   };
 
