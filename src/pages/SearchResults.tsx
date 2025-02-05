@@ -32,15 +32,15 @@ const SearchResults = () => {
 
   return (
     <div className="min-h-screen bg-white pb-16">
-      <div className="p-4 space-y-4">
-        <div className="flex items-center gap-4">
+      <div className="p-4 space-y-4 max-w-2xl mx-auto">
+        <div className="flex items-center gap-4 w-full">
           <button 
             onClick={() => navigate("/")}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors shrink-0"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
-          <div className="relative flex-1">
+          <div className="relative flex-1 max-w-[calc(100%-4rem)]">
             <Search 
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer" 
               onClick={handleSearch}
