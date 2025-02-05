@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
+import { demoGifts } from "@/utils/demoGifts";
 
 const CollectGift = () => {
   const { giftId } = useParams();
@@ -16,26 +17,18 @@ const CollectGift = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
 
-  // Mock gift data - in a real app, this would be fetched based on giftId
-  const mockGift = {
-    theme: "birthday" as const,
-    amount: "50",
-    messageVideo: new File([], "mock-video.mp4"),
-    memories: [
-      {
-        id: "1",
-        imageUrl: "/placeholder.svg",
-        caption: "Remember this day?",
-        date: new Date()
-      },
-      {
-        id: "2",
-        imageUrl: "/placeholder.svg",
-        caption: "Such a great moment!",
-        date: new Date()
-      },
-    ],
-  };
+  const gift = giftId ? demoGifts[giftId] : null;
+
+  if (!gift) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold mb-2">Gift Not Found</h1>
+          <p className="text-muted-foreground">This gift doesn't exist or has already been collected.</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleAnimationComplete = () => {
     if (isReplay) {
@@ -67,9 +60,9 @@ const CollectGift = () => {
     return (
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
-          messageVideo={mockGift.messageVideo}
-          amount={mockGift.amount}
-          memories={mockGift.memories}
+          messageVideo={gift.messageVideo}
+          amount={gift.amount}
+          memories={gift.memories}
           onComplete={handleAnimationComplete}
           memory={{
             caption: "",

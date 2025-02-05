@@ -1,39 +1,11 @@
 import { Card } from "@/components/ui/card";
 import { Gift, Calendar, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
-interface Memory {
-  id: string;
-  sender: string;
-  amount: number;
-  date: string;
-  message?: string;
-  videoUrl?: string;
-  imageUrl?: string;
-}
-
-// For demo purposes - in a real app this would come from your backend
-const mockMemories: Memory[] = [
-  {
-    id: "gift-1",
-    sender: "John Doe",
-    amount: 50,
-    date: "2024-02-14",
-    message: "Happy Birthday! 🎉",
-    videoUrl: "/mock-video.mp4",
-  },
-  {
-    id: "gift-2",
-    sender: "Jane Smith",
-    amount: 100,
-    date: "2024-01-01",
-    message: "For your special day!",
-    videoUrl: "/mock-video.mp4",
-  },
-];
+import { demoGifts } from "@/utils/demoGifts";
 
 export const MemoriesGrid = () => {
   const navigate = useNavigate();
+  const memories = Object.values(demoGifts);
 
   const handleGiftReplay = (giftId: string) => {
     navigate(`/collect/${giftId}?replay=true`);
@@ -42,11 +14,11 @@ export const MemoriesGrid = () => {
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-        Gift Memories
+        Your Gift Memories
       </h2>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {mockMemories.map((memory) => (
+        {memories.map((memory) => (
           <Card 
             key={memory.id}
             className="p-4 hover:shadow-lg transition-shadow animate-fade-in cursor-pointer"
@@ -54,15 +26,15 @@ export const MemoriesGrid = () => {
           >
             <div className="flex items-start justify-between">
               <div className="space-y-2">
-                <p className="font-medium text-purple-600">{memory.sender}</p>
-                <p className="text-2xl font-bold">${memory.amount}</p>
-                <p className="text-gray-600">{memory.message}</p>
-              </div>
-              <div className="flex flex-col items-center gap-2">
-                <Calendar className="h-5 w-5 text-gray-400" />
-                <p className="text-sm text-gray-400">
-                  {new Date(memory.date).toLocaleDateString()}
-                </p>
+                <div className="flex items-center gap-2">
+                  <Gift className="h-4 w-4 text-purple-500" />
+                  <span className="font-medium">{memory.sender}</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <Calendar className="h-4 w-4" />
+                  <span>{new Date(memory.date).toLocaleDateString()}</span>
+                </div>
+                <p className="text-lg font-bold">${memory.amount}</p>
               </div>
             </div>
             <div className="mt-4 flex items-center gap-2 text-pink-500">
