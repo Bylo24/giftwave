@@ -34,6 +34,7 @@ const Gift = () => {
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>('birthday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
+  const [isRecordingMessage, setIsRecordingMessage] = useState(false);
   const [amount, setAmount] = useState('');
   const [memory, setMemory] = useState<GiftMemory>({
     caption: '',
@@ -61,6 +62,18 @@ const Gift = () => {
     };
     setMemories(prev => [...prev, memoryWithId]);
     toast.success("Memory added successfully!");
+  };
+
+  const startMessageRecording = () => {
+    setIsRecordingMessage(true);
+    // Here you would typically implement the actual video recording logic
+    toast.info("Recording started...");
+  };
+
+  const stopMessageRecording = () => {
+    setIsRecordingMessage(false);
+    // Here you would typically implement the logic to save the recorded video
+    toast.success("Recording stopped!");
   };
 
   const renderStep = () => {
@@ -102,6 +115,9 @@ const Gift = () => {
           <MessageStep
             messageVideo={messageVideo}
             setMessageVideo={setMessageVideo}
+            isRecordingMessage={isRecordingMessage}
+            startMessageRecording={startMessageRecording}
+            stopMessageRecording={stopMessageRecording}
             onNext={() => goToNextStep('preview')}
           />
         );
