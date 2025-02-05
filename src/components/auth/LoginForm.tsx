@@ -16,7 +16,11 @@ export const LoginForm = () => {
     <div className="min-h-screen flex items-center justify-center animate-fade-in">
       <div className="w-full max-w-md mx-auto p-6 space-y-8">
         <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold">GiftWave</h1>
+          <img 
+            src="/giftwave-logo.png" 
+            alt="GiftWave Logo" 
+            className="h-12 mx-auto"
+          />
           <p className="text-sm text-gray-500">Your Gifting Companion</p>
         </div>
 
