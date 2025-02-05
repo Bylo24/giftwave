@@ -3,8 +3,9 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Mail, Phone, User } from "lucide-react";
+import { Camera, Mail, Phone, User, Users } from "lucide-react";
 import { BottomNav } from "@/components/ui/bottom-nav";
+import { toast } from "sonner";
 
 const Profile = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
@@ -15,6 +16,7 @@ const Profile = () => {
       const reader = new FileReader();
       reader.onloadend = () => {
         setProfileImage(reader.result as string);
+        toast.success("Profile picture updated!");
       };
       reader.readAsDataURL(file);
     }
@@ -84,10 +86,18 @@ const Profile = () => {
           </div>
 
           <Button 
-            className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6]"
+            className="w-full bg-[#9b87f5] hover:bg-[#8B5CF6] text-white"
             onClick={() => console.log("Edit profile")}
           >
             Edit Profile
+          </Button>
+
+          <Button 
+            className="w-full bg-gradient-to-r from-[#D946EF] to-[#9b87f5] hover:opacity-90 text-white"
+            onClick={() => console.log("View friends")}
+          >
+            <Users className="w-5 h-5 mr-2" />
+            My Friends
           </Button>
         </Card>
       </div>
