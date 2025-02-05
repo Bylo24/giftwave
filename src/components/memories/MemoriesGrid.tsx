@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Gift, Calendar, Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface Memory {
   id: string;
@@ -11,24 +12,33 @@ interface Memory {
   imageUrl?: string;
 }
 
+// For demo purposes - in a real app this would come from your backend
 const mockMemories: Memory[] = [
   {
-    id: "1",
+    id: "gift-1",
     sender: "John Doe",
     amount: 50,
     date: "2024-02-14",
     message: "Happy Birthday! 🎉",
+    videoUrl: "/mock-video.mp4",
   },
   {
-    id: "2",
+    id: "gift-2",
     sender: "Jane Smith",
     amount: 100,
     date: "2024-01-01",
     message: "For your special day!",
+    videoUrl: "/mock-video.mp4",
   },
 ];
 
 export const MemoriesGrid = () => {
+  const navigate = useNavigate();
+
+  const handleGiftReplay = (giftId: string) => {
+    navigate(`/collect/${giftId}?replay=true`);
+  };
+
   return (
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
@@ -39,7 +49,8 @@ export const MemoriesGrid = () => {
         {mockMemories.map((memory) => (
           <Card 
             key={memory.id}
-            className="p-4 hover:shadow-lg transition-shadow animate-fade-in"
+            className="p-4 hover:shadow-lg transition-shadow animate-fade-in cursor-pointer"
+            onClick={() => handleGiftReplay(memory.id)}
           >
             <div className="flex items-start justify-between">
               <div className="space-y-2">
@@ -56,7 +67,7 @@ export const MemoriesGrid = () => {
             </div>
             <div className="mt-4 flex items-center gap-2 text-pink-500">
               <Heart className="h-4 w-4" />
-              <span className="text-sm">Tap to revisit this memory</span>
+              <span className="text-sm">Tap to replay this memory</span>
             </div>
           </Card>
         ))}

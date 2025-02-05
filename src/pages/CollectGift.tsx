@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
@@ -7,6 +7,8 @@ import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 
 const CollectGift = () => {
   const { giftId } = useParams();
+  const [searchParams] = useSearchParams();
+  const isReplay = searchParams.get('replay') === 'true';
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showVerification, setShowVerification] = useState(false);
@@ -36,12 +38,15 @@ const CollectGift = () => {
   };
 
   const handleAnimationComplete = () => {
-    setIsAnimationComplete(true);
+    if (isReplay) {
+      navigate('/my-gifts');
+    } else {
+      setIsAnimationComplete(true);
+    }
   };
 
   const handlePhoneSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would send a verification code to the phone number
     toast({
       title: "Verification code sent",
       description: "Please check your phone for the code",
@@ -51,7 +56,6 @@ const CollectGift = () => {
 
   const handleCodeSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, this would verify the code and transfer the money
     toast({
       title: "Gift collected!",
       description: "The money has been added to your wallet",
@@ -59,7 +63,7 @@ const CollectGift = () => {
     navigate("/wallet");
   };
 
-  if (!isAnimationComplete) {
+  if (!isAnimationComplete || isReplay) {
     return (
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
