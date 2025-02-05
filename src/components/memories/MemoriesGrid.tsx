@@ -1,19 +1,48 @@
 import { Card } from "@/components/ui/card";
 import { Gift, Calendar, Heart, PartyPopper, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { demoGifts } from "@/utils/demoGifts";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
-export const MemoriesGrid = () => {
+interface Gift {
+  id: string;
+  sender: { full_name: string } | null;
+  amount: number;
+  created_at: string;
+  sender_id: string;
+}
+
+interface MemoriesGridProps {
+  gifts: Gift[];
+}
+
+export const MemoriesGrid = ({ gifts }: MemoriesGridProps) => {
   const navigate = useNavigate();
-  const memories = Object.values(demoGifts);
 
   const handleGiftReplay = (giftId: string) => {
     navigate(`/collect/${giftId}?replay=true`);
     toast.success("Opening gift preview...");
   };
+
+  if (!gifts.length) {
+    return (
+      <div className="space-y-6">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+            Your Gift Memories
+          </h2>
+          <p className="text-muted-foreground">No gifts found yet</p>
+        </div>
+        <Card className="p-8 text-center space-y-4">
+          <Gift className="h-12 w-12 mx-auto text-purple-500" />
+          <p className="text-lg text-muted-foreground">
+            You haven't received any gifts yet
+          </p>
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -25,11 +54,11 @@ export const MemoriesGrid = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {memories.map((memory) => (
+        {gifts.map((gift) => (
           <Card 
-            key={memory.id}
+            key={gift.id}
             className="p-6 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer group"
-            onClick={() => handleGiftReplay(memory.id)}
+            onClick={() => handleGiftReplay(gift.id)}
           >
             <div className="space-y-4">
               {/* Header */}
@@ -39,16 +68,18 @@ export const MemoriesGrid = () => {
                     <div className="p-2 bg-purple-100 rounded-full">
                       <Gift className="h-4 w-4 text-purple-500" />
                     </div>
-                    <span className="font-medium text-lg">{memory.sender}</span>
+                    <span className="font-medium text-lg">
+                      {gift.sender?.full_name || "Anonymous"}
+                    </span>
                   </div>
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
                     <Calendar className="h-4 w-4" />
-                    <span>{new Date(memory.date).toLocaleDateString()}</span>
+                    <span>{new Date(gift.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>
                 <Badge variant="secondary" className="bg-green-100 text-green-700">
                   <DollarSign className="h-4 w-4 mr-1" />
-                  {memory.amount}
+                  ${gift.amount}
                 </Badge>
               </div>
 
