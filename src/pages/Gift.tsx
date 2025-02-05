@@ -12,7 +12,7 @@ import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
-type Step = 'theme' | 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment' | 'replay';
+type Step = 'theme' | 'memory' | 'recipient' | 'message' | 'amount' | 'preview' | 'payment' | 'replay';
 
 interface GiftMemory {
   caption: string;
@@ -30,6 +30,7 @@ interface Memory {
 const Gift = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>('theme');
+  const [previousSteps, setPreviousSteps] = useState<Step[]>([]);
   const [selectedTheme, setSelectedTheme] = useState<ThemeType>('birthday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
@@ -41,6 +42,19 @@ const Gift = () => {
     date: new Date()
   });
   const [memories, setMemories] = useState<Memory[]>([]);
+
+  const goToPreviousStep = () => {
+    if (previousSteps.length > 0) {
+      const prevStep = previousSteps[previousSteps.length - 1];
+      setCurrentStep(prevStep);
+      setPreviousSteps(prev => prev.slice(0, -1));
+    }
+  };
+
+  const goToNextStep = (nextStep: Step) => {
+    setPreviousSteps(prev => [...prev, currentStep]);
+    setCurrentStep(nextStep);
+  };
 
   const startMessageRecording = async () => {
     try {
@@ -164,7 +178,7 @@ const Gift = () => {
       <div className="p-4 space-y-6 max-w-2xl mx-auto">
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => navigate("/")}
+            onClick={goToPreviousStep}
             className="p-2 hover:bg-white/80 rounded-full transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
