@@ -38,7 +38,7 @@ export const MessageStep = ({
   };
 
   return (
-    <Card className="p-6 space-y-4 bg-gradient-to-br from-orange-50 to-yellow-50 max-w-md mx-auto">
+    <Card className="p-6 space-y-4 bg-gradient-to-br from-orange-50 to-yellow-50">
       <div className="flex items-center gap-3 mb-4">
         <div className="p-3 bg-secondary/10 rounded-full animate-pulse">
           <Video className="h-6 w-6 text-secondary" />
