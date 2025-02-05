@@ -26,7 +26,7 @@ export const ProfileInfo = ({ user, profile }: ProfileInfoProps) => {
         <div className="relative">
           <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
           <Input 
-            value={profile?.phone || "Not set"}
+            value={profile?.phone_number || "Not set"}
             readOnly
             className="pl-10 bg-[#F9F9F9] border-gray-200"
           />
