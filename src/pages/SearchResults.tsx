@@ -5,6 +5,32 @@ import { Search, ArrowLeft } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useState } from "react";
 
+// Define the type for our mock data
+interface MockResult {
+  id: number;
+  name: string;
+  username: string;
+}
+
+// Add mock data
+const mockResults: MockResult[] = [
+  {
+    id: 1,
+    name: "Sarah Johnson",
+    username: "@sarahj"
+  },
+  {
+    id: 2,
+    name: "Mike Smith",
+    username: "@mikesmith"
+  },
+  {
+    id: 3,
+    name: "Emma Wilson",
+    username: "@emmaw"
+  }
+];
+
 const SearchResults = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
