@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Camera, Mail, Phone, User, Gift, Calendar, DollarSign } from "lucide-react";
+import { Camera, Mail, Phone, User, Gift, Calendar, DollarSign, ChevronRight } from "lucide-react";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -24,125 +24,100 @@ const Profile = () => {
     }
   };
 
-  // Mock data for gifts
-  const recentGifts = [
-    {
-      id: 1,
-      type: "Birthday Gift",
-      amount: 50,
-      date: "2024-02-15",
-      from: "Sarah Johnson",
-      message: "Happy birthday! Hope you have a wonderful day! 🎉",
-    },
-    {
-      id: 2,
-      type: "Anniversary Gift",
-      amount: 100,
-      date: "2024-02-10",
-      from: "Michael Smith",
-      message: "Congratulations on your special day! 🎊",
-    },
-  ];
-
   return (
-    <div className="min-h-screen bg-[#E5DEFF] pb-16">
-      <div className="p-4 space-y-6 max-w-2xl mx-auto">
-        <h1 className="text-2xl font-bold text-[#1A1F2C] text-center">My Profile</h1>
-        
-        <div className="relative w-32 h-32 mx-auto">
-          <Avatar className="w-full h-full border-4 border-[#9b87f5]">
-            <AvatarImage src={profileImage || ""} />
-            <AvatarFallback className="bg-[#D6BCFA] text-[#6E59A5] text-2xl">
-              <User className="w-12 h-12" />
-            </AvatarFallback>
-          </Avatar>
-          <label 
-            htmlFor="profile-upload" 
-            className="absolute bottom-0 right-0 p-2 bg-[#9b87f5] rounded-full cursor-pointer hover:bg-[#8B5CF6] transition-colors"
-          >
-            <Camera className="w-5 h-5 text-white" />
-          </label>
-          <input
-            id="profile-upload"
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={handleImageUpload}
-          />
+    <div className="min-h-screen bg-[#F1F1F1] pb-16">
+      <div className="p-4 space-y-4 max-w-2xl mx-auto">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-xl font-semibold text-[#2C2E2F]">Profile Settings</h1>
         </div>
-
-        <Card className="p-6 space-y-4 border-[#9b87f5]">
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#6E59A5]">Full Name</label>
-              <Input 
-                value="John Doe"
-                readOnly
-                className="bg-[#E5DEFF] border-[#9b87f5]"
+        
+        <Card className="p-6 bg-white shadow-sm border-0">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="relative">
+              <Avatar className="w-20 h-20 border-2 border-[#E5E5E5]">
+                <AvatarImage src={profileImage || ""} />
+                <AvatarFallback className="bg-[#F5F5F5] text-[#666]">
+                  <User className="w-8 h-8" />
+                </AvatarFallback>
+              </Avatar>
+              <label 
+                htmlFor="profile-upload" 
+                className="absolute bottom-0 right-0 p-1.5 bg-white rounded-full cursor-pointer hover:bg-gray-50 transition-colors border border-gray-200 shadow-sm"
+              >
+                <Camera className="w-4 h-4 text-[#666]" />
+              </label>
+              <input
+                id="profile-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageUpload}
               />
             </div>
-            
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#6E59A5]">Email</label>
+            <div>
+              <h2 className="font-medium text-[#2C2E2F]">John Doe</h2>
+              <p className="text-sm text-gray-500">Update your photo and personal details</p>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-[#666]">Email</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7E69AB]" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input 
                   value="john.doe@example.com"
                   readOnly
-                  className="pl-10 bg-[#E5DEFF] border-[#9b87f5]"
+                  className="pl-10 bg-[#F9F9F9] border-gray-200"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-[#6E59A5]">Phone</label>
+            <div className="space-y-1">
+              <label className="text-sm font-medium text-[#666]">Phone</label>
               <div className="relative">
-                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#7E69AB]" />
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input 
                   value="+1 234 567 8900"
                   readOnly
-                  className="pl-10 bg-[#E5DEFF] border-[#9b87f5]"
+                  className="pl-10 bg-[#F9F9F9] border-gray-200"
                 />
               </div>
             </div>
           </div>
+        </Card>
 
-          <div className="space-y-4">
-            <h2 className="text-xl font-semibold text-[#1A1F2C] flex items-center gap-2">
-              <Gift className="w-5 h-5 text-[#9b87f5]" />
-              My Gifts
-            </h2>
-            
-            {recentGifts.map((gift) => (
-              <Card key={gift.id} className="p-4 hover:shadow-lg transition-all duration-300 border-[#9b87f5]/20">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-2">
-                    <h3 className="font-semibold text-[#1A1F2C]">{gift.type}</h3>
-                    <p className="text-sm text-gray-600">From: {gift.from}</p>
-                    <p className="text-sm italic text-gray-500">"{gift.message}"</p>
-                  </div>
-                  <div className="text-right">
-                    <div className="flex items-center gap-1 text-green-600 font-semibold">
-                      <DollarSign className="w-4 h-4" />
-                      <span>{gift.amount}</span>
-                    </div>
-                    <div className="flex items-center gap-1 text-sm text-gray-500 mt-1">
-                      <Calendar className="w-4 h-4" />
-                      <span>{new Date(gift.date).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            ))}
+        <Card className="divide-y bg-white shadow-sm border-0">
+          <div 
+            className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => navigate("/my-gifts")}
+          >
+            <div className="flex items-center gap-3">
+              <Gift className="w-5 h-5 text-[#666]" />
+              <span className="font-medium text-[#2C2E2F]">My Gifts</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-gray-400" />
+          </div>
 
-            <Button 
-              className="w-full bg-gradient-to-r from-[#9b87f5] to-purple-500 hover:opacity-90 text-white"
-              onClick={() => navigate("/my-gifts")}
-            >
-              View All Gifts
-            </Button>
+          <div 
+            className="p-4 flex items-center justify-between cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => navigate("/wallet")}
+          >
+            <div className="flex items-center gap-3">
+              <DollarSign className="w-5 h-5 text-[#666]" />
+              <span className="font-medium text-[#2C2E2F]">Payment Methods</span>
+            </div>
+            <ChevronRight className="w-5 h-5 text-gray-400" />
           </div>
         </Card>
+
+        <Button 
+          variant="outline"
+          className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+          onClick={() => navigate("/")}
+        >
+          Sign Out
+        </Button>
       </div>
       <BottomNav />
     </div>
