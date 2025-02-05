@@ -34,7 +34,9 @@ export const LoginForm = () => {
           </div>
         </div>
 
-        <GoogleAuthButton isLoading={isLoading} />
+        <div className="flex justify-center">
+          <GoogleAuthButton isLoading={isLoading} />
+        </div>
 
         <AuthToggle
           isSignUp={isSignUp}
