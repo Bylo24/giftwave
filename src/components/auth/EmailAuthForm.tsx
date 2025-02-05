@@ -16,8 +16,23 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
+  const validateForm = () => {
+    if (!email || !email.includes("@")) {
+      toast.error("Please enter a valid email address");
+      return false;
+    }
+    if (!password || password.length < 6) {
+      toast.error("Password must be at least 6 characters long");
+      return false;
+    }
+    return true;
+  };
+
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!validateForm()) return;
+    
     setIsLoading(true);
 
     try {
@@ -30,19 +45,25 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
           },
         });
         if (error) throw error;
-        toast.success("Check your email for the confirmation link!");
-        navigate("/verify");
+        toast.success("Account created successfully! You can now sign in.");
+        navigate("/home");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password,
         });
-        if (error) throw error;
+        if (error) {
+          if (error.message === "Invalid login credentials") {
+            throw new Error("Invalid email or password. Please try again.");
+          }
+          throw error;
+        }
         toast.success("Successfully logged in!");
         navigate("/home");
       }
     } catch (error: any) {
       toast.error(error.message);
+      console.error("Auth error:", error);
     } finally {
       setIsLoading(false);
     }
@@ -56,6 +77,7 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         disabled={isLoading}
+        required
       />
       <Input
         type="password"
@@ -63,6 +85,8 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
         value={password}
         onChange={(e) => setPassword(e.target.value)}
         disabled={isLoading}
+        required
+        minLength={6}
       />
       <Button
         type="submit"
