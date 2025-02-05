@@ -15,6 +15,7 @@ import SearchResults from "./pages/SearchResults";
 import Gift from "./pages/Gift";
 import MyGifts from "./pages/MyGifts";
 import Profile from "./pages/Profile";
+import Notifications from "./pages/Notifications";
 
 function App() {
   const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ function App() {
             <Route path="/gift" element={<Gift />} />
             <Route path="/my-gifts" element={<MyGifts />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/notifications" element={<Notifications />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
