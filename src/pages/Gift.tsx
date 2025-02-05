@@ -5,6 +5,7 @@ import { ArrowLeft } from "lucide-react";
 import { RecipientStep } from "@/components/gift/RecipientStep";
 import { MessageStep } from "@/components/gift/MessageStep";
 import { AmountStep } from "@/components/gift/AmountStep";
+import { PreviewStep } from "@/components/gift/PreviewStep";
 import { toast } from "sonner";
 
 type Step = 'recipient' | 'message' | 'amount' | 'preview' | 'payment' | 'memory' | 'animation';
@@ -74,6 +75,15 @@ const Gift = () => {
           <AmountStep
             amount={amount}
             setAmount={setAmount}
+            onNext={nextStep}
+          />
+        );
+      case 'preview':
+        return (
+          <PreviewStep
+            phoneNumber={phoneNumber}
+            amount={amount}
+            messageVideo={messageVideo}
             onNext={nextStep}
           />
         );
