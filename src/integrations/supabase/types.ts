@@ -9,6 +9,74 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      gift_memories: {
+        Row: {
+          caption: string
+          created_at: string
+          date: string
+          gift_id: string | null
+          id: string
+          image_url: string | null
+        }
+        Insert: {
+          caption: string
+          created_at?: string
+          date?: string
+          gift_id?: string | null
+          id?: string
+          image_url?: string | null
+        }
+        Update: {
+          caption?: string
+          created_at?: string
+          date?: string
+          gift_id?: string | null
+          id?: string
+          image_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_memories_gift_id_fkey"
+            columns: ["gift_id"]
+            isOneToOne: false
+            referencedRelation: "gifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      gifts: {
+        Row: {
+          amount: number
+          created_at: string
+          id: string
+          message_video_url: string | null
+          recipient_phone: string | null
+          sender_id: string | null
+          theme: string
+          updated_at: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          id?: string
+          message_video_url?: string | null
+          recipient_phone?: string | null
+          sender_id?: string | null
+          theme: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          id?: string
+          message_video_url?: string | null
+          recipient_phone?: string | null
+          sender_id?: string | null
+          theme?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

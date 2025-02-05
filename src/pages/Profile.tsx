@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,20 +7,82 @@ import { Camera, Mail, Phone, User, Gift, Calendar, DollarSign, ChevronRight } f
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Profile = () => {
   const navigate = useNavigate();
+  const { user, signOut } = useAuth();
   const [profileImage, setProfileImage] = useState<string | null>(null);
+  const [profile, setProfile] = useState<any>(null);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (user) {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        if (error) {
+          console.error('Error fetching profile:', error);
+          toast.error('Failed to load profile');
+        } else if (data) {
+          setProfile(data);
+          if (data.avatar_url) {
+            setProfileImage(data.avatar_url);
+          }
+        }
+      }
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfileImage(reader.result as string);
-        toast.success("Profile picture updated!");
-      };
-      reader.readAsDataURL(file);
+    if (file && user) {
+      try {
+        // Upload to Supabase Storage
+        const fileExt = file.name.split('.').pop();
+        const filePath = `${user.id}/avatar.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('avatars')
+          .upload(filePath, file, { upsert: true });
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('avatars')
+          .getPublicUrl(filePath);
+
+        // Update profile
+        const { error: updateError } = await supabase
+          .from('profiles')
+          .update({ avatar_url: publicUrl })
+          .eq('id', user.id);
+
+        if (updateError) throw updateError;
+
+        setProfileImage(publicUrl);
+        toast.success('Profile picture updated!');
+      } catch (error) {
+        console.error('Error uploading image:', error);
+        toast.error('Failed to update profile picture');
+      }
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      navigate('/login');
+      toast.success('Signed out successfully');
+    } catch (error) {
+      toast.error('Failed to sign out');
     }
   };
 
@@ -37,7 +99,7 @@ const Profile = () => {
               <Avatar className="w-20 h-20 border-2 border-[#E5E5E5]">
                 <AvatarImage src={profileImage || ""} />
                 <AvatarFallback className="bg-[#F5F5F5] text-[#666]">
-                  <User className="w-8 h-8" />
+                  {user?.email?.[0]?.toUpperCase() || <User className="w-8 h-8" />}
                 </AvatarFallback>
               </Avatar>
               <label 
@@ -55,7 +117,7 @@ const Profile = () => {
               />
             </div>
             <div>
-              <h2 className="font-medium text-[#2C2E2F]">John Doe</h2>
+              <h2 className="font-medium text-[#2C2E2F]">{profile?.full_name || user?.email}</h2>
               <p className="text-sm text-gray-500">Update your photo and personal details</p>
             </div>
           </div>
@@ -66,7 +128,7 @@ const Profile = () => {
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input 
-                  value="john.doe@example.com"
+                  value={user?.email || ""}
                   readOnly
                   className="pl-10 bg-[#F9F9F9] border-gray-200"
                 />
@@ -78,7 +140,7 @@ const Profile = () => {
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <Input 
-                  value="+1 234 567 8900"
+                  value={profile?.phone || "Not set"}
                   readOnly
                   className="pl-10 bg-[#F9F9F9] border-gray-200"
                 />
@@ -114,7 +176,7 @@ const Profile = () => {
         <Button 
           variant="outline"
           className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
-          onClick={() => navigate("/")}
+          onClick={handleSignOut}
         >
           Sign Out
         </Button>
