@@ -3,11 +3,13 @@ import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Search, ArrowLeft } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { useState } from "react";
 
 const SearchResults = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const query = searchParams.get("q") || "";
+  const [searchInput, setSearchInput] = useState(query);
 
   // Mock search results - in a real app, this would come from an API
   const mockResults = [
@@ -16,28 +18,39 @@ const SearchResults = () => {
     { id: 3, name: "Mike Johnson", username: "@mikej" },
   ];
 
+  const handleSearch = () => {
+    if (searchInput) {
+      navigate(`/search?q=${encodeURIComponent(searchInput)}`);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
+
   return (
     <div className="min-h-screen bg-white pb-16">
       <div className="p-4 space-y-4">
         <div className="flex items-center gap-4">
           <button 
-            onClick={() => navigate(-1)}
+            onClick={() => navigate("/")}
             className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search 
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer" 
+              onClick={handleSearch}
+            />
             <Input 
               className="pl-10 bg-gray-50"
               placeholder="Search profiles or add contacts"
-              defaultValue={query}
-              onChange={(e) => {
-                const newQuery = e.target.value;
-                if (newQuery) {
-                  navigate(`/search?q=${encodeURIComponent(newQuery)}`);
-                }
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyPress={handleKeyPress}
             />
           </div>
         </div>

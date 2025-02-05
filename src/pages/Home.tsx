@@ -3,9 +3,23 @@ import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Search, Gift, Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const Home = () => {
   const navigate = useNavigate();
+  const [searchInput, setSearchInput] = useState("");
+
+  const handleSearch = () => {
+    if (searchInput) {
+      navigate(`/search?q=${encodeURIComponent(searchInput)}`);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleSearch();
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white pb-16">
@@ -13,16 +27,16 @@ const Home = () => {
       <div className="p-4 space-y-4">
         <div className="flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-[85%]">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+            <Search 
+              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer" 
+              onClick={handleSearch}
+            />
             <Input 
               className="pl-10 bg-gray-50 cursor-text" 
               placeholder="Search profiles or add contacts"
-              onChange={(e) => {
-                const query = e.target.value;
-                if (query) {
-                  navigate(`/search?q=${encodeURIComponent(query)}`);
-                }
-              }}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onKeyPress={handleKeyPress}
             />
           </div>
         </div>
