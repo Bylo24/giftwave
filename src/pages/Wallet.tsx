@@ -1,6 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { Wallet as WalletIcon, Plus, ArrowDownUp } from "lucide-react";
+import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
 
 const Wallet = () => {
   return (
@@ -30,10 +30,10 @@ const Wallet = () => {
 
           <Card 
             className="p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors"
-            onClick={() => {/* Transfer handler */}}
+            onClick={() => {/* Deposit handler */}}
           >
-            <ArrowDownUp className="h-6 w-6 mx-auto mb-2 text-primary" />
-            <p className="font-medium">Transfer</p>
+            <Download className="h-6 w-6 mx-auto mb-2 text-primary" />
+            <p className="font-medium">Deposit</p>
           </Card>
         </div>
 
