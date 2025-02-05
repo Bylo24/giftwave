@@ -1,7 +1,7 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { Search, Gift, Heart } from "lucide-react";
+import { Search, Gift, Heart, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,7 +25,7 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white pb-16">
       <div className="p-4 space-y-4">
-        <div className="flex items-center justify-center gap-4">
+        <div className="flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-[500px]">
             <Search 
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer" 
@@ -38,6 +38,12 @@ const Home = () => {
               onChange={(e) => setSearchInput(e.target.value)}
               onKeyPress={handleKeyPress}
             />
+          </div>
+          <div 
+            className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors"
+            onClick={() => navigate("/notifications")}
+          >
+            <Bell className="h-6 w-6 text-gray-600" />
           </div>
         </div>
 
