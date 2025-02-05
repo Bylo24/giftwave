@@ -3,8 +3,11 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Search, Gift, Heart } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white pb-16">
       {/* Search Header */}
@@ -46,7 +49,10 @@ const Home = () => {
             </div>
           </Card>
 
-          <Card className="p-4 flex items-center gap-4">
+          <Card 
+            className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            onClick={() => navigate("/promo")}
+          >
             <div className="bg-pink-50 p-2 rounded-full">
               <Heart className="h-6 w-6 text-pink-500" />
             </div>
