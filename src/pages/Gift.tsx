@@ -8,14 +8,22 @@ import { AmountStep } from "@/components/gift/AmountStep";
 import { PreviewStep } from "@/components/gift/PreviewStep";
 import { ThemeStep } from "@/components/gift/ThemeStep";
 import { MemoryStep } from "@/components/gift/MemoryStep";
+import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
-type Step = 'theme' | 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment';
+type Step = 'theme' | 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment' | 'replay';
 
 interface GiftMemory {
   caption: string;
   image?: File;
+  date: Date;
+}
+
+interface Memory {
+  id: string;
+  imageUrl?: string;
+  caption: string;
   date: Date;
 }
 
@@ -32,6 +40,7 @@ const Gift = () => {
     caption: '',
     date: new Date()
   });
+  const [memories, setMemories] = useState<Memory[]>([]);
 
   const startMessageRecording = async () => {
     try {
@@ -64,8 +73,16 @@ const Gift = () => {
     }
   };
 
+  const handleAddMemory = (newMemory: Omit<Memory, "id">) => {
+    const memoryWithId = {
+      ...newMemory,
+      id: crypto.randomUUID(),
+    };
+    setMemories([...memories, memoryWithId]);
+  };
+
   const nextStep = () => {
-    const steps: Step[] = ['theme', 'recipient', 'message', 'amount', 'memory', 'preview', 'payment'];
+    const steps: Step[] = ['theme', 'recipient', 'message', 'amount', 'memory', 'preview', 'payment', 'replay'];
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
@@ -130,6 +147,13 @@ const Gift = () => {
             onNext={nextStep}
           />
         );
+      case 'replay':
+        return (
+          <MemoryReplayScreen
+            memories={memories}
+            onAddMemory={handleAddMemory}
+          />
+        );
       default:
         return null;
     }
@@ -146,7 +170,7 @@ const Gift = () => {
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            Create a Gift
+            {currentStep === 'replay' ? 'Memory Replay' : 'Create a Gift'}
           </h1>
         </div>
 
