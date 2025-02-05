@@ -12,9 +12,7 @@ export const AnonymousAuthButton = ({ isLoading }: AnonymousAuthButtonProps) => 
 
   const handleAnonymousAuth = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithSSO({
-        provider: 'anonymous'
-      });
+      const { data, error } = await supabase.auth.signInAnonymously();
       
       if (error) throw error;
       
