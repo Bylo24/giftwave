@@ -20,112 +20,85 @@ interface PreviewStepProps {
 }
 
 export const PreviewStep = ({ 
-  theme = 'birthday', // Provide a default theme
+  theme = 'birthday',
   phoneNumber, 
   amount, 
   messageVideo,
   memory,
   onNext 
 }: PreviewStepProps) => {
-  // Ensure we have a valid theme or fallback to birthday theme
   const selectedTheme = giftThemes[theme] || giftThemes.birthday;
 
   return (
-    <Card className={`p-6 space-y-6 bg-gradient-to-br ${selectedTheme.colors.secondary}`}>
-      <div className="flex items-center gap-3 mb-4">
-        <div className={`p-3 bg-opacity-10 rounded-full ${selectedTheme.animations[0]}`}>
-          <PartyPopper className={`h-6 w-6 ${selectedTheme.colors.accent}`} />
-        </div>
-        <h2 className={`text-2xl font-bold bg-gradient-to-r ${selectedTheme.colors.primary} bg-clip-text text-transparent`}>
-          Preview Gift Experience
-        </h2>
-      </div>
-
-      {/* Gift Preview Experience */}
-      <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
-        {/* Animated Header */}
-        <div className={`absolute top-0 w-full h-24 bg-gradient-to-r ${selectedTheme.colors.primary} animate-pulse`}>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="flex flex-col items-center gap-2">
-              <span className="text-4xl animate-bounce">{selectedTheme.icon}</span>
-              <h3 className="text-xl font-bold text-white animate-fade-in">
-                You've received a special gift!
-              </h3>
-            </div>
+    <div className="space-y-6 animate-fade-in max-w-md mx-auto">
+      <Card className={`p-6 space-y-6 bg-gradient-to-br ${selectedTheme.colors.secondary}`}>
+        <div className="flex items-center gap-3 mb-4">
+          <div className={`p-3 bg-opacity-10 rounded-full ${selectedTheme.animations[0]}`}>
+            <PartyPopper className={`h-6 w-6 ${selectedTheme.colors.accent}`} />
           </div>
+          <h2 className={`text-2xl font-bold bg-gradient-to-r ${selectedTheme.colors.primary} bg-clip-text text-transparent`}>
+            Preview Gift
+          </h2>
         </div>
 
-        {/* Content Preview */}
-        <div className="pt-28 p-6 space-y-6">
-          {/* Sender Preview */}
-          <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-white to-gray-50 rounded-lg animate-fade-in">
-            <Avatar className="h-12 w-12 border-2 border-purple-500">
-              <AvatarFallback className="bg-purple-100">
-                <User className="h-6 w-6 text-purple-500" />
-              </AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm text-purple-600">A gift from</p>
-              <p className="font-medium text-gray-900">Your Friend</p>
-            </div>
-          </div>
-
-          {/* Video Message Preview */}
-          {messageVideo && (
-            <div className="relative aspect-video bg-gradient-to-br from-gray-50 to-white rounded-lg overflow-hidden animate-fade-in">
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Video className="h-12 w-12 text-purple-500 animate-pulse" />
-                <div className="absolute bottom-4 left-4">
-                  <p className="text-sm text-purple-600 bg-white/80 px-3 py-1 rounded-full">
-                    Tap to watch your special message
-                  </p>
-                </div>
+        <Card className="overflow-hidden rounded-lg bg-white shadow-lg">
+          <div className={`h-24 bg-gradient-to-r ${selectedTheme.colors.primary} relative`}>
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="text-center">
+                <span className="text-4xl">{selectedTheme.icon}</span>
+                <h3 className="text-xl font-bold text-white mt-2">
+                  Special Gift!
+                </h3>
               </div>
             </div>
-          )}
+          </div>
 
-          {/* Gift Amount Preview */}
-          <div className="relative p-6 bg-gradient-to-br from-white to-gray-50 rounded-lg animate-fade-in">
-            <div className="absolute -top-3 -right-3">
-              <div className="p-3 bg-gradient-to-r from-green-500 to-blue-500 rounded-full animate-bounce">
-                <DollarSign className="h-6 w-6 text-white" />
+          <div className="p-6 space-y-4">
+            <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-white to-gray-50 rounded-lg">
+              <Avatar>
+                <AvatarFallback>
+                  <User className="h-5 w-5" />
+                </AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="text-sm text-purple-600">From</p>
+                <p className="font-medium">Your Friend</p>
               </div>
             </div>
-            <div className="text-center space-y-2">
-              <p className="text-lg text-purple-600">Your Gift Amount</p>
-              <p className="text-4xl font-bold text-gray-900">${amount}</p>
+
+            {messageVideo && (
+              <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                <Video className="h-8 w-8 text-gray-400" />
+              </div>
+            )}
+
+            <div className="text-center p-4 bg-gradient-to-br from-white to-gray-50 rounded-lg">
+              <DollarSign className="h-8 w-8 mx-auto text-green-500 mb-2" />
+              <p className="text-4xl font-bold">${amount}</p>
             </div>
+
+            {(memory.image || memory.caption) && (
+              <div className="p-4 bg-gradient-to-br from-white to-gray-50 rounded-lg">
+                {memory.image && (
+                  <div className="aspect-video bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
+                    <Image className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+                {memory.caption && (
+                  <p className="text-gray-600 italic">"{memory.caption}"</p>
+                )}
+              </div>
+            )}
           </div>
+        </Card>
 
-          {/* Memory Preview */}
-          {(memory.image || memory.caption) && (
-            <div className="relative p-4 bg-gradient-to-br from-white to-gray-50 rounded-lg animate-fade-in">
-              {memory.image && (
-                <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden mb-3">
-                  <Image className="h-8 w-8 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400" />
-                </div>
-              )}
-              {memory.caption && (
-                <p className="text-gray-600 italic">"{memory.caption}"</p>
-              )}
-            </div>
-          )}
-
-          {/* Interactive Elements */}
-          <div className="flex items-center justify-center gap-4 text-pink-500 animate-fade-in">
-            <Heart className="h-5 w-5 animate-pulse" />
-            <p className="text-sm">Swipe up to reveal your gift</p>
-            <Heart className="h-5 w-5 animate-pulse" />
-          </div>
-        </div>
-      </div>
-
-      <Button
-        className={`w-full bg-gradient-to-r ${selectedTheme.colors.primary} hover:opacity-90 transition-opacity text-white`}
-        onClick={onNext}
-      >
-        Continue to Payment
-      </Button>
-    </Card>
+        <Button
+          className={`w-full bg-gradient-to-r ${selectedTheme.colors.primary} hover:opacity-90 transition-opacity text-white`}
+          onClick={onNext}
+        >
+          Continue to Payment
+        </Button>
+      </Card>
+    </div>
   );
 };

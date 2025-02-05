@@ -3,10 +3,18 @@ import { Input } from "@/components/ui/input";
 import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export const PhoneVerification = () => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [countryCode, setCountryCode] = useState("+1");
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -30,14 +38,27 @@ export const PhoneVerification = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <div className="space-y-2">
-          <Input
-            type="tel"
-            placeholder="Phone number"
-            value={phoneNumber}
-            onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full"
-          />
+        <div className="space-y-4">
+          <div className="flex gap-2">
+            <Select value={countryCode} onValueChange={setCountryCode}>
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Code" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="+1">+1 (US)</SelectItem>
+                <SelectItem value="+44">+44 (UK)</SelectItem>
+                <SelectItem value="+91">+91 (IN)</SelectItem>
+                {/* Add more country codes as needed */}
+              </SelectContent>
+            </Select>
+            <Input
+              type="tel"
+              placeholder="Phone number"
+              value={phoneNumber}
+              onChange={(e) => setPhoneNumber(e.target.value)}
+              className="flex-1"
+            />
+          </div>
           <p className="text-xs text-gray-500">
             By tapping Send Code, you confirm that you are authorized to use the
             phone number entered and agree to receive SMS texts verifying your

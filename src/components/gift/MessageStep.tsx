@@ -2,6 +2,7 @@ import { Video, Upload, Camera } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
+import { useState } from "react";
 
 interface MessageStepProps {
   messageVideo: File | null;
@@ -20,11 +21,15 @@ export const MessageStep = ({
   stopMessageRecording,
   onNext,
 }: MessageStepProps) => {
+  const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+
   const handleMessageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.type.startsWith('video/')) {
         setMessageVideo(file);
+        const url = URL.createObjectURL(file);
+        setVideoPreviewUrl(url);
         toast.success('Video message uploaded successfully!');
       } else {
         toast.error('Please upload a video file');
@@ -44,6 +49,16 @@ export const MessageStep = ({
       </div>
       <p className="text-gray-600">Send them a personal video message they'll love!</p>
       
+      {videoPreviewUrl && (
+        <div className="relative aspect-video rounded-lg overflow-hidden bg-black">
+          <video
+            src={videoPreviewUrl}
+            controls
+            className="w-full h-full object-contain"
+          />
+        </div>
+      )}
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <Card className="p-4 cursor-pointer hover:shadow-lg transition-shadow border-2 border-secondary/20">
           <label className="flex flex-col items-center gap-3 cursor-pointer">
