@@ -5,10 +5,12 @@ import { Search, Gift, Heart, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
   const navigate = useNavigate();
   const [searchInput, setSearchInput] = useState("");
+  const { user } = useAuth();
 
   const handleSearch = () => {
     if (searchInput) {
@@ -99,6 +101,24 @@ const Home = () => {
               <p className="text-sm text-gray-500">Have a code? Enter it here</p>
             </div>
           </Card>
+
+          {!user && (
+            <Card className="p-4">
+              <div className="text-center space-y-4">
+                <p className="text-sm text-gray-500">
+                  Sign in or create an account to start sending and receiving gifts!
+                </p>
+                <div className="flex gap-4 justify-center">
+                  <button
+                    onClick={() => navigate("/login")}
+                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                  >
+                    Sign In
+                  </button>
+                </div>
+              </div>
+            </Card>
+          )}
 
           <Card className="p-4">
             <h3 className="font-medium mb-4">Frequently Asked Questions</h3>

@@ -7,6 +7,7 @@ import { LoginForm } from "./components/auth/LoginForm";
 import { PhoneVerification } from "./components/auth/PhoneVerification";
 import { CodeVerification } from "./components/auth/CodeVerification";
 import { AccountSetup } from "./components/auth/AccountSetup";
+import { RequireAuth } from "./components/auth/RequireAuth";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PromoCode from "./pages/PromoCode";
@@ -30,20 +31,22 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/home" element={<Home />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/verify" element={<PhoneVerification />} />
               <Route path="/verify-code" element={<CodeVerification />} />
               <Route path="/setup" element={<AccountSetup />} />
-              <Route path="/home" element={<Home />} />
-              <Route path="/promo" element={<PromoCode />} />
-              <Route path="/wallet" element={<Wallet />} />
-              <Route path="/search" element={<SearchResults />} />
-              <Route path="/gift" element={<Gift />} />
-              <Route path="/my-gifts" element={<MyGifts />} />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/notifications" element={<Notifications />} />
-              <Route path="/collect/:giftId" element={<CollectGift />} />
+              
+              {/* Protected Routes */}
+              <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
+              <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
+              <Route path="/search" element={<RequireAuth><SearchResults /></RequireAuth>} />
+              <Route path="/gift" element={<RequireAuth><Gift /></RequireAuth>} />
+              <Route path="/my-gifts" element={<RequireAuth><MyGifts /></RequireAuth>} />
+              <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
+              <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
+              <Route path="/collect/:giftId" element={<RequireAuth><CollectGift /></RequireAuth>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
