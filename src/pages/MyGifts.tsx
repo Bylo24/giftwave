@@ -1,16 +1,47 @@
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Gift } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const MyGifts = () => {
-  const gifts: any[] = []; // This would normally come from your backend
+  const { user } = useAuth();
+
+  const { data: gifts, isLoading } = useQuery({
+    queryKey: ['gifts', user?.id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('gifts')
+        .select('*, profiles(full_name)')
+        .or(`sender_id.eq.${user?.id},recipient_phone.eq.${user?.phone}`);
+
+      if (error) {
+        toast.error("Failed to load gifts");
+        throw error;
+      }
+
+      console.log("Fetched gifts:", data); // Debug log
+      return data || [];
+    },
+    enabled: !!user,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#E5DEFF] pb-16 flex items-center justify-center">
+        <p>Loading gifts...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#E5DEFF] pb-16">
       <div className="p-4 space-y-6 max-w-2xl mx-auto">
         <h1 className="text-2xl font-bold text-[#1A1F2C] text-center">My Gifts</h1>
         
-        {gifts.length === 0 ? (
+        {(!gifts || gifts.length === 0) ? (
           <Card className="p-8 text-center space-y-4 border-[#9b87f5]">
             <Gift className="w-16 h-16 mx-auto text-[#9b87f5]" />
             <p className="text-lg text-[#6E59A5]">
@@ -24,7 +55,20 @@ const MyGifts = () => {
           <div className="space-y-4">
             {gifts.map((gift) => (
               <Card key={gift.id} className="p-4 border-[#9b87f5]">
-                {/* Gift card content would go here */}
+                <div className="flex justify-between items-start">
+                  <div>
+                    <p className="font-semibold">
+                      {gift.sender_id === user?.id ? 'Sent to: ' + gift.recipient_phone : 'From: ' + gift.profiles?.full_name}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Amount: ${gift.amount}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      Date: {new Date(gift.created_at).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <Gift className="w-6 h-6 text-[#9b87f5]" />
+                </div>
               </Card>
             ))}
           </div>
