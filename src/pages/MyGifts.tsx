@@ -27,9 +27,7 @@ const MyGifts = () => {
         .from('gifts')
         .select(`
           *,
-          sender:sender_id (
-            full_name
-          )
+          sender:profiles(full_name)
         `)
         .or(`sender_id.eq.${user?.id}${profile?.phone_number ? `,recipient_phone.eq.${profile.phone_number}` : ''}`);
 
