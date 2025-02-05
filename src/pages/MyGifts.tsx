@@ -12,18 +12,39 @@ const MyGifts = () => {
   const { data: gifts, isLoading } = useQuery({
     queryKey: ['gifts', user?.id],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // First, fetch the gifts
+      const { data: giftsData, error: giftsError } = await supabase
         .from('gifts')
-        .select('*, profiles(full_name)')
-        .or(`sender_id.eq.${user?.id},recipient_phone.eq.${user?.phone}`);
+        .select('*')
+        .or(`sender_id.eq.${user?.id}${user?.phone ? `,recipient_phone.eq.${user.phone}` : ''}`);
 
-      if (error) {
+      if (giftsError) {
         toast.error("Failed to load gifts");
-        throw error;
+        throw giftsError;
       }
 
-      console.log("Fetched gifts:", data); // Debug log
-      return data || [];
+      // For each gift, fetch the sender's profile if it's not the current user
+      const giftsWithProfiles = await Promise.all(
+        (giftsData || []).map(async (gift) => {
+          if (gift.sender_id === user?.id) {
+            return { ...gift, sender_name: 'You' };
+          }
+
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name')
+            .eq('id', gift.sender_id)
+            .single();
+
+          return {
+            ...gift,
+            sender_name: profileData?.full_name || 'Anonymous'
+          };
+        })
+      );
+
+      console.log("Fetched gifts:", giftsWithProfiles); // Debug log
+      return giftsWithProfiles || [];
     },
     enabled: !!user,
   });
@@ -58,7 +79,7 @@ const MyGifts = () => {
                 <div className="flex justify-between items-start">
                   <div>
                     <p className="font-semibold">
-                      {gift.sender_id === user?.id ? 'Sent to: ' + gift.recipient_phone : 'From: ' + gift.profiles?.full_name}
+                      {gift.sender_id === user?.id ? 'Sent to: ' + gift.recipient_phone : 'From: ' + gift.sender_name}
                     </p>
                     <p className="text-sm text-gray-500">
                       Amount: ${gift.amount}
