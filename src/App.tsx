@@ -11,6 +11,7 @@ import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PromoCode from "./pages/PromoCode";
 import Wallet from "./pages/Wallet";
+import SearchResults from "./pages/SearchResults";
 
 function App() {
   const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ function App() {
             <Route path="/setup" element={<AccountSetup />} />
             <Route path="/promo" element={<PromoCode />} />
             <Route path="/wallet" element={<Wallet />} />
+            <Route path="/search" element={<SearchResults />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
