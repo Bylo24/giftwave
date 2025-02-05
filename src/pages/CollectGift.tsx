@@ -88,6 +88,7 @@ const CollectGift = () => {
     navigate("/wallet");
   };
 
+  // Show animation for both initial view and replay
   if (!isAnimationComplete || isReplay) {
     return (
       <div className="min-h-screen bg-background">
