@@ -2,24 +2,21 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { Search, QrCode, Gift, Heart } from "lucide-react";
+import { Search, Gift, Heart } from "lucide-react";
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-white pb-16">
       {/* Search Header */}
       <div className="p-4 space-y-4">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center">
           <div className="flex-1 relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <Input 
               className="pl-10 bg-gray-50" 
-              placeholder="People, Business, & Charities" 
+              placeholder="Search profiles or add contacts" 
             />
           </div>
-          <Button variant="outline" size="icon">
-            <QrCode className="h-4 w-4" />
-          </Button>
         </div>
 
         {/* Welcome Section */}
