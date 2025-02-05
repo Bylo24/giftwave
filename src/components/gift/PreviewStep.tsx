@@ -1,23 +1,41 @@
-import { Gift, Heart, Video, DollarSign, PartyPopper, User } from "lucide-react";
+import { Gift, Heart, Video, DollarSign, PartyPopper, User, Image } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { giftThemes, ThemeType } from "@/utils/giftThemes";
+
+interface GiftMemory {
+  caption: string;
+  image?: File;
+  date: Date;
+}
 
 interface PreviewStepProps {
+  theme: ThemeType;
   phoneNumber: string;
   amount: string;
   messageVideo: File | null;
+  memory: GiftMemory;
   onNext: () => void;
 }
 
-export const PreviewStep = ({ phoneNumber, amount, messageVideo, onNext }: PreviewStepProps) => {
+export const PreviewStep = ({ 
+  theme,
+  phoneNumber, 
+  amount, 
+  messageVideo,
+  memory,
+  onNext 
+}: PreviewStepProps) => {
+  const selectedTheme = giftThemes[theme];
+
   return (
-    <Card className="p-6 space-y-6 bg-gradient-to-br from-purple-50 to-pink-50">
+    <Card className={`p-6 space-y-6 bg-gradient-to-br ${selectedTheme.colors.secondary}`}>
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-3 bg-purple-500/10 rounded-full animate-bounce">
-          <PartyPopper className="h-6 w-6 text-purple-500" />
+        <div className={`p-3 bg-opacity-10 rounded-full ${selectedTheme.animations[0]}`}>
+          <PartyPopper className={`h-6 w-6 ${selectedTheme.colors.accent}`} />
         </div>
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+        <h2 className={`text-2xl font-bold bg-gradient-to-r ${selectedTheme.colors.primary} bg-clip-text text-transparent`}>
           Preview Gift Experience
         </h2>
       </div>
@@ -25,10 +43,10 @@ export const PreviewStep = ({ phoneNumber, amount, messageVideo, onNext }: Previ
       {/* Gift Preview Experience */}
       <div className="relative overflow-hidden rounded-lg bg-white shadow-lg">
         {/* Animated Header */}
-        <div className="absolute top-0 w-full h-24 bg-gradient-to-r from-purple-500 via-pink-500 to-purple-500 animate-pulse">
+        <div className={`absolute top-0 w-full h-24 bg-gradient-to-r ${selectedTheme.colors.primary} animate-pulse`}>
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="flex flex-col items-center gap-2">
-              <Gift className="h-8 w-8 text-white animate-bounce" />
+              <span className="text-4xl animate-bounce">{selectedTheme.icon}</span>
               <h3 className="text-xl font-bold text-white animate-fade-in">
                 You've received a special gift!
               </h3>
@@ -39,7 +57,7 @@ export const PreviewStep = ({ phoneNumber, amount, messageVideo, onNext }: Previ
         {/* Content Preview */}
         <div className="pt-28 p-6 space-y-6">
           {/* Sender Preview */}
-          <div className="flex items-center gap-4 p-4 bg-purple-50 rounded-lg animate-fade-in">
+          <div className="flex items-center gap-4 p-4 bg-gradient-to-r from-white to-gray-50 rounded-lg animate-fade-in">
             <Avatar className="h-12 w-12 border-2 border-purple-500">
               <AvatarFallback className="bg-purple-100">
                 <User className="h-6 w-6 text-purple-500" />
@@ -53,7 +71,7 @@ export const PreviewStep = ({ phoneNumber, amount, messageVideo, onNext }: Previ
 
           {/* Video Message Preview */}
           {messageVideo && (
-            <div className="relative aspect-video bg-purple-50 rounded-lg overflow-hidden animate-fade-in">
+            <div className="relative aspect-video bg-gradient-to-br from-gray-50 to-white rounded-lg overflow-hidden animate-fade-in">
               <div className="absolute inset-0 flex items-center justify-center">
                 <Video className="h-12 w-12 text-purple-500 animate-pulse" />
                 <div className="absolute bottom-4 left-4">
@@ -66,9 +84,9 @@ export const PreviewStep = ({ phoneNumber, amount, messageVideo, onNext }: Previ
           )}
 
           {/* Gift Amount Preview */}
-          <div className="relative p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-lg animate-fade-in">
+          <div className="relative p-6 bg-gradient-to-br from-white to-gray-50 rounded-lg animate-fade-in">
             <div className="absolute -top-3 -right-3">
-              <div className="p-3 bg-purple-500 rounded-full animate-bounce">
+              <div className="p-3 bg-gradient-to-r from-green-500 to-blue-500 rounded-full animate-bounce">
                 <DollarSign className="h-6 w-6 text-white" />
               </div>
             </div>
@@ -77,6 +95,20 @@ export const PreviewStep = ({ phoneNumber, amount, messageVideo, onNext }: Previ
               <p className="text-4xl font-bold text-gray-900">${amount}</p>
             </div>
           </div>
+
+          {/* Memory Preview */}
+          {(memory.image || memory.caption) && (
+            <div className="relative p-4 bg-gradient-to-br from-white to-gray-50 rounded-lg animate-fade-in">
+              {memory.image && (
+                <div className="relative aspect-video bg-gray-100 rounded-lg overflow-hidden mb-3">
+                  <Image className="h-8 w-8 absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-gray-400" />
+                </div>
+              )}
+              {memory.caption && (
+                <p className="text-gray-600 italic">"{memory.caption}"</p>
+              )}
+            </div>
+          )}
 
           {/* Interactive Elements */}
           <div className="flex items-center justify-center gap-4 text-pink-500 animate-fade-in">
@@ -88,7 +120,7 @@ export const PreviewStep = ({ phoneNumber, amount, messageVideo, onNext }: Previ
       </div>
 
       <Button
-        className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:opacity-90 transition-opacity"
+        className={`w-full bg-gradient-to-r ${selectedTheme.colors.primary} hover:opacity-90 transition-opacity text-white`}
         onClick={onNext}
       >
         Continue to Payment

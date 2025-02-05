@@ -6,20 +6,32 @@ import { RecipientStep } from "@/components/gift/RecipientStep";
 import { MessageStep } from "@/components/gift/MessageStep";
 import { AmountStep } from "@/components/gift/AmountStep";
 import { PreviewStep } from "@/components/gift/PreviewStep";
+import { ThemeStep } from "@/components/gift/ThemeStep";
+import { MemoryStep } from "@/components/gift/MemoryStep";
 import { toast } from "sonner";
+import { ThemeType } from "@/utils/giftThemes";
 
-type Step = 'recipient' | 'message' | 'amount' | 'preview' | 'payment' | 'memory';
+type Step = 'theme' | 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment';
+
+interface GiftMemory {
+  caption: string;
+  image?: File;
+  date: Date;
+}
 
 const Gift = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<Step>('recipient');
+  const [currentStep, setCurrentStep] = useState<Step>('theme');
+  const [selectedTheme, setSelectedTheme] = useState<ThemeType>('birthday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
   const [messageStream, setMessageStream] = useState<MediaStream | null>(null);
   const [amount, setAmount] = useState('');
-  const [memoryCaption, setMemoryCaption] = useState('');
-  const [memoryImage, setMemoryImage] = useState<File | null>(null);
+  const [memory, setMemory] = useState<GiftMemory>({
+    caption: '',
+    date: new Date()
+  });
 
   const startMessageRecording = async () => {
     try {
@@ -42,33 +54,36 @@ const Gift = () => {
   };
 
   const handlePayment = async () => {
-    // Implement payment logic here
-    toast.success('Payment successful!');
-    setCurrentStep('memory');
-  };
-
-  const handleMemoryUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      setMemoryImage(file);
-      toast.success('Memory image uploaded!');
+    try {
+      // Simulated payment process
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast.success('Payment successful!');
+      navigate('/my-gifts');
+    } catch (error) {
+      toast.error('Payment failed. Please try again.');
     }
   };
 
   const nextStep = () => {
-    const steps: Step[] = ['recipient', 'message', 'amount', 'preview', 'payment', 'memory'];
+    const steps: Step[] = ['theme', 'recipient', 'message', 'amount', 'memory', 'preview', 'payment'];
     const currentIndex = steps.indexOf(currentStep);
     if (currentIndex < steps.length - 1) {
       setCurrentStep(steps[currentIndex + 1]);
     } else {
-      // Complete the gifting process
-      toast.success('Gift sent successfully!');
-      navigate('/my-gifts');
+      handlePayment();
     }
   };
 
   const renderStep = () => {
     switch (currentStep) {
+      case 'theme':
+        return (
+          <ThemeStep
+            selectedTheme={selectedTheme}
+            setSelectedTheme={setSelectedTheme}
+            onNext={nextStep}
+          />
+        );
       case 'recipient':
         return (
           <RecipientStep
@@ -96,12 +111,22 @@ const Gift = () => {
             onNext={nextStep}
           />
         );
+      case 'memory':
+        return (
+          <MemoryStep
+            memory={memory}
+            setMemory={setMemory}
+            onNext={nextStep}
+          />
+        );
       case 'preview':
         return (
           <PreviewStep
+            theme={selectedTheme}
             phoneNumber={phoneNumber}
             amount={amount}
             messageVideo={messageVideo}
+            memory={memory}
             onNext={nextStep}
           />
         );
