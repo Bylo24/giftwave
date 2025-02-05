@@ -5,7 +5,7 @@ import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
 const Wallet = () => {
   return (
     <div className="min-h-screen bg-white pb-16">
-      <div className="p-4 space-y-6">
+      <div className="p-4 pt-16 space-y-6">
         {/* Balance Card */}
         <Card className="p-6 bg-primary text-white">
           <div className="flex items-center gap-3 mb-4">
