@@ -53,19 +53,21 @@ const SearchResults = () => {
   return (
     <div className="min-h-screen bg-[#E5DEFF]">
       <div className="fixed top-0 left-0 right-0 bg-[#E5DEFF] p-4 z-10">
-        <div className="flex items-center gap-2 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2 w-full max-w-7xl mx-auto px-4">
           <button 
             onClick={() => navigate("/")}
-            className="p-2 hover:bg-[#D6BCFA] rounded-full transition-colors"
+            className="p-2 hover:bg-[#D6BCFA] rounded-full transition-colors flex-shrink-0"
           >
             <ArrowLeft className="h-5 w-5 text-[#6E59A5]" />
           </button>
-          <SearchBar 
-            searchInput={searchInput}
-            setSearchInput={setSearchInput}
-            handleSearch={handleSearch}
-            handleKeyPress={handleKeyPress}
-          />
+          <div className="flex-1">
+            <SearchBar 
+              searchInput={searchInput}
+              setSearchInput={setSearchInput}
+              handleSearch={handleSearch}
+              handleKeyPress={handleKeyPress}
+            />
+          </div>
         </div>
       </div>
 
