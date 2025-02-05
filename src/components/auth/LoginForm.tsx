@@ -13,7 +13,7 @@ export const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-end justify-center pb-16 animate-fade-in">
+    <div className="min-h-screen flex items-center justify-center animate-fade-in">
       <div className="w-full max-w-md mx-auto p-6 space-y-8">
         <div className="text-center space-y-2">
           <h1 className="text-2xl font-semibold">SwiftPay</h1>
