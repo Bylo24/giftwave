@@ -7,6 +7,13 @@ import { useState } from "react";
 import { GiftRevealAnimation } from "./GiftRevealAnimation";
 import { toast } from "sonner";
 
+interface Memory {
+  id: string;
+  imageUrl?: string;
+  caption: string;
+  date: Date;
+}
+
 interface GiftMemory {
   caption: string;
   image?: File;
@@ -19,6 +26,7 @@ interface PreviewStepProps {
   amount: string;
   messageVideo: File | null;
   memory: GiftMemory;
+  memories: Memory[];
   onNext: () => void;
 }
 
@@ -28,6 +36,7 @@ export const PreviewStep = ({
   amount, 
   messageVideo,
   memory,
+  memories,
   onNext 
 }: PreviewStepProps) => {
   const [showAnimation, setShowAnimation] = useState(false);
@@ -49,6 +58,7 @@ export const PreviewStep = ({
           messageVideo={messageVideo}
           amount={amount}
           memory={memory}
+          memories={memories}
           onComplete={handleAnimationComplete}
         />
       )}
