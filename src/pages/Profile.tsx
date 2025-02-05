@@ -16,27 +16,28 @@ const Profile = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      if (user) {
-        const { data, error } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('id', user.id)
-          .single();
+  const fetchProfile = async () => {
+    if (user) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .single();
 
-        if (error) {
-          console.error('Error fetching profile:', error);
-          toast.error('Failed to load profile');
-        } else if (data) {
-          setProfile(data);
-          if (data.avatar_url) {
-            setProfileImage(data.avatar_url);
-          }
+      if (error) {
+        console.error('Error fetching profile:', error);
+        toast.error('Failed to load profile');
+      } else if (data) {
+        console.log('Fetched profile:', data); // Debug log
+        setProfile(data);
+        if (data.avatar_url) {
+          setProfileImage(data.avatar_url);
         }
       }
-    };
+    }
+  };
 
+  useEffect(() => {
     fetchProfile();
   }, [user]);
 
