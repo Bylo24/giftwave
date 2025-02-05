@@ -37,6 +37,9 @@ const PromoCode = () => {
           <p className="text-sm text-gray-500">
             Enter your code below to redeem your offer
           </p>
+          <p className="text-xs text-pink-500 italic">
+            The code will apply to your next gift
+          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
