@@ -38,7 +38,7 @@ const Home = () => {
             <div className="text-center space-y-2">
               <h2 className="font-medium">Make your first payment</h2>
               <p className="text-sm text-gray-500">
-                Send someone a gift or payment
+                Send someone a gift
               </p>
               <Button variant="outline" className="w-full">
                 Get started
