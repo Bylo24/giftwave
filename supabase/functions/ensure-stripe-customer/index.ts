@@ -7,6 +7,13 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Create Supabase client with service role key for admin operations
+    const supabaseAdmin = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    )
+
+    // Create regular client for user authentication
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -20,8 +27,10 @@ Deno.serve(async (req) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
     if (userError || !user) throw userError || new Error('No user found')
 
-    // Check if customer already exists
-    const { data: existingCustomer } = await supabase
+    console.log('Checking existing customer for user:', user.id)
+    
+    // Use admin client for database operations
+    const { data: existingCustomer } = await supabaseAdmin
       .from('stripe_customers')
       .select('customer_id')
       .eq('id', user.id)
@@ -44,16 +53,15 @@ Deno.serve(async (req) => {
       },
     })
 
-    // Use upsert operation instead of insert
-    const { error: insertError } = await supabase
+    // Use admin client for insert operation
+    const { error: insertError } = await supabaseAdmin
       .from('stripe_customers')
-      .upsert(
-        { id: user.id, customer_id: customer.id },
-        { onConflict: 'id' }
-      )
+      .insert([
+        { id: user.id, customer_id: customer.id }
+      ])
 
     if (insertError) {
-      console.error('Error upserting customer:', insertError)
+      console.error('Error inserting customer:', insertError)
       throw insertError
     }
 
