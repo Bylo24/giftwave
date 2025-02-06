@@ -52,7 +52,7 @@ export const AddCard = () => {
         <Elements 
           stripe={stripePromise} 
           options={{ 
-            clientSecret, 
+            clientSecret,
             appearance: { theme: 'stripe' },
           }}
         >

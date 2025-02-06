@@ -12,6 +12,7 @@ export const PaymentForm = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!stripe || !elements) {
       setError("Stripe has not been initialized");
       return;
@@ -19,6 +20,13 @@ export const PaymentForm = () => {
 
     setIsLoading(true);
     setError(null);
+
+    const { error: submitError } = await elements.submit();
+    if (submitError) {
+      setError(submitError.message);
+      setIsLoading(false);
+      return;
+    }
 
     try {
       const { error: setupError } = await stripe.confirmSetup({
@@ -57,12 +65,8 @@ export const PaymentForm = () => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <PaymentElement 
-        onChange={(event) => {
-          if (event.complete) {
-            setError(null);
-          } else if (event.empty) {
-            setError("Please enter your card details");
-          }
+        options={{
+          layout: "tabs"
         }}
       />
       {error && (
