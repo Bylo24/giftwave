@@ -3,7 +3,11 @@ import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js"
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 
-export const PaymentForm = () => {
+interface PaymentFormProps {
+  onComplete?: () => void;
+}
+
+export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
@@ -48,6 +52,7 @@ export const PaymentForm = () => {
           title: "Success",
           description: "Card added successfully",
         });
+        onComplete?.();
       }
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to add card";

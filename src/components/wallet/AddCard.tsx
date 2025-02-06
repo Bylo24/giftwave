@@ -10,7 +10,7 @@ import { PaymentForm } from "./PaymentForm";
 
 export const AddCard = () => {
   const [showForm, setShowForm] = useState(false);
-  const [clientSecret, setClientSecret] = useState("");
+  const [clientSecret, setClientSecret] = useState<string | null>(null);
   const { toast } = useToast();
 
   const handleAddCard = async () => {
@@ -37,6 +37,11 @@ export const AddCard = () => {
     }
   };
 
+  const handlePaymentComplete = () => {
+    setShowForm(false);
+    setClientSecret(null);
+  };
+
   return (
     <Card className="p-4">
       {!showForm ? (
@@ -50,13 +55,14 @@ export const AddCard = () => {
         </Button>
       ) : clientSecret ? (
         <Elements 
+          key={clientSecret}
           stripe={stripePromise} 
           options={{ 
             clientSecret,
             appearance: { theme: 'stripe' },
           }}
         >
-          <PaymentForm />
+          <PaymentForm onComplete={handlePaymentComplete} />
         </Elements>
       ) : null}
     </Card>
