@@ -26,6 +26,7 @@ export const AddCard = () => {
         throw new Error("No client secret received");
       }
 
+      console.log('Setup intent created with client secret');
       setClientSecret(data.clientSecret);
       setShowForm(true);
     } catch (error) {
@@ -60,6 +61,7 @@ export const AddCard = () => {
           options={{ 
             clientSecret,
             appearance: { theme: 'stripe' },
+            loader: 'auto',
           }}
         >
           <PaymentForm onComplete={handlePaymentComplete} />

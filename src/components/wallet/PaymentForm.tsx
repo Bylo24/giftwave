@@ -11,14 +11,15 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [isElementsReady, setIsElementsReady] = useState(false);
 
   useEffect(() => {
     if (!stripe || !elements) {
-      console.log('Stripe or Elements initializing...');
+      console.log('Stripe or Elements not yet initialized');
       return;
     }
-    setIsReady(true);
+    console.log('Stripe and Elements initialized successfully');
+    setIsElementsReady(true);
   }, [stripe, elements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -32,11 +33,13 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     setIsLoading(true);
 
     try {
+      console.log('Submitting payment form...');
       const { error: submitError } = await elements.submit();
       if (submitError) {
         throw submitError;
       }
 
+      console.log('Confirming setup...');
       const { error: setupError } = await stripe.confirmSetup({
         elements,
         confirmParams: {
@@ -59,8 +62,8 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     }
   };
 
-  if (!isReady) {
-    return <div className="p-4 text-center text-gray-500">Loading payment form...</div>;
+  if (!isElementsReady) {
+    return <div className="p-4 text-center text-gray-500">Initializing payment form...</div>;
   }
 
   return (
