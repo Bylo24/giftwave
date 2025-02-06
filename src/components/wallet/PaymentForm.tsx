@@ -11,32 +11,11 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [isElementsReady, setIsElementsReady] = useState(false);
-
-  useEffect(() => {
-    const checkElements = async () => {
-      if (stripe && elements) {
-        try {
-          // Initialize elements without the loader option
-          setIsElementsReady(true);
-        } catch (error) {
-          console.error('Error initializing elements:', error);
-          toast.error('Failed to initialize payment form');
-        }
-      }
-    };
-
-    checkElements();
-
-    return () => {
-      setIsElementsReady(false);
-    };
-  }, [stripe, elements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements || !isElementsReady) {
+    if (!stripe || !elements) {
       return;
     }
 
@@ -69,7 +48,7 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     }
   };
 
-  if (!isElementsReady) {
+  if (!stripe || !elements) {
     return <div className="p-4 text-center text-gray-500">Loading payment form...</div>;
   }
 
@@ -82,7 +61,7 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
       />
       <Button 
         type="submit"
-        disabled={!stripe || isLoading} 
+        disabled={isLoading} 
         className="w-full"
       >
         {isLoading ? "Adding..." : "Add Card"}
