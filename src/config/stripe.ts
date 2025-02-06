@@ -1,4 +1,9 @@
 import { loadStripe } from '@stripe/stripe-js';
 
-// Use the publishable key directly since it's safe for frontend
-export const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || '');
+const publishableKey = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
+
+if (!publishableKey) {
+  throw new Error('Stripe publishable key is not set. Please set VITE_STRIPE_PUBLISHABLE_KEY in your environment variables.');
+}
+
+export const stripePromise = loadStripe(publishableKey);

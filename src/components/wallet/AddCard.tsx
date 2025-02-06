@@ -11,6 +11,7 @@ import { PaymentForm } from "./PaymentForm";
 export const AddCard = () => {
   const [showForm, setShowForm] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  const [stripeError, setStripeError] = useState<string | null>(null);
 
   const handleAddCard = async () => {
     try {
@@ -37,6 +38,22 @@ export const AddCard = () => {
     setShowForm(false);
     setClientSecret(null);
   };
+
+  // Handle potential Stripe initialization errors
+  stripePromise.catch(error => {
+    console.error('Stripe initialization error:', error);
+    setStripeError(error.message);
+  });
+
+  if (stripeError) {
+    return (
+      <Card className="p-4">
+        <div className="text-red-500 text-sm">
+          Failed to initialize payment system: {stripeError}
+        </div>
+      </Card>
+    );
+  }
 
   return (
     <Card className="p-4">
