@@ -11,11 +11,14 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     if (!stripe || !elements) {
       console.log('Stripe or Elements initializing...');
+      return;
     }
+    setIsReady(true);
   }, [stripe, elements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -55,6 +58,10 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
       setIsLoading(false);
     }
   };
+
+  if (!isReady) {
+    return <div className="p-4 text-center text-gray-500">Loading payment form...</div>;
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">

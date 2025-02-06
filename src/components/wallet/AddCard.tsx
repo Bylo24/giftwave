@@ -11,10 +11,11 @@ import { PaymentForm } from "./PaymentForm";
 export const AddCard = () => {
   const [showForm, setShowForm] = useState(false);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  const [stripeError, setStripeError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleAddCard = async () => {
     try {
+      setIsLoading(true);
       const { data, error } = await supabase.functions.invoke('create-setup-intent');
       
       if (error) {
@@ -31,6 +32,8 @@ export const AddCard = () => {
       const errorMessage = error instanceof Error ? error.message : "Failed to initialize card setup";
       toast.error(errorMessage);
       console.error('Error creating setup intent:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -39,23 +42,6 @@ export const AddCard = () => {
     setClientSecret(null);
   };
 
-  // Handle potential Stripe initialization errors
-  stripePromise.catch(error => {
-    console.error('Stripe initialization error:', error);
-    setStripeError(error.message);
-    toast.error('Failed to initialize payment system');
-  });
-
-  if (stripeError) {
-    return (
-      <Card className="p-4">
-        <div className="text-red-500 text-sm">
-          Failed to initialize payment system. Please try again later.
-        </div>
-      </Card>
-    );
-  }
-
   return (
     <Card className="p-4">
       {!showForm ? (
@@ -63,9 +49,10 @@ export const AddCard = () => {
           variant="outline" 
           className="w-full" 
           onClick={handleAddCard}
+          disabled={isLoading}
         >
           <Plus className="w-4 h-4 mr-2" />
-          Add New Card
+          {isLoading ? "Initializing..." : "Add New Card"}
         </Button>
       ) : clientSecret ? (
         <Elements 
