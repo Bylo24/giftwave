@@ -69,10 +69,10 @@ const AddCardForm = () => {
     <form onSubmit={handleSubmit} className="space-y-4">
       <PaymentElement 
         onChange={(event) => {
-          if (event.error) {
-            setError(event.error.message);
-          } else {
+          if (event.complete) {
             setError(null);
+          } else if (event.empty) {
+            setError("Please enter your card details");
           }
         }}
       />
