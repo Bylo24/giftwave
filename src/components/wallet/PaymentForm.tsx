@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -11,12 +11,18 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  useEffect(() => {
+    if (stripe && elements) {
+      setIsReady(true);
+    }
+  }, [stripe, elements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!stripe || !elements) {
-      console.error("Stripe not initialized");
       return;
     }
 
@@ -49,7 +55,7 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     }
   };
 
-  if (!stripe || !elements) {
+  if (!isReady) {
     return <div className="p-4 text-center text-gray-500">Loading payment form...</div>;
   }
 

@@ -58,7 +58,8 @@ export const AddCard = () => {
           stripe={stripePromise} 
           options={{ 
             clientSecret,
-            appearance: { theme: 'stripe' }
+            appearance: { theme: 'stripe' },
+            loader: 'always'
           }}
         >
           <PaymentForm onComplete={handlePaymentComplete} />
