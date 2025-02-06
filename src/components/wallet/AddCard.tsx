@@ -12,7 +12,8 @@ import {
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
 
-const stripePromise = loadStripe(process.env.STRIPE_PUBLISHABLE_KEY || '');
+// Replace with your actual publishable key
+const stripePromise = loadStripe('pk_test_51OpGxfEuQGHRyZU8qTxHWZvtKHJa4z7wCOYyxVxwXtPvvzqjIWF9qxDEsAGBxgEyEPEHbPxhPSzlBXTLYyRVzXAw00J5YFZK3N');
 
 const AddCardForm = () => {
   const stripe = useStripe();
