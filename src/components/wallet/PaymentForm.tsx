@@ -11,18 +11,32 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [isReady, setIsReady] = useState(false);
+  const [isElementsReady, setIsElementsReady] = useState(false);
 
   useEffect(() => {
-    if (stripe && elements) {
-      setIsReady(true);
-    }
+    const checkElements = async () => {
+      if (stripe && elements) {
+        try {
+          await elements.update({ loader: 'auto' });
+          setIsElementsReady(true);
+        } catch (error) {
+          console.error('Error initializing elements:', error);
+          toast.error('Failed to initialize payment form');
+        }
+      }
+    };
+
+    checkElements();
+
+    return () => {
+      setIsElementsReady(false);
+    };
   }, [stripe, elements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements) {
+    if (!stripe || !elements || !isElementsReady) {
       return;
     }
 
@@ -55,7 +69,7 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     }
   };
 
-  if (!isReady) {
+  if (!isElementsReady) {
     return <div className="p-4 text-center text-gray-500">Loading payment form...</div>;
   }
 

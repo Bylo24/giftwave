@@ -59,7 +59,7 @@ export const AddCard = () => {
           options={{ 
             clientSecret,
             appearance: { theme: 'stripe' },
-            loader: 'always'
+            loader: 'auto'
           }}
         >
           <PaymentForm onComplete={handlePaymentComplete} />
