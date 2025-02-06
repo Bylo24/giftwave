@@ -4,15 +4,36 @@ import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddCard } from "@/components/wallet/AddCard";
 import { SavedCards } from "@/components/wallet/SavedCards";
+import { useEffect } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const Wallet = () => {
+  const { user } = useAuth();
+
+  useEffect(() => {
+    const ensureStripeCustomer = async () => {
+      try {
+        await supabase.functions.invoke('ensure-stripe-customer');
+      } catch (error) {
+        console.error('Error ensuring Stripe customer:', error);
+        toast.error('Failed to initialize payment system');
+      }
+    };
+
+    if (user) {
+      ensureStripeCustomer();
+    }
+  }, [user]);
+
   return (
     <div className="min-h-screen bg-white pb-16">
       <div className="p-4 pt-16 space-y-6">
         {/* Greeting */}
         <div className="text-center mb-4">
           <h1 className="text-xl font-medium text-gray-800">
-            Hey <Link to="/profile" className="text-primary hover:underline">John Doe</Link>,
+            Hey <Link to="/profile" className="text-primary hover:underline">{user?.email}</Link>,
           </h1>
           <p className="text-gray-600">here's your balance</p>
         </div>
