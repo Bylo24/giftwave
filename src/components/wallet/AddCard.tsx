@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
@@ -13,6 +13,14 @@ export const AddCard = () => {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Cleanup function when component unmounts
+  useEffect(() => {
+    return () => {
+      setShowForm(false);
+      setClientSecret(null);
+    };
+  }, []);
+
   const handleAddCard = async () => {
     try {
       const { data, error } = await supabase.functions.invoke('create-setup-intent');
@@ -24,6 +32,11 @@ export const AddCard = () => {
         });
         return;
       }
+      
+      if (!data?.clientSecret) {
+        throw new Error("No client secret received");
+      }
+
       setClientSecret(data.clientSecret);
       setShowForm(true);
     } catch (error) {

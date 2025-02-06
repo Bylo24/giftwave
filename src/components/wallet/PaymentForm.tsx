@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
@@ -14,6 +14,13 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const [error, setError] = useState<string | null>(null);
   const { toast } = useToast();
 
+  // Verify stripe is initialized
+  useEffect(() => {
+    if (!stripe || !elements) {
+      console.warn('Stripe or Elements not initialized');
+    }
+  }, [stripe, elements]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -28,9 +35,7 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     try {
       const { error: submitError } = await elements.submit();
       if (submitError) {
-        setError(submitError.message);
-        setIsLoading(false);
-        return;
+        throw submitError;
       }
 
       const { error: setupError } = await stripe.confirmSetup({
@@ -41,19 +46,14 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
       });
 
       if (setupError) {
-        setError(setupError.message);
-        toast({
-          title: "Error adding card",
-          description: setupError.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "Card added successfully",
-        });
-        onComplete?.();
+        throw setupError;
       }
+
+      toast({
+        title: "Success",
+        description: "Card added successfully",
+      });
+      onComplete?.();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to add card";
       setError(errorMessage);
@@ -77,7 +77,11 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
       {error && (
         <p className="text-sm text-destructive">{error}</p>
       )}
-      <Button disabled={!stripe || isLoading} className="w-full">
+      <Button 
+        type="submit"
+        disabled={!stripe || isLoading} 
+        className="w-full"
+      >
         {isLoading ? "Adding..." : "Add Card"}
       </Button>
     </form>
