@@ -11,32 +11,18 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-
-  useEffect(() => {
-    if (!stripe || !elements) {
-      return;
-    }
-    setIsReady(true);
-  }, [stripe, elements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!stripe || !elements || !isReady) {
-      toast.error("Payment system is not ready");
+    if (!stripe || !elements) {
+      toast.error("Payment system is not initialized");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      console.log("Submitting payment form...");
-      const { error: submitError } = await elements.submit();
-      if (submitError) {
-        throw submitError;
-      }
-
       console.log("Confirming setup...");
       const { error: setupError } = await stripe.confirmSetup({
         elements,
@@ -61,20 +47,16 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     }
   };
 
-  if (!stripe || !elements || !isReady) {
+  if (!stripe || !elements) {
     return <div className="p-4 text-center text-gray-500">Loading payment form...</div>;
   }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement 
-        options={{
-          layout: "tabs"
-        }}
-      />
+      <PaymentElement />
       <Button 
         type="submit"
-        disabled={isLoading || !isReady} 
+        disabled={isLoading} 
         className="w-full"
       >
         {isLoading ? "Adding..." : "Add Card"}
