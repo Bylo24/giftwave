@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
-import { useToast } from "@/components/ui/use-toast";
+import { toast } from "sonner";
 
 interface PaymentFormProps {
   onComplete?: () => void;
@@ -11,13 +11,10 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
 
-  // Verify stripe is initialized
   useEffect(() => {
     if (!stripe || !elements) {
-      console.warn('Stripe or Elements not initialized');
+      console.log('Stripe or Elements initializing...');
     }
   }, [stripe, elements]);
 
@@ -25,12 +22,11 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     e.preventDefault();
     
     if (!stripe || !elements) {
-      setError("Payment system not initialized");
+      console.error("Stripe not initialized");
       return;
     }
 
     setIsLoading(true);
-    setError(null);
 
     try {
       const { error: submitError } = await elements.submit();
@@ -49,19 +45,12 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
         throw setupError;
       }
 
-      toast({
-        title: "Success",
-        description: "Card added successfully",
-      });
+      toast.success("Card added successfully");
       onComplete?.();
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to add card";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
+      toast.error(errorMessage);
+      console.error('Setup error:', error);
     } finally {
       setIsLoading(false);
     }
@@ -74,9 +63,6 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
           layout: "tabs"
         }}
       />
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
       <Button 
         type="submit"
         disabled={!stripe || isLoading} 

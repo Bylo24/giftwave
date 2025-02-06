@@ -8,7 +8,6 @@ serve(async (req) => {
   }
 
   try {
-    // Get the user from the auth header
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? ''
@@ -20,6 +19,8 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
     if (userError || !user) throw userError || new Error('No user found')
 
+    console.log('Creating setup intent for user:', user.id)
+
     // Get or create Stripe customer
     const { data: customerData } = await supabase
       .from('stripe_customers')
@@ -30,7 +31,7 @@ serve(async (req) => {
     let customerId = customerData?.customer_id
 
     if (!customerId) {
-      // Create new customer in Stripe
+      console.log('Creating new Stripe customer for user:', user.id)
       const customer = await stripe.customers.create({
         email: user.email,
         metadata: {
@@ -39,7 +40,6 @@ serve(async (req) => {
       })
       customerId = customer.id
 
-      // Save customer ID to database
       await supabase
         .from('stripe_customers')
         .insert([
@@ -47,11 +47,11 @@ serve(async (req) => {
         ])
     }
 
-    // Create Setup Intent for the customer
+    console.log('Creating setup intent for customer:', customerId)
     const setupIntent = await stripe.setupIntents.create({
       customer: customerId,
       payment_method_types: ['card'],
-      usage: 'off_session', // This allows the card to be used for future payments
+      usage: 'off_session',
     })
 
     console.log('Setup intent created:', setupIntent.id)
