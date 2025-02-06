@@ -17,7 +17,7 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     const checkElements = async () => {
       if (stripe && elements) {
         try {
-          await elements.update({ loader: 'auto' });
+          // Initialize elements without the loader option
           setIsElementsReady(true);
         } catch (error) {
           console.error('Error initializing elements:', error);
