@@ -15,7 +15,7 @@ export const CodeVerification = () => {
 
   useEffect(() => {
     const storedPhone = sessionStorage.getItem('verifying_phone');
-    console.log('Stored phone number:', storedPhone);
+    console.log('[CodeVerification] Stored phone number:', storedPhone);
     if (!storedPhone) {
       navigate('/verify');
       return;
@@ -28,7 +28,7 @@ export const CodeVerification = () => {
     if (!user || !phoneNumber) return;
 
     setIsLoading(true);
-    console.log('Attempting to verify code:', code, 'for phone:', phoneNumber);
+    console.log('[CodeVerification] Verifying code:', code, 'for phone:', phoneNumber);
 
     try {
       const { data, error: verifyError } = await supabase.auth.verifyOtp({
@@ -37,7 +37,7 @@ export const CodeVerification = () => {
         type: 'sms'
       });
 
-      console.log('Verification response:', { data, error: verifyError });
+      console.log('[CodeVerification] Verification response:', { data, error: verifyError });
 
       if (verifyError) throw verifyError;
 
@@ -57,7 +57,7 @@ export const CodeVerification = () => {
       toast.success("Phone number verified successfully!");
       navigate('/profile');
     } catch (error: any) {
-      console.error('Verification error:', error);
+      console.error('[CodeVerification] Verification error:', error);
       toast.error(error.message || "Failed to verify code");
       
       // Update verification attempts
@@ -92,19 +92,19 @@ export const CodeVerification = () => {
     
     try {
       setIsLoading(true);
-      console.log('Resending code to:', phoneNumber);
+      console.log('[CodeVerification] Resending code to:', phoneNumber);
       
       const { data, error } = await supabase.auth.signInWithOtp({
         phone: phoneNumber
       });
 
-      console.log('Resend response:', { data, error });
+      console.log('[CodeVerification] Resend response:', { data, error });
 
       if (error) throw error;
       
       toast.success("New verification code sent!");
     } catch (error: any) {
-      console.error('Error resending code:', error);
+      console.error('[CodeVerification] Error resending code:', error);
       toast.error("Failed to resend code. Please try again.");
     } finally {
       setIsLoading(false);

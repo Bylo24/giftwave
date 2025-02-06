@@ -35,19 +35,19 @@ export const PhoneVerification = () => {
 
     setIsLoading(true);
     const fullPhoneNumber = `${countryCode}${phoneNumber}`;
-    console.log('Attempting to send OTP to:', fullPhoneNumber);
+    console.log('[PhoneVerification] Attempting to send OTP to:', fullPhoneNumber);
 
     try {
       // First update the phone number in the profiles table
       await updateUserPhone(user.id, fullPhoneNumber);
-      console.log('Updated user phone in profiles table');
+      console.log('[PhoneVerification] Updated user phone in profiles table');
       
       // Then send the OTP
       const { data, error } = await supabase.auth.signInWithOtp({
         phone: fullPhoneNumber,
       });
 
-      console.log('OTP Response:', { data, error });
+      console.log('[PhoneVerification] OTP Response:', { data, error });
 
       if (error) throw error;
 
@@ -55,7 +55,7 @@ export const PhoneVerification = () => {
       navigate("/verify-code");
       toast.success("Verification code sent to your phone");
     } catch (error: any) {
-      console.error('Error sending OTP:', error);
+      console.error('[PhoneVerification] Error sending OTP:', error);
       toast.error(error.message || "Failed to send verification code");
     } finally {
       setIsLoading(false);
