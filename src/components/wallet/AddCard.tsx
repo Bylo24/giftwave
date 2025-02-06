@@ -14,6 +14,8 @@ export const AddCard = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleAddCard = async () => {
+    if (isLoading) return;
+    
     try {
       setIsLoading(true);
       console.log("Creating setup intent...");
@@ -35,6 +37,8 @@ export const AddCard = () => {
       console.error("Add card error:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to initialize card setup";
       toast.error(errorMessage);
+      setShowForm(false);
+      setClientSecret(null);
     } finally {
       setIsLoading(false);
     }
@@ -60,7 +64,7 @@ export const AddCard = () => {
       ) : clientSecret ? (
         <Elements 
           stripe={stripePromise} 
-          options={{ 
+          options={{
             clientSecret,
             appearance: { theme: 'stripe' }
           }}
