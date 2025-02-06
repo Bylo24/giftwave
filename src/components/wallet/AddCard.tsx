@@ -2,90 +2,11 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
-import { loadStripe } from "@stripe/stripe-js";
-import {
-  Elements,
-  PaymentElement,
-  useStripe,
-  useElements,
-} from "@stripe/react-stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
-
-// Replace with your actual publishable key
-const stripePromise = loadStripe('pk_test_51OpGxfEuQGHRyZU8qTxHWZvtKHJa4z7wCOYyxVxwXtPvvzqjIWF9qxDEsAGBxgEyEPEHbPxhPSzlBXTLYyRVzXAw00J5YFZK3N');
-
-const AddCardForm = () => {
-  const stripe = useStripe();
-  const elements = useElements();
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!stripe || !elements) {
-      setError("Stripe has not been initialized");
-      return;
-    }
-
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const { error: setupError } = await stripe.confirmSetup({
-        elements,
-        confirmParams: {
-          return_url: `${window.location.origin}/wallet`,
-        },
-      });
-
-      if (setupError) {
-        setError(setupError.message);
-        toast({
-          title: "Error adding card",
-          description: setupError.message,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Success",
-          description: "Card added successfully",
-        });
-      }
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to add card";
-      setError(errorMessage);
-      toast({
-        title: "Error",
-        description: errorMessage,
-        variant: "destructive",
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  return (
-    <form onSubmit={handleSubmit} className="space-y-4">
-      <PaymentElement 
-        onChange={(event) => {
-          if (event.complete) {
-            setError(null);
-          } else if (event.empty) {
-            setError("Please enter your card details");
-          }
-        }}
-      />
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
-      <Button disabled={!stripe || isLoading} className="w-full">
-        {isLoading ? "Adding..." : "Add Card"}
-      </Button>
-    </form>
-  );
-};
+import { stripePromise } from "@/config/stripe";
+import { PaymentForm } from "./PaymentForm";
 
 export const AddCard = () => {
   const [showForm, setShowForm] = useState(false);
@@ -135,7 +56,7 @@ export const AddCard = () => {
             appearance: { theme: 'stripe' },
           }}
         >
-          <AddCardForm />
+          <PaymentForm />
         </Elements>
       ) : null}
     </Card>
