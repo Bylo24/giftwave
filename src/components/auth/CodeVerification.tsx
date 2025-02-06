@@ -15,6 +15,7 @@ export const CodeVerification = () => {
 
   useEffect(() => {
     const storedPhone = sessionStorage.getItem('verifying_phone');
+    console.log('Stored phone number:', storedPhone);
     if (!storedPhone) {
       navigate('/verify');
       return;
@@ -27,12 +28,16 @@ export const CodeVerification = () => {
     if (!user || !phoneNumber) return;
 
     setIsLoading(true);
+    console.log('Attempting to verify code:', code, 'for phone:', phoneNumber);
+
     try {
-      const { error: verifyError } = await supabase.auth.verifyOtp({
+      const { data, error: verifyError } = await supabase.auth.verifyOtp({
         phone: phoneNumber,
         token: code,
         type: 'sms'
       });
+
+      console.log('Verification response:', { data, error: verifyError });
 
       if (verifyError) throw verifyError;
 
@@ -52,7 +57,7 @@ export const CodeVerification = () => {
       toast.success("Phone number verified successfully!");
       navigate('/profile');
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error('Verification error:', error);
       toast.error(error.message || "Failed to verify code");
       
       // Update verification attempts
@@ -87,15 +92,19 @@ export const CodeVerification = () => {
     
     try {
       setIsLoading(true);
-      const { error } = await supabase.auth.signInWithOtp({
+      console.log('Resending code to:', phoneNumber);
+      
+      const { data, error } = await supabase.auth.signInWithOtp({
         phone: phoneNumber
       });
+
+      console.log('Resend response:', { data, error });
 
       if (error) throw error;
       
       toast.success("New verification code sent!");
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error('Error resending code:', error);
       toast.error("Failed to resend code. Please try again.");
     } finally {
       setIsLoading(false);

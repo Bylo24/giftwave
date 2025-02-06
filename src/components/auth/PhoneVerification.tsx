@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PhoneInput } from "./PhoneInput";
 import { VerificationHeader } from "./VerificationHeader";
 import { fetchUserPhone, updateUserPhone } from "@/services/phoneService";
+import { supabase } from "@/integrations/supabase/client";
 
 export const PhoneVerification = () => {
   const navigate = useNavigate();
@@ -34,14 +35,26 @@ export const PhoneVerification = () => {
 
     setIsLoading(true);
     const fullPhoneNumber = `${countryCode}${phoneNumber}`;
+    console.log('Attempting to send OTP to:', fullPhoneNumber);
 
     try {
+      // First update the phone number in the profiles table
       await updateUserPhone(user.id, fullPhoneNumber);
+      
+      // Then send the OTP
+      const { data, error } = await supabase.auth.signInWithOtp({
+        phone: fullPhoneNumber,
+      });
+
+      console.log('OTP Response:', { data, error });
+
+      if (error) throw error;
+
       sessionStorage.setItem('verifying_phone', fullPhoneNumber);
       navigate("/verify-code");
       toast.success("Verification code sent to your phone");
     } catch (error: any) {
-      console.error('Error:', error);
+      console.error('Error sending OTP:', error);
       toast.error(error.message || "Failed to send verification code");
     } finally {
       setIsLoading(false);
@@ -74,7 +87,7 @@ export const PhoneVerification = () => {
         <Button 
           type="submit" 
           className="w-full bg-primary hover:bg-primary/90"
-          disabled={isLoading}
+          disabled={isLoading || !phoneNumber}
         >
           {isLoading ? "Sending..." : "Send code"}
         </Button>
