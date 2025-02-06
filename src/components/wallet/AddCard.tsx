@@ -26,13 +26,11 @@ export const AddCard = () => {
         throw new Error("No client secret received");
       }
 
-      console.log('Setup intent created with client secret');
       setClientSecret(data.clientSecret);
       setShowForm(true);
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to initialize card setup";
       toast.error(errorMessage);
-      console.error('Error creating setup intent:', error);
     } finally {
       setIsLoading(false);
     }
@@ -60,8 +58,7 @@ export const AddCard = () => {
           stripe={stripePromise} 
           options={{ 
             clientSecret,
-            appearance: { theme: 'stripe' },
-            loader: 'auto',
+            appearance: { theme: 'stripe' }
           }}
         >
           <PaymentForm onComplete={handlePaymentComplete} />

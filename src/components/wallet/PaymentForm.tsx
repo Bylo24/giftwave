@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -11,16 +11,6 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [isLoading, setIsLoading] = useState(false);
-  const [isElementsReady, setIsElementsReady] = useState(false);
-
-  useEffect(() => {
-    if (!stripe || !elements) {
-      console.log('Stripe or Elements not yet initialized');
-      return;
-    }
-    console.log('Stripe and Elements initialized successfully');
-    setIsElementsReady(true);
-  }, [stripe, elements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -33,13 +23,11 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     setIsLoading(true);
 
     try {
-      console.log('Submitting payment form...');
       const { error: submitError } = await elements.submit();
       if (submitError) {
         throw submitError;
       }
 
-      console.log('Confirming setup...');
       const { error: setupError } = await stripe.confirmSetup({
         elements,
         confirmParams: {
@@ -56,14 +44,13 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : "Failed to add card";
       toast.error(errorMessage);
-      console.error('Setup error:', error);
     } finally {
       setIsLoading(false);
     }
   };
 
-  if (!isElementsReady) {
-    return <div className="p-4 text-center text-gray-500">Initializing payment form...</div>;
+  if (!stripe || !elements) {
+    return <div className="p-4 text-center text-gray-500">Loading payment form...</div>;
   }
 
   return (
