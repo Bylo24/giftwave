@@ -32,7 +32,7 @@ function App() {
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/" element={<Navigate to="/home" replace />} />
+              <Route path="/" element={<Navigate to="/wallet" replace />} />
               <Route path="/home" element={<Home />} />
               <Route path="/login" element={<LoginForm />} />
               <Route path="/verify" element={<PhoneVerification />} />
