@@ -91,30 +91,36 @@ export type Database = {
           created_at: string
           full_name: string | null
           id: string
+          last_verification_attempt: string | null
           phone_number: string | null
           phone_verified: boolean | null
           updated_at: string
           username: string | null
+          verification_attempts: number | null
         }
         Insert: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id: string
+          last_verification_attempt?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
           updated_at?: string
           username?: string | null
+          verification_attempts?: number | null
         }
         Update: {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
           id?: string
+          last_verification_attempt?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
           updated_at?: string
           username?: string | null
+          verification_attempts?: number | null
         }
         Relationships: []
       }
