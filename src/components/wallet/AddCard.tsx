@@ -16,9 +16,11 @@ export const AddCard = () => {
   const handleAddCard = async () => {
     try {
       setIsLoading(true);
+      console.log("Creating setup intent...");
       const { data, error } = await supabase.functions.invoke('create-setup-intent');
       
       if (error) {
+        console.error("Setup intent error:", error);
         throw error;
       }
       
@@ -26,9 +28,11 @@ export const AddCard = () => {
         throw new Error("No client secret received");
       }
 
+      console.log("Setup intent created successfully");
       setClientSecret(data.clientSecret);
       setShowForm(true);
     } catch (error) {
+      console.error("Add card error:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to initialize card setup";
       toast.error(errorMessage);
     } finally {
@@ -58,8 +62,7 @@ export const AddCard = () => {
           stripe={stripePromise} 
           options={{ 
             clientSecret,
-            appearance: { theme: 'stripe' },
-            loader: 'auto'
+            appearance: { theme: 'stripe' }
           }}
         >
           <PaymentForm onComplete={handlePaymentComplete} />

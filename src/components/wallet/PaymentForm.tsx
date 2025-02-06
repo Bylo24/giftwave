@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { PaymentElement, useStripe, useElements } from "@stripe/react-stripe-js";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
@@ -16,17 +16,20 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     e.preventDefault();
     
     if (!stripe || !elements) {
+      toast.error("Stripe is not initialized");
       return;
     }
 
     setIsLoading(true);
 
     try {
+      console.log("Submitting payment form...");
       const { error: submitError } = await elements.submit();
       if (submitError) {
         throw submitError;
       }
 
+      console.log("Confirming setup...");
       const { error: setupError } = await stripe.confirmSetup({
         elements,
         confirmParams: {
@@ -38,9 +41,11 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
         throw setupError;
       }
 
+      console.log("Card added successfully");
       toast.success("Card added successfully");
       onComplete?.();
     } catch (error) {
+      console.error("Payment error:", error);
       const errorMessage = error instanceof Error ? error.message : "Failed to add card";
       toast.error(errorMessage);
     } finally {
