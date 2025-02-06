@@ -43,13 +43,14 @@ export const AddCard = () => {
   stripePromise.catch(error => {
     console.error('Stripe initialization error:', error);
     setStripeError(error.message);
+    toast.error('Failed to initialize payment system');
   });
 
   if (stripeError) {
     return (
       <Card className="p-4">
         <div className="text-red-500 text-sm">
-          Failed to initialize payment system: {stripeError}
+          Failed to initialize payment system. Please try again later.
         </div>
       </Card>
     );
