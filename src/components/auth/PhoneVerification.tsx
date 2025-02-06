@@ -12,7 +12,7 @@ export const PhoneVerification = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const [phoneNumber, setPhoneNumber] = useState("");
-  const [countryCode, setCountryCode] = useState("+1");
+  const [countryCode, setCountryCode] = useState("+64"); // Setting default to NZ
   const [isLoading, setIsLoading] = useState(false);
   const [currentPhone, setCurrentPhone] = useState<string | null>(null);
 
@@ -40,6 +40,7 @@ export const PhoneVerification = () => {
     try {
       // First update the phone number in the profiles table
       await updateUserPhone(user.id, fullPhoneNumber);
+      console.log('Updated user phone in profiles table');
       
       // Then send the OTP
       const { data, error } = await supabase.auth.signInWithOtp({
