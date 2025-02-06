@@ -54,16 +54,18 @@ export const AddCard = () => {
           Add New Card
         </Button>
       ) : clientSecret ? (
-        <Elements 
-          key={clientSecret}
-          stripe={stripePromise} 
-          options={{ 
-            clientSecret,
-            appearance: { theme: 'stripe' },
-          }}
-        >
-          <PaymentForm onComplete={handlePaymentComplete} />
-        </Elements>
+        <div className="w-full">
+          <Elements 
+            key={clientSecret}
+            stripe={stripePromise} 
+            options={{ 
+              clientSecret,
+              appearance: { theme: 'stripe' },
+            }}
+          >
+            <PaymentForm onComplete={handlePaymentComplete} />
+          </Elements>
+        </div>
       ) : null}
     </Card>
   );

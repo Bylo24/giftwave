@@ -18,21 +18,21 @@ export const PaymentForm = ({ onComplete }: PaymentFormProps) => {
     e.preventDefault();
     
     if (!stripe || !elements) {
-      setError("Stripe has not been initialized");
+      setError("Payment system not initialized");
       return;
     }
 
     setIsLoading(true);
     setError(null);
 
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      setError(submitError.message);
-      setIsLoading(false);
-      return;
-    }
-
     try {
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        setError(submitError.message);
+        setIsLoading(false);
+        return;
+      }
+
       const { error: setupError } = await stripe.confirmSetup({
         elements,
         confirmParams: {
