@@ -1,10 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts"
-import Stripe from 'https://esm.sh/stripe@14.21.0'
-
-const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+import { stripe } from '../_shared/stripe.ts'
+import { corsHeaders } from '../_shared/cors.ts'
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -13,10 +9,6 @@ serve(async (req) => {
   }
 
   try {
-    const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
-      apiVersion: '2023-10-16',
-    })
-
     const setupIntent = await stripe.setupIntents.create({
       payment_method_types: ['card'],
     })
