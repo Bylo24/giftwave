@@ -3,6 +3,7 @@ import { BottomNav } from "@/components/ui/bottom-nav";
 import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddCard } from "@/components/wallet/AddCard";
+import { SavedCards } from "@/components/wallet/SavedCards";
 
 const Wallet = () => {
   return (
@@ -50,6 +51,7 @@ const Wallet = () => {
         {/* Payment Methods */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Payment Methods</h3>
+          <SavedCards />
           <AddCard />
         </div>
 
