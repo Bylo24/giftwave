@@ -40,7 +40,9 @@ export const CodeVerification = () => {
         .from('profiles')
         .update({ 
           phone_verified: true,
-          phone_number: phoneNumber 
+          phone_number: phoneNumber,
+          verification_attempts: 0,
+          last_verification_attempt: new Date().toISOString()
         })
         .eq('id', user.id);
 
@@ -52,6 +54,29 @@ export const CodeVerification = () => {
     } catch (error: any) {
       console.error('Error:', error);
       toast.error(error.message || "Failed to verify code");
+      
+      // Update verification attempts
+      if (user) {
+        const { data } = await supabase
+          .from('profiles')
+          .select('verification_attempts')
+          .eq('id', user.id)
+          .single();
+        
+        const attempts = (data?.verification_attempts || 0) + 1;
+        await supabase
+          .from('profiles')
+          .update({ 
+            verification_attempts: attempts,
+            last_verification_attempt: new Date().toISOString()
+          })
+          .eq('id', user.id);
+
+        if (attempts >= 3) {
+          toast.error("Too many verification attempts. Please try again later.");
+          navigate('/verify');
+        }
+      }
     } finally {
       setIsLoading(false);
     }

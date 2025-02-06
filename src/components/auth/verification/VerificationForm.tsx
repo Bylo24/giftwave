@@ -1,7 +1,7 @@
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { ResendButton } from "./ResendButton";
+import { VerificationInput } from "./VerificationInput";
 
 interface VerificationFormProps {
   code: string;
@@ -23,30 +23,27 @@ export const VerificationForm = ({
   return (
     <form onSubmit={onSubmit} className="space-y-6">
       <div className="space-y-4">
-        <Input
-          type="text"
-          maxLength={6}
-          placeholder="Enter 6-digit code"
-          value={code}
-          onChange={(e) => onCodeChange(e.target.value)}
-          className="w-full text-center text-2xl tracking-widest"
-          disabled={isLoading}
+        <VerificationInput
+          code={code}
+          onCodeChange={onCodeChange}
+          isLoading={isLoading}
         />
         <div className="flex items-center justify-between">
           <ResendButton onResend={onResend} isLoading={isLoading} />
-          <button 
+          <Button 
             type="button"
+            variant="link"
             onClick={() => navigate('/verify')}
-            className="text-sm text-primary hover:text-primary/90"
+            className="px-0 h-auto font-normal"
           >
             Change phone number
-          </button>
+          </Button>
         </div>
       </div>
 
       <Button 
         type="submit" 
-        className="w-full bg-primary hover:bg-primary/90"
+        className="w-full"
         disabled={isLoading || code.length !== 6}
       >
         {isLoading ? "Verifying..." : "Verify"}

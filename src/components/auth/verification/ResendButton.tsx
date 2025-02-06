@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
 
 interface ResendButtonProps {
   onResend: () => Promise<void>;
@@ -34,17 +35,17 @@ export const ResendButton = ({ onResend, isLoading }: ResendButtonProps) => {
   };
 
   return (
-    <button 
-      type="button"
+    <Button 
+      variant="link" 
       onClick={handleResend}
-      className={`text-sm ${canResend ? 'text-primary hover:text-primary/90' : 'text-gray-400'}`}
       disabled={!canResend || isLoading}
+      className="px-0 h-auto font-normal"
     >
       {canResend ? (
         "Resend code"
       ) : (
         `Resend code in ${resendTimer}s`
       )}
-    </button>
+    </Button>
   );
 };
