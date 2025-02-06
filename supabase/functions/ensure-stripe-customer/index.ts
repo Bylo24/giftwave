@@ -28,6 +28,7 @@ Deno.serve(async (req) => {
       .single()
 
     if (existingCustomer?.customer_id) {
+      console.log('Customer already exists:', existingCustomer.customer_id)
       return new Response(
         JSON.stringify({ customerId: existingCustomer.customer_id }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -35,6 +36,7 @@ Deno.serve(async (req) => {
     }
 
     // Create new Stripe customer
+    console.log('Creating new Stripe customer for user:', user.id)
     const customer = await stripe.customers.create({
       email: user.email,
       metadata: {
@@ -42,18 +44,26 @@ Deno.serve(async (req) => {
       },
     })
 
-    // Save customer ID to database
+    // Use upsert operation instead of insert
     const { error: insertError } = await supabase
       .from('stripe_customers')
-      .insert([{ id: user.id, customer_id: customer.id }])
+      .upsert(
+        { id: user.id, customer_id: customer.id },
+        { onConflict: 'id' }
+      )
 
-    if (insertError) throw insertError
+    if (insertError) {
+      console.error('Error upserting customer:', insertError)
+      throw insertError
+    }
 
+    console.log('Successfully created Stripe customer:', customer.id)
     return new Response(
       JSON.stringify({ customerId: customer.id }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {
+    console.error('Error in ensure-stripe-customer:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
