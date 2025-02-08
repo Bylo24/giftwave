@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -30,7 +29,7 @@ const Home = () => {
       <div className="p-4 space-y-4">
         <div className="flex justify-center mb-6">
           <img 
-            src="/lovable-uploads/e22008e4-0ff6-41bf-a659-f533d4df158c.png"
+            src="/lovable-uploads/d0eaee07-4183-4bee-82ec-c2b979790c51.png"
             alt="GiftWave Logo"
             className="h-16 w-auto"
           />
@@ -174,4 +173,3 @@ const Home = () => {
 };
 
 export default Home;
-
