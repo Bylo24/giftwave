@@ -1,3 +1,4 @@
+
 import { Link, useLocation } from "react-router-dom";
 import { Home, Wallet, Gift, User } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -6,7 +7,7 @@ export function BottomNav() {
   const location = useLocation();
   
   const navItems = [
-    { icon: Home, label: "Home", path: "/" },
+    { icon: Home, label: "Home", path: "/home" },
     { icon: Wallet, label: "Wallet", path: "/wallet" },
     { icon: Gift, label: "Gift", path: "/gift", isCenter: true },
     { icon: Gift, label: "My Gifts", path: "/my-gifts" },
