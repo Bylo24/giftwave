@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
@@ -14,12 +15,17 @@ const Wallet = () => {
 
   useEffect(() => {
     const ensureStripeCustomer = async () => {
+      if (!session?.access_token) {
+        console.error('No auth session available');
+        return;
+      }
+
       try {
         const { error } = await supabase.functions.invoke(
           'ensure-stripe-customer',
           {
             headers: {
-              Authorization: `Bearer ${session?.access_token}`
+              Authorization: `Bearer ${session.access_token}`
             }
           }
         );
@@ -34,6 +40,19 @@ const Wallet = () => {
       ensureStripeCustomer();
     }
   }, [user, session]);
+
+  if (!session?.access_token) {
+    return (
+      <div className="min-h-screen bg-white pb-16">
+        <div className="p-4 pt-16">
+          <Card className="p-4">
+            <p className="text-center text-gray-500">Please log in to access your wallet</p>
+          </Card>
+        </div>
+        <BottomNav />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white pb-16">

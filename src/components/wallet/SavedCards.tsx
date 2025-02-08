@@ -21,34 +21,45 @@ interface PaymentMethod {
 export const SavedCards = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const queryClient = useQueryClient();
-  const { session } = useAuth();
+  const { session, user } = useAuth();
 
-  const { data: cards, isLoading } = useQuery({
-    queryKey: ['payment-methods'],
+  const { data: cards, isLoading, error } = useQuery({
+    queryKey: ['payment-methods', user?.id],
     queryFn: async () => {
+      if (!session?.access_token) {
+        throw new Error('No auth session');
+      }
       const { data, error } = await supabase.functions.invoke('list-payment-methods', {
         headers: {
-          Authorization: `Bearer ${session?.access_token}`
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       if (error) throw error;
       return data.paymentMethods as PaymentMethod[];
     },
-    enabled: !!session?.access_token,
+    enabled: !!session?.access_token && !!user,
+    retry: false,
+    onError: (error) => {
+      console.error('Error fetching payment methods:', error);
+      toast.error('Failed to load payment methods');
+    }
   });
 
   const deleteCard = useMutation({
     mutationFn: async (paymentMethodId: string) => {
+      if (!session?.access_token) {
+        throw new Error('No auth session');
+      }
       const { error } = await supabase.functions.invoke('delete-payment-method', {
         body: { paymentMethodId },
         headers: {
-          Authorization: `Bearer ${session?.access_token}`
+          Authorization: `Bearer ${session.access_token}`
         }
       });
       if (error) throw error;
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['payment-methods'] });
+      queryClient.invalidateQueries({ queryKey: ['payment-methods', user?.id] });
       toast.success('Card removed successfully');
     },
     onError: (error) => {
@@ -64,6 +75,22 @@ export const SavedCards = () => {
     setIsDeleting(paymentMethodId);
     deleteCard.mutate(paymentMethodId);
   };
+
+  if (!session?.access_token) {
+    return (
+      <Card className="p-4">
+        <p className="text-center text-gray-500">Please log in to view payment methods</p>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className="p-4">
+        <p className="text-center text-gray-500">Failed to load payment methods</p>
+      </Card>
+    );
+  }
 
   if (isLoading) {
     return (
