@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -27,6 +28,14 @@ const Home = () => {
   return (
     <div className="min-h-screen bg-white pb-16">
       <div className="p-4 space-y-4">
+        <div className="flex justify-center mb-6">
+          <img 
+            src="/lovable-uploads/e22008e4-0ff6-41bf-a659-f533d4df158c.png"
+            alt="GiftWave Logo"
+            className="h-16 w-auto"
+          />
+        </div>
+
         <div className="flex items-center justify-between gap-4">
           <div className="relative flex-1 max-w-[500px]">
             <Search 
@@ -165,3 +174,4 @@ const Home = () => {
 };
 
 export default Home;
+
