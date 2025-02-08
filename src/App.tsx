@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import { CodeVerification } from "./components/auth/CodeVerification";
 import { AccountSetup } from "./components/auth/AccountSetup";
 import { RequireAuth } from "./components/auth/RequireAuth";
 import { UpdatePhone } from "./components/profile/UpdatePhone";
+import { PullToRefresh } from "./components/ui/pull-to-refresh";
 import Home from "./pages/Home";
 import NotFound from "./pages/NotFound";
 import PromoCode from "./pages/PromoCode";
@@ -31,6 +33,7 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <AuthProvider>
+            <PullToRefresh />
             <Routes>
               <Route path="/" element={<Navigate to="/wallet" replace />} />
               <Route path="/home" element={<Home />} />

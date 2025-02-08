@@ -39,9 +39,11 @@ export const SavedCards = () => {
     },
     enabled: !!session?.access_token && !!user,
     retry: false,
-    onError: (error) => {
-      console.error('Error fetching payment methods:', error);
-      toast.error('Failed to load payment methods');
+    meta: {
+      onError: (error: Error) => {
+        console.error('Error fetching payment methods:', error);
+        toast.error('Failed to load payment methods');
+      }
     }
   });
 
