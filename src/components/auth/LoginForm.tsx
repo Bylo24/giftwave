@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { EmailAuthForm } from "./EmailAuthForm";
 import { GoogleAuthButton } from "./GoogleAuthButton";
@@ -10,11 +11,18 @@ export const LoginForm = () => {
   return (
     <div className="min-h-screen flex items-center justify-center animate-fade-in bg-background">
       <div className="w-full max-w-md mx-auto p-6 space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-2xl font-semibold">Welcome to GiftWave</h1>
-          <p className="text-sm text-gray-500">
-            {isSignUp ? "Create an account" : "Sign in to your account"}
-          </p>
+        <div className="flex flex-col items-center space-y-6">
+          <img 
+            src="/lovable-uploads/d0eaee07-4183-4bee-82ec-c2b979790c51.png"
+            alt="GiftWave Logo"
+            className="h-16 w-auto"
+          />
+          <div className="text-center space-y-2">
+            <h1 className="text-2xl font-semibold">Welcome to GiftWave</h1>
+            <p className="text-sm text-gray-500">
+              {isSignUp ? "Create an account" : "Sign in to your account"}
+            </p>
+          </div>
         </div>
 
         <EmailAuthForm
