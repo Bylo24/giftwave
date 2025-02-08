@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -5,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface PaymentMethod {
   id: string;
@@ -19,20 +21,29 @@ interface PaymentMethod {
 export const SavedCards = () => {
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const { session } = useAuth();
 
   const { data: cards, isLoading } = useQuery({
     queryKey: ['payment-methods'],
     queryFn: async () => {
-      const { data, error } = await supabase.functions.invoke('list-payment-methods');
+      const { data, error } = await supabase.functions.invoke('list-payment-methods', {
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
       if (error) throw error;
       return data.paymentMethods as PaymentMethod[];
     },
+    enabled: !!session?.access_token,
   });
 
   const deleteCard = useMutation({
     mutationFn: async (paymentMethodId: string) => {
       const { error } = await supabase.functions.invoke('delete-payment-method', {
         body: { paymentMethodId },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
       });
       if (error) throw error;
     },

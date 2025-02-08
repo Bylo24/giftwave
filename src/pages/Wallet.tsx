@@ -10,27 +10,34 @@ import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const Wallet = () => {
-  const { user } = useAuth();
+  const { session, user } = useAuth();
 
   useEffect(() => {
     const ensureStripeCustomer = async () => {
       try {
-        await supabase.functions.invoke('ensure-stripe-customer');
+        const { error } = await supabase.functions.invoke(
+          'ensure-stripe-customer',
+          {
+            headers: {
+              Authorization: `Bearer ${session?.access_token}`
+            }
+          }
+        );
+        if (error) throw error;
       } catch (error) {
         console.error('Error ensuring Stripe customer:', error);
         toast.error('Failed to initialize payment system');
       }
     };
 
-    if (user) {
+    if (user && session?.access_token) {
       ensureStripeCustomer();
     }
-  }, [user]);
+  }, [user, session]);
 
   return (
     <div className="min-h-screen bg-white pb-16">
       <div className="p-4 pt-16 space-y-6">
-        {/* Greeting */}
         <div className="text-center mb-4">
           <h1 className="text-xl font-medium text-gray-800">
             Hey <Link to="/profile" className="text-primary hover:underline">{user?.email}</Link>,
@@ -38,7 +45,6 @@ const Wallet = () => {
           <p className="text-gray-600">here's your balance</p>
         </div>
 
-        {/* Balance Card */}
         <Card className="p-6 bg-primary text-white">
           <div className="flex items-center gap-3 mb-4">
             <WalletIcon className="h-6 w-6" />
@@ -50,7 +56,6 @@ const Wallet = () => {
           </div>
         </Card>
 
-        {/* Quick Actions */}
         <div className="grid grid-cols-2 gap-4">
           <Card 
             className="p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors"
@@ -69,14 +74,12 @@ const Wallet = () => {
           </Card>
         </div>
 
-        {/* Payment Methods */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Payment Methods</h3>
           <SavedCards />
           <AddCard />
         </div>
 
-        {/* Recent Activity */}
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
           <Card className="p-4">
