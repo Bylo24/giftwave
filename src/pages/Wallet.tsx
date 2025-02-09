@@ -5,22 +5,39 @@ import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddCard } from "@/components/wallet/AddCard";
 import { SavedCards } from "@/components/wallet/SavedCards";
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const Wallet = () => {
   const { session, user } = useAuth();
+  const [firstName, setFirstName] = useState<string>('there');
 
-  const firstName = useMemo(() => {
-    if (user?.email) {
-      // First try to get the part before @ in email
-      const emailName = user.email.split('@')[0];
-      // Capitalize first letter and return
-      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
-    }
-    return 'there'; // Fallback
+  useEffect(() => {
+    const fetchProfile = async () => {
+      if (!user) return;
+
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        if (data?.full_name) {
+          // Get the first word from full_name
+          const firstWord = data.full_name.split(' ')[0];
+          setFirstName(firstWord);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      }
+    };
+
+    fetchProfile();
   }, [user]);
 
   useEffect(() => {
