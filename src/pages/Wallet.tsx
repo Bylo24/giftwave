@@ -5,13 +5,23 @@ import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddCard } from "@/components/wallet/AddCard";
 import { SavedCards } from "@/components/wallet/SavedCards";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 
 const Wallet = () => {
   const { session, user } = useAuth();
+
+  const firstName = useMemo(() => {
+    if (user?.email) {
+      // First try to get the part before @ in email
+      const emailName = user.email.split('@')[0];
+      // Capitalize first letter and return
+      return emailName.charAt(0).toUpperCase() + emailName.slice(1);
+    }
+    return 'there'; // Fallback
+  }, [user]);
 
   useEffect(() => {
     const ensureStripeCustomer = async () => {
@@ -59,7 +69,7 @@ const Wallet = () => {
       <div className="p-4 pt-16 space-y-6">
         <div className="text-center mb-4">
           <h1 className="text-xl font-medium text-gray-800">
-            Hey <Link to="/profile" className="text-primary hover:underline">{user?.email}</Link>,
+            Hey <Link to="/profile" className="text-primary hover:underline">{firstName}</Link>,
           </h1>
           <p className="text-gray-600">here's your balance</p>
         </div>
