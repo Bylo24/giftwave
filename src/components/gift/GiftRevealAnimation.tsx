@@ -3,9 +3,13 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "react-confetti";
 import { Button } from "@/components/ui/button";
-import { Gift, ChevronUp } from "lucide-react";
+import { ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { InitialStage } from "./stages/InitialStage";
+import { VideoStage } from "./stages/VideoStage";
+import { MemoryStage } from "./stages/MemoryStage";
+import { demoContent } from "@/utils/demoContent";
 
 interface GiftRevealAnimationProps {
   messageVideo: File | string | null;
@@ -25,9 +29,9 @@ interface GiftRevealAnimationProps {
 }
 
 export const GiftRevealAnimation = ({ 
-  messageVideo, 
+  messageVideo = demoContent.sampleVideo, 
   amount, 
-  memories = [],
+  memories = demoContent.memories,
   onComplete 
 }: GiftRevealAnimationProps) => {
   const navigate = useNavigate();
@@ -114,45 +118,7 @@ export const GiftRevealAnimation = ({
     <div className="fixed inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center z-50">
       <AnimatePresence mode="wait">
         {stage === 'initial' && (
-          <motion.div 
-            className="flex flex-col items-center space-y-8"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-          >
-            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
-              You've received a gift!
-            </h2>
-            <motion.div
-              className="relative w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-2xl flex items-center justify-center cursor-pointer shadow-xl hover:shadow-violet-400/20"
-              animate={{ 
-                y: [0, -10, 0],
-                rotateZ: [0, -2, 2, 0]
-              }}
-              transition={{ 
-                y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
-                rotateZ: { duration: 4, repeat: Infinity, ease: "easeInOut" }
-              }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => setStage('opening')}
-            >
-              <Gift className="w-12 h-12 md:w-16 md:h-16 text-white" />
-              <motion.div
-                className="absolute inset-0 rounded-2xl border-2 border-white/30"
-                animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.5, 0, 0.5]
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut"
-                }}
-              />
-            </motion.div>
-            <p className="text-gray-500 animate-pulse">Tap to open</p>
-          </motion.div>
+          <InitialStage onOpen={() => setStage('opening')} />
         )}
 
         {stage === 'opening' && (
@@ -162,7 +128,6 @@ export const GiftRevealAnimation = ({
             transition={{ duration: 1, times: [0, 0.3, 1] }}
             className="relative"
           >
-            <Gift className="w-24 h-24 md:w-32 md:h-32 text-violet-500" />
             <Confetti
               numberOfPieces={isMobile ? 50 : 100}
               gravity={0.2}
@@ -173,56 +138,14 @@ export const GiftRevealAnimation = ({
         )}
 
         {stage === 'video' && messageVideo && (
-          <motion.div
-            className="w-full max-w-lg mx-auto px-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-black/5">
-              <video
-                className="w-full h-full object-cover"
-                src={getVideoUrl()}
-                autoPlay
-                playsInline
-                controls={false}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-            </div>
-          </motion.div>
+          <VideoStage videoUrl={getVideoUrl()} />
         )}
 
         {stage === 'memories' && memories[memoryIndex] && (
-          <motion.div
-            className="w-full max-w-lg mx-auto px-4 space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            onAnimationComplete={() => {
-              if (memoryIndex < Math.min(memories.length - 1, 1)) {
-                setTimeout(() => setMemoryIndex(prev => prev + 1), 3000);
-              }
-            }}
-          >
-            {memories[memoryIndex].imageUrl && (
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-square">
-                <img 
-                  src={memories[memoryIndex].imageUrl} 
-                  alt="Memory"
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
-              </div>
-            )}
-            <motion.p 
-              className="text-lg md:text-xl text-center text-gray-800 font-medium"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              {memories[memoryIndex].caption}
-            </motion.p>
-          </motion.div>
+          <MemoryStage 
+            memory={memories[memoryIndex]} 
+            key={memoryIndex}
+          />
         )}
 
         {stage === 'tapping' && (
