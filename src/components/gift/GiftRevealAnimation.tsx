@@ -39,9 +39,18 @@ export const GiftRevealAnimation = ({
 
   useEffect(() => {
     if (stage === 'opening') {
-      setTimeout(() => setStage('video'), 2000);
+      const timer = setTimeout(() => {
+        if (messageVideo) {
+          setStage('video');
+        } else if (memories.length > 0) {
+          setStage('memories');
+        } else {
+          setStage('tapping');
+        }
+      }, 2000);
+      return () => clearTimeout(timer);
     }
-  }, [stage]);
+  }, [stage, messageVideo, memories.length]);
 
   useEffect(() => {
     if (stage === 'video') {
@@ -54,21 +63,16 @@ export const GiftRevealAnimation = ({
             setStage('tapping');
           }
         };
-      } else {
-        if (memories.length > 0) {
-          setStage('memories');
-        } else {
-          setStage('tapping');
-        }
       }
     }
   }, [stage, memories.length]);
 
   useEffect(() => {
-    if (stage === 'memories' && memoryIndex >= 2) {
-      setTimeout(() => setStage('tapping'), 3000);
+    if (stage === 'memories' && memoryIndex >= Math.min(memories.length - 1, 1)) {
+      const timer = setTimeout(() => setStage('tapping'), 3000);
+      return () => clearTimeout(timer);
     }
-  }, [memoryIndex, stage]);
+  }, [memoryIndex, stage, memories.length]);
 
   useEffect(() => {
     if (stage === 'tapping') {
@@ -102,6 +106,7 @@ export const GiftRevealAnimation = ({
   };
 
   const handleCollect = () => {
+    onComplete();
     navigate('/login');
   };
 
@@ -195,7 +200,7 @@ export const GiftRevealAnimation = ({
             exit={{ opacity: 0, y: -20 }}
             onAnimationComplete={() => {
               if (memoryIndex < Math.min(memories.length - 1, 1)) {
-                setTimeout(() => setMemoryIndex(memoryIndex + 1), 3000);
+                setTimeout(() => setMemoryIndex(prev => prev + 1), 3000);
               }
             }}
           >
