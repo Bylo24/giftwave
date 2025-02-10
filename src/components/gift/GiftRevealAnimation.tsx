@@ -1,9 +1,9 @@
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import Confetti from "react-confetti";
 import { Button } from "@/components/ui/button";
-import { Gift } from "lucide-react";
+import { Gift, ChevronUp } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -32,31 +32,68 @@ export const GiftRevealAnimation = ({
 }: GiftRevealAnimationProps) => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
-  const [opened, setOpened] = useState(false);
-  const [videoPlayed, setVideoPlayed] = useState(false);
-  const [memoryIndex, setMemoryIndex] = useState(-1);
-  const [amountRevealed, setAmountRevealed] = useState(false);
-  const [showClaim, setShowClaim] = useState(false);
+  const [stage, setStage] = useState<'initial' | 'opening' | 'video' | 'memories' | 'tapping' | 'revealed' | 'claim'>('initial');
+  const [taps, setTaps] = useState(0);
+  const [memoryIndex, setMemoryIndex] = useState(0);
+  const [blurAmount, setBlurAmount] = useState(20);
 
   useEffect(() => {
-    if (opened) {
-      setTimeout(() => setVideoPlayed(true), 1000);
+    if (stage === 'opening') {
+      setTimeout(() => setStage('video'), 2000);
     }
-  }, [opened]);
+  }, [stage]);
 
   useEffect(() => {
-    if (videoPlayed && memoryIndex < memories.length - 1) {
-      setTimeout(() => setMemoryIndex(memoryIndex + 1), 3000);
-    } else if (memoryIndex === memories.length - 1) {
-      setTimeout(() => setAmountRevealed(true), 3000);
+    if (stage === 'video') {
+      const videoElement = document.querySelector('video');
+      if (videoElement) {
+        videoElement.onended = () => {
+          if (memories.length > 0) {
+            setStage('memories');
+          } else {
+            setStage('tapping');
+          }
+        };
+      } else {
+        if (memories.length > 0) {
+          setStage('memories');
+        } else {
+          setStage('tapping');
+        }
+      }
     }
-  }, [videoPlayed, memoryIndex]);
+  }, [stage, memories.length]);
 
   useEffect(() => {
-    if (amountRevealed) {
-      setTimeout(() => setShowClaim(true), 2000);
+    if (stage === 'memories' && memoryIndex >= 2) {
+      setTimeout(() => setStage('tapping'), 3000);
     }
-  }, [amountRevealed]);
+  }, [memoryIndex, stage]);
+
+  useEffect(() => {
+    if (stage === 'tapping') {
+      const interval = setInterval(() => {
+        if (blurAmount > 0) {
+          setBlurAmount(prev => Math.max(0, prev - 0.2));
+        }
+      }, 50);
+      return () => clearInterval(interval);
+    }
+  }, [stage]);
+
+  const handleTap = () => {
+    if (stage === 'tapping') {
+      setTaps(prev => {
+        const newTaps = prev + 1;
+        if (newTaps >= 10) {
+          setStage('revealed');
+          setTimeout(() => setStage('claim'), 2000);
+        }
+        return newTaps;
+      });
+      setBlurAmount(prev => Math.max(0, prev - 2));
+    }
+  };
 
   const getVideoUrl = () => {
     if (!messageVideo) return '';
@@ -69,105 +106,200 @@ export const GiftRevealAnimation = ({
   };
 
   return (
-    <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-      {!opened && (
-        <div className="flex flex-col items-center space-y-6">
-          <div className="text-2xl md:text-3xl font-bold text-white animate-pulse">
-            You have a gift!
-          </div>
-          <motion.div
-            className="relative w-20 h-20 md:w-24 md:h-24 bg-gradient-to-br from-yellow-400 to-yellow-500 rounded-xl flex items-center justify-center cursor-pointer shadow-xl hover:shadow-yellow-400/20"
-            animate={{ y: [0, -5, 0] }}
-            transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-            onClick={() => setOpened(true)}
+    <div className="fixed inset-0 bg-gradient-to-br from-white to-gray-50 flex items-center justify-center z-50">
+      <AnimatePresence mode="wait">
+        {stage === 'initial' && (
+          <motion.div 
+            className="flex flex-col items-center space-y-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.9 }}
           >
-            <Gift className="w-10 h-10 md:w-12 md:h-12 text-white" />
+            <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">
+              You've received a gift!
+            </h2>
+            <motion.div
+              className="relative w-24 h-24 md:w-32 md:h-32 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-2xl flex items-center justify-center cursor-pointer shadow-xl hover:shadow-violet-400/20"
+              animate={{ 
+                y: [0, -10, 0],
+                rotateZ: [0, -2, 2, 0]
+              }}
+              transition={{ 
+                y: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                rotateZ: { duration: 4, repeat: Infinity, ease: "easeInOut" }
+              }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setStage('opening')}
+            >
+              <Gift className="w-12 h-12 md:w-16 md:h-16 text-white" />
+              <motion.div
+                className="absolute inset-0 rounded-2xl border-2 border-white/30"
+                animate={{
+                  scale: [1, 1.1, 1],
+                  opacity: [0.5, 0, 0.5]
+                }}
+                transition={{
+                  duration: 2,
+                  repeat: Infinity,
+                  ease: "easeInOut"
+                }}
+              />
+            </motion.div>
+            <p className="text-gray-500 animate-pulse">Tap to open</p>
           </motion.div>
-        </div>
-      )}
+        )}
 
-      {opened && (
-        <Confetti 
-          numberOfPieces={isMobile ? 50 : 100}
-          width={window.innerWidth} 
-          height={window.innerHeight}
-          gravity={0.2}
-          recycle={false}
-        />
-      )}
-
-      {opened && !videoPlayed && messageVideo && (
-        <motion.video
-          className="w-full h-full md:h-auto md:max-w-2xl md:aspect-video object-cover rounded-lg"
-          src={getVideoUrl()}
-          autoPlay
-          muted
-          playsInline
-          onEnded={() => setVideoPlayed(true)}
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        />
-      )}
-
-      {videoPlayed && memoryIndex >= 0 && memoryIndex < memories.length && (
-        <motion.div
-          className="text-center space-y-6 max-w-sm md:max-w-xl mx-auto p-4 md:p-6"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-        >
-          {memories[memoryIndex].imageUrl && (
-            <motion.img 
-              src={memories[memoryIndex].imageUrl} 
-              className="w-full h-48 md:h-64 object-cover rounded-xl shadow-xl" 
-              alt="Memory"
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ duration: 0.5 }}
+        {stage === 'opening' && (
+          <motion.div
+            initial={{ scale: 1 }}
+            animate={{ scale: [1, 1.1, 0] }}
+            transition={{ duration: 1, times: [0, 0.3, 1] }}
+            className="relative"
+          >
+            <Gift className="w-24 h-24 md:w-32 md:h-32 text-violet-500" />
+            <Confetti
+              numberOfPieces={isMobile ? 50 : 100}
+              gravity={0.2}
+              recycle={false}
+              colors={['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9']}
             />
-          )}
-          <motion.p 
-            className="mt-4 text-lg md:text-xl font-medium text-center text-white"
+          </motion.div>
+        )}
+
+        {stage === 'video' && messageVideo && (
+          <motion.div
+            className="w-full max-w-lg mx-auto px-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            exit={{ opacity: 0 }}
           >
-            {memories[memoryIndex].caption}
-          </motion.p>
-        </motion.div>
-      )}
+            <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-black/5">
+              <video
+                className="w-full h-full object-cover"
+                src={getVideoUrl()}
+                autoPlay
+                playsInline
+                controls={false}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+            </div>
+          </motion.div>
+        )}
 
-      {amountRevealed && (
-        <motion.div
-          className="bg-gradient-to-br from-green-400 to-blue-500 w-56 md:w-64 h-28 md:h-32 rounded-2xl flex items-center justify-center text-white text-3xl md:text-4xl font-bold shadow-2xl"
-          initial={{ opacity: 0, scale: 0.8, rotate: -5 }}
-          animate={{ opacity: 1, scale: 1, rotate: 0 }}
-          transition={{ 
-            duration: 0.6,
-            type: "spring",
-            stiffness: 200,
-            damping: 15
-          }}
-        >
-          ${amount}
-        </motion.div>
-      )}
-
-      {showClaim && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="absolute bottom-10 left-0 right-0 text-center px-4"
-        >
-          <Button 
-            onClick={handleCollect}
-            className="bg-gradient-to-r from-pink-500 to-purple-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:opacity-90 transition-opacity shadow-xl hover:shadow-pink-500/20"
+        {stage === 'memories' && memories[memoryIndex] && (
+          <motion.div
+            className="w-full max-w-lg mx-auto px-4 space-y-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            onAnimationComplete={() => {
+              if (memoryIndex < Math.min(memories.length - 1, 1)) {
+                setTimeout(() => setMemoryIndex(memoryIndex + 1), 3000);
+              }
+            }}
           >
-            Collect Your Gift
-          </Button>
-        </motion.div>
-      )}
+            {memories[memoryIndex].imageUrl && (
+              <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-square">
+                <img 
+                  src={memories[memoryIndex].imageUrl} 
+                  alt="Memory"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
+              </div>
+            )}
+            <motion.p 
+              className="text-lg md:text-xl text-center text-gray-800 font-medium"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+            >
+              {memories[memoryIndex].caption}
+            </motion.p>
+          </motion.div>
+        )}
+
+        {stage === 'tapping' && (
+          <motion.div
+            className="space-y-6 text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <p className="text-lg text-gray-600">Tap rapidly to reveal your gift!</p>
+            <motion.div
+              className="w-64 h-32 md:w-80 md:h-40 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-2xl flex items-center justify-center cursor-pointer shadow-xl"
+              animate={{ scale: [1, 1.02, 1] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+              onClick={handleTap}
+              style={{ 
+                filter: `blur(${blurAmount}px)`,
+                WebkitFilter: `blur(${blurAmount}px)`
+              }}
+            >
+              <span className="text-4xl md:text-5xl font-bold text-white">
+                ${amount}
+              </span>
+            </motion.div>
+            <motion.div 
+              animate={{ y: [0, -10, 0] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            >
+              <ChevronUp className="w-6 h-6 text-gray-400 mx-auto" />
+            </motion.div>
+          </motion.div>
+        )}
+
+        {stage === 'revealed' && (
+          <motion.div
+            className="relative"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 1.1, opacity: 0 }}
+          >
+            <motion.div
+              className="w-64 h-32 md:w-80 md:h-40 bg-gradient-to-br from-violet-500 to-indigo-500 rounded-2xl flex items-center justify-center shadow-2xl"
+              animate={{ 
+                boxShadow: [
+                  "0 25px 50px -12px rgba(139, 92, 246, 0.25)",
+                  "0 25px 50px -12px rgba(139, 92, 246, 0.45)",
+                  "0 25px 50px -12px rgba(139, 92, 246, 0.25)"
+                ]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+            >
+              <span className="text-4xl md:text-5xl font-bold text-white">
+                ${amount}
+              </span>
+            </motion.div>
+            <Confetti
+              numberOfPieces={isMobile ? 50 : 100}
+              gravity={0.2}
+              recycle={false}
+              colors={['#8B5CF6', '#D946EF', '#F97316', '#0EA5E9']}
+            />
+          </motion.div>
+        )}
+
+        {stage === 'claim' && (
+          <motion.div
+            className="space-y-6 text-center px-4"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+          >
+            <Button
+              onClick={handleCollect}
+              className="bg-gradient-to-r from-violet-500 to-indigo-500 text-white px-8 py-6 rounded-full text-lg font-semibold hover:opacity-90 transition-opacity shadow-xl hover:shadow-violet-500/20"
+            >
+              Claim Your Gift
+            </Button>
+            <p className="text-sm text-gray-500">
+              Sign up or log in to receive your gift
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };
