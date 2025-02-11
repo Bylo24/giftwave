@@ -11,13 +11,13 @@ interface MemoryStageProps {
 export const MemoryStage = ({ memory }: MemoryStageProps) => {
   return (
     <motion.div
-      className="w-full max-w-lg mx-auto px-4 space-y-4"
+      className="w-full max-w-sm mx-auto px-4 space-y-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
     >
       {memory.imageUrl && (
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-square">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[9/16]">
           <img 
             src={memory.imageUrl} 
             alt="Memory"
@@ -37,3 +37,4 @@ export const MemoryStage = ({ memory }: MemoryStageProps) => {
     </motion.div>
   );
 };
+

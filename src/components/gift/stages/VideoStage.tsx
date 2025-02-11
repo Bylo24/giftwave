@@ -8,12 +8,12 @@ interface VideoStageProps {
 export const VideoStage = ({ videoUrl }: VideoStageProps) => {
   return (
     <motion.div
-      className="w-full max-w-lg mx-auto px-4"
+      className="w-full max-w-sm mx-auto px-4"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
     >
-      <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-video bg-black/5">
+      <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[9/16] bg-black/5">
         <video
           className="w-full h-full object-cover"
           src={videoUrl}
@@ -26,3 +26,4 @@ export const VideoStage = ({ videoUrl }: VideoStageProps) => {
     </motion.div>
   );
 };
+

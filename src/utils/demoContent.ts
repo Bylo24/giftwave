@@ -1,18 +1,19 @@
 
 export const demoContent = {
-  sampleVideo: "https://assets.mixkit.co/videos/preview/mixkit-friends-with-colored-smoke-bombs-4556-large.mp4",
+  sampleVideo: "https://assets.mixkit.co/videos/preview/mixkit-young-woman-waving-at-a-video-call-47564-large.mp4",
   memories: [
     {
       id: "memory1",
-      imageUrl: "https://images.unsplash.com/photo-1582562124811-c09040d0a901",
+      imageUrl: "https://images.unsplash.com/photo-1609220136736-443140cffec6",
       caption: "Remember our amazing adventures together! 🎉",
       date: new Date()
     },
     {
       id: "memory2",
-      imageUrl: "https://images.unsplash.com/photo-1466721591366-2d5fba72006d",
-      caption: "That time we explored the wilderness! 🌲",
+      imageUrl: "https://images.unsplash.com/photo-1494790108377-be9c29b29330",
+      caption: "That time we explored the city! 🌆",
       date: new Date()
     }
   ]
 };
+
