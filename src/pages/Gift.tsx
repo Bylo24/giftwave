@@ -12,7 +12,7 @@ import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
-type Step = 'memory' | 'amount' | 'recipient' | 'message' | 'preview' | 'payment' | 'replay';
+type Step = 'recipient' | 'personalize' | 'preview' | 'payment';
 
 interface GiftMemory {
   caption: string;
@@ -29,7 +29,7 @@ interface Memory {
 
 const Gift = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<Step>('memory');
+  const [currentStep, setCurrentStep] = useState<Step>('recipient');
   const [previousSteps, setPreviousSteps] = useState<Step[]>([]);
   const [selectedTheme] = useState<ThemeType>('birthday');
   const [phoneNumber, setPhoneNumber] = useState('');
@@ -76,40 +76,40 @@ const Gift = () => {
 
   const renderStep = () => {
     switch (currentStep) {
-      case 'memory':
-        return (
-          <MemoryReplayScreen
-            memories={memories}
-            onAddMemory={handleAddMemory}
-            onNext={() => goToNextStep('amount')}
-          />
-        );
-      case 'amount':
-        return (
-          <AmountStep
-            amount={amount}
-            setAmount={setAmount}
-            onNext={() => goToNextStep('recipient')}
-          />
-        );
       case 'recipient':
         return (
           <RecipientStep
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
-            onNext={() => goToNextStep('message')}
+            onNext={() => goToNextStep('personalize')}
           />
         );
-      case 'message':
+      case 'personalize':
         return (
-          <MessageStep
-            messageVideo={messageVideo}
-            setMessageVideo={setMessageVideo}
-            isRecordingMessage={isRecordingMessage}
-            startMessageRecording={startMessageRecording}
-            stopMessageRecording={stopMessageRecording}
-            onNext={() => goToNextStep('preview')}
-          />
+          <div className="space-y-6">
+            <MessageStep
+              messageVideo={messageVideo}
+              setMessageVideo={setMessageVideo}
+              isRecordingMessage={isRecordingMessage}
+              startMessageRecording={startMessageRecording}
+              stopMessageRecording={stopMessageRecording}
+              onNext={() => {
+                if (messageVideo || window.confirm('Skip adding a message?')) {
+                  setCurrentStep('preview');
+                }
+              }}
+            />
+            <AmountStep
+              amount={amount}
+              setAmount={setAmount}
+              onNext={() => goToNextStep('preview')}
+            />
+            <MemoryReplayScreen
+              memories={memories}
+              onAddMemory={handleAddMemory}
+              onNext={() => goToNextStep('preview')}
+            />
+          </div>
         );
       case 'preview':
         return (
@@ -128,6 +128,36 @@ const Gift = () => {
     }
   };
 
+  const getStepTitle = () => {
+    switch (currentStep) {
+      case 'recipient':
+        return 'Select Your Recipient';
+      case 'personalize':
+        return 'Personalize Your Gift';
+      case 'preview':
+        return 'Preview & Send';
+      case 'payment':
+        return "Complete Payment";
+      default:
+        return 'Create a Gift';
+    }
+  };
+
+  const getStepDescription = () => {
+    switch (currentStep) {
+      case 'recipient':
+        return 'Choose who you want to send a gift to by phone number, and let us do the rest!';
+      case 'personalize':
+        return 'Record a heartfelt video message, upload a cherished photo, or skip the video—your choice. Add a custom or preset gift amount.';
+      case 'preview':
+        return 'Review your gift, confirm the details, and pay using your wallet or credit card. Then watch the magic happen!';
+      case 'payment':
+        return 'Complete your payment to send this special gift!';
+      default:
+        return '';
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-blue-50 pb-16">
       <div className="p-4 space-y-6 max-w-2xl mx-auto">
@@ -138,9 +168,12 @@ const Gift = () => {
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-            {currentStep === 'replay' ? 'Memory Replay' : 'Create a Gift'}
-          </h1>
+          <div>
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+              {getStepTitle()}
+            </h1>
+            <p className="text-sm text-gray-600 mt-1">{getStepDescription()}</p>
+          </div>
         </div>
 
         <div className="animate-fade-in">
