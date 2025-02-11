@@ -1,3 +1,4 @@
+
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { MemoriesGrid } from "@/components/memories/MemoriesGrid";
 import { useQuery } from "@tanstack/react-query";
@@ -45,14 +46,14 @@ const MyGifts = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#E5DEFF] pb-16 flex items-center justify-center">
+      <div className="min-h-screen bg-background pb-16 flex items-center justify-center">
         <p>Loading gifts...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#E5DEFF] pb-16">
+    <div className="min-h-screen bg-background pb-16">
       <div className="p-4 space-y-6 max-w-2xl mx-auto">
         <MemoriesGrid gifts={gifts || []} />
       </div>
