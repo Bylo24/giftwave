@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -6,13 +7,12 @@ import { RecipientStep } from "@/components/gift/RecipientStep";
 import { MessageStep } from "@/components/gift/MessageStep";
 import { AmountStep } from "@/components/gift/AmountStep";
 import { PreviewStep } from "@/components/gift/PreviewStep";
-import { ThemeStep } from "@/components/gift/ThemeStep";
 import { MemoryStep } from "@/components/gift/MemoryStep";
 import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
-type Step = 'theme' | 'memory' | 'amount' | 'recipient' | 'message' | 'preview' | 'payment' | 'replay';
+type Step = 'memory' | 'amount' | 'recipient' | 'message' | 'preview' | 'payment' | 'replay';
 
 interface GiftMemory {
   caption: string;
@@ -29,9 +29,9 @@ interface Memory {
 
 const Gift = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<Step>('theme');
+  const [currentStep, setCurrentStep] = useState<Step>('memory');
   const [previousSteps, setPreviousSteps] = useState<Step[]>([]);
-  const [selectedTheme, setSelectedTheme] = useState<ThemeType>('birthday');
+  const [selectedTheme] = useState<ThemeType>('birthday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
@@ -76,14 +76,6 @@ const Gift = () => {
 
   const renderStep = () => {
     switch (currentStep) {
-      case 'theme':
-        return (
-          <ThemeStep
-            selectedTheme={selectedTheme}
-            setSelectedTheme={setSelectedTheme}
-            onNext={() => goToNextStep('memory')}
-          />
-        );
       case 'memory':
         return (
           <MemoryReplayScreen
