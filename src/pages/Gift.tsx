@@ -47,6 +47,8 @@ const Gift = () => {
       const prevStep = previousSteps[previousSteps.length - 1];
       setCurrentStep(prevStep);
       setPreviousSteps(prev => prev.slice(0, -1));
+    } else {
+      navigate('/');
     }
   };
 
@@ -95,7 +97,7 @@ const Gift = () => {
               stopMessageRecording={stopMessageRecording}
               onNext={() => {
                 if (messageVideo || window.confirm('Skip adding a message?')) {
-                  setCurrentStep('preview');
+                  goToNextStep('preview');
                 }
               }}
             />
@@ -122,6 +124,13 @@ const Gift = () => {
             memories={memories}
             onNext={() => goToNextStep('payment')}
           />
+        );
+      case 'payment':
+        return (
+          <div className="text-center p-6">
+            <h2 className="text-xl font-semibold mb-4">Complete Payment</h2>
+            <p className="text-gray-600">Payment processing coming soon!</p>
+          </div>
         );
       default:
         return null;
