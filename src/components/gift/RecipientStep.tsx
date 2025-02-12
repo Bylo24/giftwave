@@ -1,4 +1,3 @@
-
 import { Phone } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -142,7 +141,7 @@ export const RecipientStep = ({ phoneNumber, setPhoneNumber, onNext }: Recipient
         
         <Input
           type="tel"
-          placeholder="Enter phone number"
+          placeholder="Phone"
           value={phoneNumber}
           onChange={handlePhoneChange}
           className="text-lg border-2 border-primary/20 focus:border-primary/40 transition-colors flex-1"
