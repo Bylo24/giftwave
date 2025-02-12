@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -144,7 +143,7 @@ const Gift = () => {
               onAddMemory={handleAddMemory}
               onNext={() => {
                 if (memories.length === 0) {
-                  if (window.confirm("Are you sure you want to continue without adding any memories?")) {
+                  if (window.confirm("Are you sure you want to continue without adding any memories? Click 'Add Memory' to lock it in.")) {
                     goToNextStep('preview');
                   }
                 } else {
