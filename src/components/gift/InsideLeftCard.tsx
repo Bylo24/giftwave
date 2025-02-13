@@ -20,6 +20,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [isUploading, setIsUploading] = useState(false);
   const [frames, setFrames] = useState<Frame[]>([]);
   const [isLoadingFrames, setIsLoadingFrames] = useState(true);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
 
   useEffect(() => {
     const loadFrames = async () => {
@@ -46,18 +47,27 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
       try {
         const fileExt = file.name.split('.').pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        const filePath = `public/${fileName}`;
         
+        // Upload the file to Supabase Storage
         const { error: uploadError } = await supabase.storage
           .from('gift_videos')
-          .upload(fileName, file);
+          .upload(filePath, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
 
-        if (uploadError) throw uploadError;
+        if (uploadError) {
+          throw uploadError;
+        }
 
+        // Get the public URL
         const { data: { publicUrl } } = supabase.storage
           .from('gift_videos')
-          .getPublicUrl(fileName);
+          .getPublicUrl(filePath);
 
         setMessageVideo(file);
+        setVideoUrl(publicUrl);
         toast.success('Video message uploaded successfully!');
       } catch (error) {
         console.error('Upload error:', error);
@@ -116,7 +126,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                 {messageVideo ? (
                   <>
                     <video
-                      src={URL.createObjectURL(messageVideo)}
+                      src={videoUrl || URL.createObjectURL(messageVideo)}
                       controls
                       className="w-full h-full object-cover rounded-lg"
                       playsInline
