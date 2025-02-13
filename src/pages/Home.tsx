@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { Search, Gift, Wallet, Plus, ArrowDown, History, UserPlus, Settings, Bell } from "lucide-react";
+import { Search, Gift, Wallet, Plus, ArrowDown, UserPlus, Settings, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -26,7 +26,6 @@ const Home = () => {
 
   const quickActions = [
     { icon: Gift, label: "My Gifts", route: "/my-gifts", color: "pink" },
-    { icon: History, label: "History", route: "/my-gifts", color: "purple" },
     { icon: UserPlus, label: "Invite", route: "/invite", color: "blue" }
   ];
 
@@ -112,7 +111,7 @@ const Home = () => {
         </Card>
 
         {/* Quick Access */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4">
           {quickActions.map((action, index) => (
             <Card 
               key={index}
