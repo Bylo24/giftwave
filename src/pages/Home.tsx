@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -13,12 +14,6 @@ const Home = () => {
 
   const handleSearch = () => {
     navigate("/contacts");
-  };
-
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
   };
 
   const quickActions = [
@@ -52,19 +47,13 @@ const Home = () => {
           </div>
         </div>
 
-        <div className="relative">
-          <Search 
-            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" 
-            onClick={handleSearch}
-          />
-          <Input 
-            className="pl-10 bg-gray-100 border-0 rounded-full text-sm" 
-            placeholder="Search contacts or invite friends"
-            value={searchInput}
-            onChange={(e) => setSearchInput(e.target.value)}
-            onKeyPress={handleKeyPress}
-          />
-        </div>
+        <button 
+          onClick={handleSearch}
+          className="w-full flex items-center gap-3 px-4 py-3 bg-gray-100 rounded-full text-gray-500 text-sm hover:bg-gray-200 transition-colors"
+        >
+          <Search className="h-5 w-5" />
+          <span>Search contacts or invite friends</span>
+        </button>
       </div>
 
       {/* Main Content */}

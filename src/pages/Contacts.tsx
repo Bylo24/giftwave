@@ -87,7 +87,16 @@ const Contacts = () => {
         .order('contact_name', { ascending: true });
 
       if (error) throw error;
-      setContacts(data || []);
+      
+      // Explicitly type the data to match our Contact interface
+      const typedContacts: Contact[] = data?.map(contact => ({
+        id: contact.id,
+        contact_name: contact.contact_name,
+        contact_phone: contact.contact_phone,
+        status: contact.status as 'pending' | 'registered' | 'not_registered'
+      })) || [];
+      
+      setContacts(typedContacts);
     } catch (error) {
       console.error('Error fetching contacts:', error);
       toast.error("Error loading contacts");
