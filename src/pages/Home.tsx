@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -13,9 +12,7 @@ const Home = () => {
   const { user } = useAuth();
 
   const handleSearch = () => {
-    if (searchInput) {
-      navigate(`/search?q=${encodeURIComponent(searchInput)}`);
-    }
+    navigate("/contacts");
   };
 
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -26,7 +23,7 @@ const Home = () => {
 
   const quickActions = [
     { icon: Gift, label: "My Gifts", route: "/my-gifts", color: "pink" },
-    { icon: UserPlus, label: "Invite", route: "/invite", color: "blue" }
+    { icon: UserPlus, label: "Invite", route: "/contacts", color: "blue" }
   ];
 
   return (
@@ -62,7 +59,7 @@ const Home = () => {
           />
           <Input 
             className="pl-10 bg-gray-100 border-0 rounded-full text-sm" 
-            placeholder="Search profiles or add contacts"
+            placeholder="Search contacts or invite friends"
             value={searchInput}
             onChange={(e) => setSearchInput(e.target.value)}
             onKeyPress={handleKeyPress}
