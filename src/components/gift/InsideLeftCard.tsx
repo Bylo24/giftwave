@@ -179,11 +179,11 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
         {/* Card Section */}
         <div className="flex-1 flex items-center justify-center px-4 pb-20">
           <div 
-            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-4 transition-colors duration-300 relative`}
+            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg transition-colors duration-300 relative`}
           >
-            <div className="relative z-10 h-full flex flex-col gap-4 p-4">
+            <div className="relative z-10 h-full flex flex-col justify-between p-2">
               {[0, 1].map((index) => (
-                <div key={index} className="flex-1">
+                <div key={index} className="flex-1 p-2">
                   {renderMemoryCard(memories[index] || null, index)}
                 </div>
               ))}
