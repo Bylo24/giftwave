@@ -1,12 +1,14 @@
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Video } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
 import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
 import { PatternSelector } from "@/components/gift/PatternSelector";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
 import InsideLeftCard from "@/components/gift/InsideLeftCard";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const themeOptions: ThemeOption[] = [
   {
@@ -208,6 +210,37 @@ const Gift = () => {
     );
   };
 
+  const handleVideoUpload = async (file: File) => {
+    if (!file.type.startsWith('video/')) {
+      toast.error('Please upload a video file');
+      return;
+    }
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('gift_videos')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      setMessageVideo(file);
+      toast.success('Video message uploaded successfully!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload video. Please try again.');
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleVideoUpload(file);
+    }
+  };
+
   if (currentPage === 'inside-left') {
     return (
       <InsideLeftCard
@@ -260,7 +293,25 @@ const Gift = () => {
               />
               
               <div className="relative z-10 h-full flex flex-col items-center justify-center">
-                {/* This card is intentionally left blank */}
+                <input 
+                  type="file" 
+                  accept="video/*"
+                  capture="user"
+                  className="hidden" 
+                  id="video-upload"
+                  onChange={handleFileChange}
+                />
+                <label 
+                  htmlFor="video-upload"
+                  className="cursor-pointer flex flex-col items-center space-y-4"
+                >
+                  <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors">
+                    <Video className="h-8 w-8 text-gray-600" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                    {messageVideo ? 'Change video message' : 'Add video message'}
+                  </span>
+                </label>
               </div>
 
               <StickerLayer
