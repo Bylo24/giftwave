@@ -84,13 +84,13 @@ export const MessageStep = ({
   };
 
   const handleStopRecording = async () => {
-    const recordedVideo = await stopMessageRecording();
+    const recordedVideo = await Promise.resolve(stopMessageRecording());
     if (recordingTimer.current) {
       clearInterval(recordingTimer.current);
       recordingTimer.current = null;
     }
     
-    if (recordedVideo) {
+    if (recordedVideo instanceof File) {
       await handleMessageUpload(recordedVideo);
     }
   };
