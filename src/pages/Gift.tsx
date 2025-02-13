@@ -25,28 +25,34 @@ interface GiftMemory {
 
 const themeOptions: ThemeOption[] = [
   {
-    text: "MERRY",
-    emoji: "🧦",
-    bgColor: "bg-[#F5F2E8]",
-    textColors: ["text-[#2E5A2C]", "text-[#1B4B6B]", "text-[#EA384C]", "text-[#FF9EBA]", "text-[#C4D6A0]"]
-  },
-  {
     text: "HAPPY BIRTHDAY",
     emoji: "🎂",
     bgColor: "bg-[#FFF6E9]",
     textColors: ["text-[#FF6B6B]", "text-[#4ECDC4]", "text-[#FFD93D]", "text-[#FF6B6B]", "text-[#4ECDC4]"]
   },
   {
-    text: "CONGRATS",
+    text: "CONGRATULATIONS",
     emoji: "🎉",
     bgColor: "bg-[#F0FFF4]",
     textColors: ["text-[#38A169]", "text-[#2B6CB0]", "text-[#805AD5]", "text-[#38A169]", "text-[#2B6CB0]"]
+  },
+  {
+    text: "MERRY CHRISTMAS",
+    emoji: "🎄",
+    bgColor: "bg-[#F5F2E8]",
+    textColors: ["text-[#2E5A2C]", "text-[#1B4B6B]", "text-[#EA384C]", "text-[#FF9EBA]", "text-[#C4D6A0]"]
   },
   {
     text: "THANK YOU",
     emoji: "💝",
     bgColor: "bg-[#FFF5F5]",
     textColors: ["text-[#E53E3E]", "text-[#DD6B20]", "text-[#D53F8C]", "text-[#E53E3E]", "text-[#DD6B20]"]
+  },
+  {
+    text: "GOOD LUCK",
+    emoji: "🍀",
+    bgColor: "bg-[#ECFDF5]",
+    textColors: ["text-[#047857]", "text-[#059669]", "text-[#10B981]", "text-[#047857]", "text-[#059669]"]
   }
 ];
 
@@ -142,6 +148,17 @@ const Gift = () => {
                 {selectedThemeOption.emoji}
               </div>
             </div>
+          </div>
+        </div>
+
+        <div className="p-4">
+          <div className="flex justify-center max-w-md mx-auto">
+            <button className="flex flex-col items-center space-y-1">
+              <div className="w-12 h-12 flex items-center justify-center bg-white/90 rounded-full shadow-lg">
+                <span className="text-2xl">⭐</span>
+              </div>
+              <span className="text-xs text-white font-medium">Stickers</span>
+            </button>
           </div>
         </div>
 
