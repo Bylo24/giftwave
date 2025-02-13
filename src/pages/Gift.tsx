@@ -1,8 +1,8 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
+import { motion, AnimatePresence } from "framer-motion";
 
 interface ThemeOption {
   text: string;
@@ -80,6 +80,13 @@ const Gift = () => {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [selectedThemeOption, setSelectedThemeOption] = useState<ThemeOption>(themeOptions[0]);
   const [showStickers, setShowStickers] = useState(false);
+  const [placedStickers, setPlacedStickers] = useState<Array<{
+    id: string;
+    emoji: string;
+    x: number;
+    y: number;
+    rotation: number;
+  }>>([]);
 
   const goToPreviousStep = () => {
     if (previousSteps.length > 0) {
@@ -94,6 +101,26 @@ const Gift = () => {
   const goToNextStep = (nextStep: 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment') => {
     setPreviousSteps(prev => [...prev, currentStep]);
     setCurrentStep(nextStep);
+  };
+
+  const handleStickerClick = (emoji: string) => {
+    const cardElement = document.querySelector('.card-container');
+    if (!cardElement) return;
+
+    const rect = cardElement.getBoundingClientRect();
+    const padding = 40; // Keep stickers away from edges
+
+    // Random position within the card boundaries
+    const position = {
+      id: `${emoji}-${Date.now()}`,
+      emoji,
+      x: Math.random() * (rect.width - padding * 2) + padding,
+      y: Math.random() * (rect.height - padding * 2) + padding,
+      rotation: Math.random() * 30 - 15 // Random rotation between -15 and 15 degrees
+    };
+
+    setPlacedStickers([...placedStickers, position]);
+    setShowStickers(false);
   };
 
   return (
@@ -143,7 +170,9 @@ const Gift = () => {
         </div>
 
         <div className="flex-1 flex items-center justify-center px-4">
-          <div className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300`}>
+          <div 
+            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container`}
+          >
             <div className="h-full flex flex-col items-center justify-center space-y-8">
               <div className="text-center">
                 {selectedThemeOption.text.split('').map((letter, index) => (
@@ -160,6 +189,27 @@ const Gift = () => {
                 {selectedThemeOption.emoji}
               </div>
             </div>
+
+            <AnimatePresence>
+              {placedStickers.map((sticker) => (
+                <motion.div
+                  key={sticker.id}
+                  className="absolute text-4xl cursor-move"
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  drag
+                  dragMomentum={false}
+                  style={{
+                    x: sticker.x,
+                    y: sticker.y,
+                    rotate: sticker.rotation,
+                    touchAction: 'none'
+                  }}
+                >
+                  {sticker.emoji}
+                </motion.div>
+              ))}
+            </AnimatePresence>
           </div>
         </div>
 
@@ -182,6 +232,7 @@ const Gift = () => {
                     <button 
                       key={index}
                       className="w-10 h-10 flex items-center justify-center hover:bg-white/50 rounded-full transition-colors"
+                      onClick={() => handleStickerClick(sticker.emoji)}
                     >
                       <span className="text-2xl">{sticker.emoji}</span>
                     </button>
