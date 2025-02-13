@@ -1,17 +1,60 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { VideoStage } from "@/components/gift/stages/VideoStage";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { useStickerManager } from "@/hooks/useStickerManager";
+import { BlankCard } from "@/components/gift/cards/BlankCard";
+import { stickerOptions } from "@/constants/giftOptions";
+import { toast } from "sonner";
 
 const InsideLeftCardContent = () => {
   const navigate = useNavigate();
-  const [videoUrl, setVideoUrl] = useState<string>("");
+  const [messageVideo, setMessageVideo] = useState<File | null>(null);
+  const { selectedThemeOption, handlePatternChange } = useTheme();
+  const {
+    placedStickers,
+    selectedSticker,
+    showStickers,
+    setShowStickers,
+    handleStickerClick,
+    handleStickerDragEnd,
+    handleStickerTap,
+    handleStickerRemove,
+    handleStickerRotate
+  } = useStickerManager();
+
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) {
+      toast.error('Please upload a video file');
+      return;
+    }
+
+    setMessageVideo(file);
+  };
 
   return (
-    <div className="min-h-screen bg-black">
-      {videoUrl && <VideoStage videoUrl={videoUrl} />}
-    </div>
+    <BlankCard
+      selectedThemeOption={selectedThemeOption}
+      messageVideo={messageVideo}
+      placedStickers={placedStickers}
+      selectedSticker={selectedSticker}
+      showStickers={showStickers}
+      stickerOptions={stickerOptions}
+      onBack={() => navigate(-1)}
+      onNext={() => navigate('/add-memories')}
+      onPatternChange={handlePatternChange}
+      onShowStickers={setShowStickers}
+      onStickerClick={handleStickerClick}
+      onStickerTap={handleStickerTap}
+      onStickerDragEnd={handleStickerDragEnd}
+      onStickerRemove={handleStickerRemove}
+      onStickerRotate={handleStickerRotate}
+      onFileChange={handleFileChange}
+      setMessageVideo={setMessageVideo}
+    />
   );
 };
 

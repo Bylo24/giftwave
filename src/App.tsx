@@ -30,7 +30,7 @@ import AddMessage from "./pages/AddMessage";
 import AddMemories from "./pages/AddMemories";
 import SelectAmount from "./pages/SelectAmount";
 import PreviewGift from "./pages/PreviewGift";
-import FrontCard from "./pages/FrontCard";
+import { FrontCard } from "./pages/FrontCard";
 import InsideLeftCard from "./pages/InsideLeftCard";
 
 function App() {

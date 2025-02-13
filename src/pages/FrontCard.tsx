@@ -1,20 +1,20 @@
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
-import { ThemeSelector } from "@/components/gift/ThemeSelector";
-import { PatternSelector } from "@/components/gift/PatternSelector";
+import { ThemeOption, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
-import { stickerOptions } from "@/constants/giftOptions";
-import { useStickerManager } from "@/hooks/useStickerManager";
-import { Button } from "@/components/ui/button";
+import { PatternSelector } from "@/components/gift/PatternSelector";
+import { ThemeSelector } from "@/components/gift/ThemeSelector";
 import { ArrowLeft } from "lucide-react";
-import { ThemeOption } from "@/types/gift";
+import { Button } from "@/components/ui/button";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { useStickerManager } from "@/hooks/useStickerManager";
+import { stickerOptions } from "@/constants/giftOptions";
 
 const FrontCardContent = () => {
   const navigate = useNavigate();
-  const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
   const cardRef = useRef<HTMLDivElement>(null);
+  const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
   const {
     placedStickers,
     selectedSticker,
@@ -27,8 +27,8 @@ const FrontCardContent = () => {
     handleStickerRotate
   } = useStickerManager();
 
-  const handleNext = () => {
-    navigate('/select-recipient');
+  const handleBackClick = () => {
+    navigate('/home');
   };
 
   const getPatternStyle = (pattern: ThemeOption['pattern']) => {
@@ -72,8 +72,8 @@ const FrontCardContent = () => {
       <div className="relative z-10 min-h-screen flex flex-col">
         <div className="flex items-center justify-between p-4">
           <button 
-            onClick={() => navigate(-1)}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg"
+            onClick={handleBackClick}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
@@ -85,7 +85,7 @@ const FrontCardContent = () => {
           />
           
           <Button 
-            onClick={handleNext}
+            onClick={() => navigate('/insideleftcard')}
             className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
             Next
@@ -165,12 +165,10 @@ const FrontCardContent = () => {
   );
 };
 
-const FrontCard = () => {
+export const FrontCard = () => {
   return (
     <ThemeProvider>
       <FrontCardContent />
     </ThemeProvider>
   );
 };
-
-export default FrontCard;
