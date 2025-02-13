@@ -57,7 +57,11 @@ export const EditableText = ({
           <select
             value={selectedFont}
             onChange={(e) => setSelectedFont(e.target.value)}
-            className="absolute -top-10 left-0 bg-white border border-gray-300 rounded px-2 py-1 text-sm"
+            className="absolute -top-10 left-0 bg-white border border-gray-300 rounded px-2 py-1 text-sm z-50"
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+            }}
             onClick={(e) => e.stopPropagation()}
           >
             {fontOptions.map((font) => (
@@ -73,7 +77,12 @@ export const EditableText = ({
               setText(e.target.value);
               onTextChange?.(e.target.value);
             }}
-            onBlur={() => setIsEditing(false)}
+            onBlur={(e) => {
+              // Check if the related target is the font dropdown
+              if (!(e.relatedTarget instanceof HTMLSelectElement)) {
+                setIsEditing(false);
+              }
+            }}
             className={`${className} ${selectedFont} resize-none outline-none border-2 border-blue-500 rounded p-1 bg-white/80 backdrop-blur-sm min-w-[100px] min-h-[50px]`}
             onClick={(e) => e.stopPropagation()}
           />
