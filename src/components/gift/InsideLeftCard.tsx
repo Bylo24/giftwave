@@ -67,7 +67,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     if (!memory) {
       return (
         <div className="flex flex-col space-y-2">
-          <div className="relative rounded-lg overflow-hidden aspect-[3/4] shadow-lg bg-gray-200">
+          <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg bg-gray-200">
             <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium">
               Your memory
             </div>
@@ -79,7 +79,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
 
     return (
       <div className="flex flex-col space-y-2">
-        <div className="relative rounded-lg overflow-hidden aspect-[3/4] shadow-lg">
+        <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg">
           <img 
             src={memory.imageUrl} 
             alt="Memory"
@@ -146,7 +146,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
 
               {/* Preview */}
               {previewImage && (
-                <div className="rounded-lg overflow-hidden w-full aspect-[3/4]">
+                <div className="rounded-lg overflow-hidden w-full aspect-square">
                   <img 
                     src={previewImage} 
                     alt="Preview" 
@@ -181,9 +181,9 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           <div 
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-4 transition-colors duration-300 relative`}
           >
-            <div className="relative z-10 h-full grid grid-cols-2 gap-4 p-4">
+            <div className="relative z-10 h-full flex flex-col gap-4 p-4">
               {[0, 1].map((index) => (
-                <div key={index}>
+                <div key={index} className="flex-1">
                   {renderMemoryCard(memories[index] || null, index)}
                 </div>
               ))}
