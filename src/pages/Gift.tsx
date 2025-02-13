@@ -313,25 +313,27 @@ const Gift = () => {
                     </button>
                   </div>
                 ) : (
-                  <input 
-                    type="file" 
-                    accept="video/*"
-                    capture="user"
-                    className="hidden" 
-                    id="video-upload"
-                    onChange={handleFileChange}
-                  />
-                  <label 
-                    htmlFor="video-upload"
-                    className="cursor-pointer flex flex-col items-center space-y-4"
-                  >
-                    <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors">
-                      <Video className="h-8 w-8 text-gray-600" />
-                    </div>
-                    <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                      Add video message
-                    </span>
-                  </label>
+                  <>
+                    <input 
+                      type="file" 
+                      accept="video/*"
+                      capture="user"
+                      className="hidden" 
+                      id="video-upload"
+                      onChange={handleFileChange}
+                    />
+                    <label 
+                      htmlFor="video-upload"
+                      className="cursor-pointer flex flex-col items-center space-y-4"
+                    >
+                      <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors">
+                        <Video className="h-8 w-8 text-gray-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                        Add video message
+                      </span>
+                    </label>
+                  </>
                 )}
               </div>
 
