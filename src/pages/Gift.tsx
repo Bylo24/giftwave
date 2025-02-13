@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -142,15 +143,16 @@ const Gift = () => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
-    const x = rect.width / 2 - 20; // Center X with offset for sticker size
-    const y = rect.height / 2 - 20; // Center Y with offset for sticker size
+    // Random position within the card boundaries, leaving 40px margin for sticker size
+    const x = Math.random() * (rect.width - 80) + 40;
+    const y = Math.random() * (rect.height - 80) + 40;
 
     setPlacedStickers(prev => [...prev, {
       id: `${emoji}-${Date.now()}`,
       emoji,
       x,
       y,
-      rotation: Math.random() * 30 - 15
+      rotation: Math.random() * 360 // Full rotation for more randomness
     }]);
     setShowStickers(false);
   };
@@ -261,13 +263,13 @@ const Gift = () => {
           </div>
         </div>
 
-        <div className="space-y-8 mb-4">
+        <div className="space-y-8">
           <PatternSelector
             currentPattern={selectedThemeOption.pattern.type}
             onPatternChange={handlePatternChange}
           />
 
-          <div className="flex justify-center max-w-md mx-auto relative">
+          <div className="flex justify-center max-w-md mx-auto relative pb-8">
             <div className="relative group">
               <button 
                 onClick={() => setShowStickers(!showStickers)}
