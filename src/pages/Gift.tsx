@@ -107,8 +107,8 @@ const Gift = () => {
     const currentInstance = searchParams.get('instance') || '0';
     const nextInstance = parseInt(currentInstance) + 1;
     
-    // Force a complete reload by using window.location
-    window.location.href = `/gift?instance=${nextInstance}`;
+    // Just navigate to a new instance while preserving the current one
+    navigate(`/gift?instance=${nextInstance}`);
   };
 
   const handleStickerClick = (emoji: string) => {
