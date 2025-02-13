@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
@@ -82,7 +81,7 @@ const GiftContent = () => {
     if (currentPage === 'front') {
       setCurrentPage('blank');
     } else if (currentPage === 'blank') {
-      setCurrentPage('inside-left');
+      navigate('/insideleftcard');
     } else {
       setPreviousSteps(prev => [...prev, currentStep]);
       setCurrentStep('memory');
