@@ -19,7 +19,7 @@ const GiftV2Content = () => {
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
       <div className="p-4">
         <button 
-          onClick={() => navigate(-1)}
+          onClick={() => navigate('/gift')}
           className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg"
         >
           <ArrowLeft className="h-5 w-5 text-gray-600" />
