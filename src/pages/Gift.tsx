@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -9,25 +10,45 @@ import { PreviewStep } from "@/components/gift/PreviewStep";
 import { MemoryStep } from "@/components/gift/MemoryStep";
 import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { GiftCard } from "@/components/gift/GiftCard";
-import { EditableText } from "@/components/gift/EditableText";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
 type Step = 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment';
 type CardView = 'card' | 'message' | 'envelope';
 
-interface GiftMemory {
-  caption: string;
-  image?: File;
-  date: Date;
+interface ThemeOption {
+  text: string;
+  emoji: string;
+  bgColor: string;
+  textColors: string[];
 }
 
-interface Memory {
-  id: string;
-  imageUrl?: string;
-  caption: string;
-  date: Date;
-}
+const themeOptions: ThemeOption[] = [
+  {
+    text: "MERRY",
+    emoji: "🧦",
+    bgColor: "bg-[#F5F2E8]",
+    textColors: ["text-[#2E5A2C]", "text-[#1B4B6B]", "text-[#EA384C]", "text-[#FF9EBA]", "text-[#C4D6A0]"]
+  },
+  {
+    text: "HAPPY BIRTHDAY",
+    emoji: "🎂",
+    bgColor: "bg-[#FFF6E9]",
+    textColors: ["text-[#FF6B6B]", "text-[#4ECDC4]", "text-[#FFD93D]", "text-[#FF6B6B]", "text-[#4ECDC4]"]
+  },
+  {
+    text: "CONGRATS",
+    emoji: "🎉",
+    bgColor: "bg-[#F0FFF4]",
+    textColors: ["text-[#38A169]", "text-[#2B6CB0]", "text-[#805AD5]", "text-[#38A169]", "text-[#2B6CB0]"]
+  },
+  {
+    text: "THANK YOU",
+    emoji: "💝",
+    bgColor: "bg-[#FFF5F5]",
+    textColors: ["text-[#E53E3E]", "text-[#DD6B20]", "text-[#D53F8C]", "text-[#E53E3E]", "text-[#DD6B20]"]
+  }
+];
 
 const Gift = () => {
   const navigate = useNavigate();
@@ -44,10 +65,7 @@ const Gift = () => {
   });
   const [memories, setMemories] = useState<Memory[]>([]);
   const [currentView, setCurrentView] = useState<CardView>('card');
-  const [messageText, setMessageText] = useState(
-    "Wishing you peace, joy and\nlove this holiday season. I miss\nyou like crazy and can't wait\nto see you in February."
-  );
-  const [signatureText, setSignatureText] = useState("Love,\nAllison");
+  const [selectedThemeOption, setSelectedThemeOption] = useState<ThemeOption>(themeOptions[0]);
 
   const goToPreviousStep = () => {
     if (previousSteps.length > 0) {
@@ -84,9 +102,20 @@ const Gift = () => {
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           
-          <button className="w-10 h-10 flex items-center justify-center bg-white rounded-full">
-            <div className="h-5 w-5 text-gray-600">1</div>
-          </button>
+          <select
+            value={selectedThemeOption.text}
+            onChange={(e) => {
+              const newTheme = themeOptions.find(t => t.text === e.target.value);
+              if (newTheme) setSelectedThemeOption(newTheme);
+            }}
+            className="px-4 py-2 bg-white rounded-full text-gray-800 font-medium"
+          >
+            {themeOptions.map((theme) => (
+              <option key={theme.text} value={theme.text}>
+                {theme.text}
+              </option>
+            ))}
+          </select>
           
           <button 
             onClick={() => goToNextStep('message')}
@@ -97,32 +126,21 @@ const Gift = () => {
         </div>
 
         <div className="flex-1 px-4 pt-4">
-          <div className="bg-[#F5F2E8] rounded-lg aspect-[3/4] w-full max-w-md mx-auto shadow-lg p-8">
-            <div className="h-full flex flex-col items-center justify-between">
-              <div className="text-center space-y-4">
-                <div className="space-y-2">
-                  <span className="text-8xl font-serif text-[#2E5A2C]">M</span>
-                  <span className="text-8xl font-serif text-[#1B4B6B]">E</span>
-                  <span className="text-8xl font-serif text-[#EA384C]">R</span>
-                  <span className="text-8xl font-serif text-[#FF9EBA]">R</span>
-                  <span className="text-8xl font-serif text-[#C4D6A0]">Y</span>
-                </div>
-                <div className="text-center mt-8">
-                  <div className="text-[#EA384C] text-6xl">🧦</div>
-                </div>
+          <div className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md mx-auto shadow-lg p-8 transition-colors duration-300`}>
+            <div className="h-full flex flex-col items-center justify-center space-y-8">
+              <div className="text-center">
+                {selectedThemeOption.text.split('').map((letter, index) => (
+                  <span 
+                    key={index} 
+                    className={`text-8xl font-serif ${selectedThemeOption.textColors[index % selectedThemeOption.textColors.length]}`}
+                  >
+                    {letter}
+                  </span>
+                ))}
               </div>
               
-              <div className="text-center text-[#2E5A2C] space-y-4 w-full">
-                <EditableText
-                  initialText={messageText}
-                  onTextChange={setMessageText}
-                  className="text-lg leading-relaxed"
-                />
-                <EditableText
-                  initialText={signatureText}
-                  onTextChange={setSignatureText}
-                  className="text-xl"
-                />
+              <div className="text-6xl animate-bounce">
+                {selectedThemeOption.emoji}
               </div>
             </div>
           </div>
