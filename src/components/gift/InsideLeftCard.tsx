@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { ArrowLeft, Upload } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
-import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -116,17 +115,12 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                     />
                     <label
                       htmlFor="video-upload"
-                      className="cursor-pointer"
+                      className="cursor-pointer inline-flex items-center px-4 py-2 bg-white rounded-md shadow hover:bg-gray-50 transition-colors"
                     >
-                      <Button
-                        disabled={isUploading}
-                        variant="outline"
-                        size="default"
-                        className="bg-white/90 backdrop-blur-sm text-gray-800 shadow-lg hover:bg-white/95"
-                      >
-                        <Upload className="mr-2 h-5 w-5" />
+                      <Upload className="h-5 w-5 mr-2" />
+                      <span className="font-medium">
                         {isUploading ? 'Uploading...' : 'Upload Video'}
-                      </Button>
+                      </span>
                     </label>
                   </div>
                 )}
