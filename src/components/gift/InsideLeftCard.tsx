@@ -15,6 +15,14 @@ interface InsideLeftCardProps {
   onNext: () => void;
 }
 
+const stickerOptions = [
+  { emoji: "⭐", name: "Star" },
+  { emoji: "💫", name: "Sparkle" },
+  { emoji: "✨", name: "Glitter" },
+  { emoji: "🌟", name: "Glow" },
+  { emoji: "💝", name: "Heart" },
+];
+
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -22,6 +30,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [caption, setCaption] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
+  const [showStickers, setShowStickers] = useState(false);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -60,6 +69,11 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     toast.success('Memory added successfully!');
     setPreviewImage(null);
     setCaption('');
+  };
+
+  const handleStickerClick = (emoji: string) => {
+    toast.success('Sticker selected!');
+    setShowStickers(false);
   };
 
   const renderMemoryCard = (memory: Memory | null, index: number) => {
@@ -187,6 +201,32 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Sticker Section */}
+        <div className="fixed bottom-8 left-0 right-0 flex justify-center">
+          <div className="relative">
+            <button 
+              onClick={() => setShowStickers(!showStickers)}
+              className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors"
+            >
+              <span className="text-2xl">⭐</span>
+            </button>
+            
+            {showStickers && (
+              <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl grid grid-cols-5 gap-2 min-w-[200px]">
+                {stickerOptions.map((sticker, index) => (
+                  <button 
+                    key={index}
+                    className="w-10 h-10 flex items-center justify-center hover:bg-white/50 rounded-full transition-colors"
+                    onClick={() => handleStickerClick(sticker.emoji)}
+                  >
+                    <span className="text-2xl">{sticker.emoji}</span>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
