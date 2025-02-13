@@ -5,6 +5,11 @@ import { ThemeOption } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
+interface Memory {
+  imageUrl: string;
+  caption: string;
+}
+
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
   onBack: () => void;
@@ -17,18 +22,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-
-  // Demo memories - in a real app these would come from props or an API
-  const demoMemories = [
-    {
-      imageUrl: "https://images.unsplash.com/photo-1522673607200-164d1627a267?auto=format&fit=crop&w=300",
-      caption: "That time we went on an adventure"
-    },
-    {
-      imageUrl: "https://images.unsplash.com/photo-1516205651411-aef33a44f7c2?auto=format&fit=crop&w=300",
-      caption: "Remember this moment?"
-    }
-  ];
+  const [memories, setMemories] = useState<Memory[]>([]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -53,10 +47,49 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
       return;
     }
 
-    // Here you would typically save the memory
+    if (memories.length >= 2) {
+      toast.error('Maximum of 2 memories allowed');
+      return;
+    }
+
+    const newMemory = {
+      imageUrl: previewImage,
+      caption: caption.trim()
+    };
+
+    setMemories(prev => [...prev, newMemory]);
     toast.success('Memory added successfully!');
     setPreviewImage(null);
     setCaption('');
+  };
+
+  const renderMemoryCard = (memory: Memory | null, index: number) => {
+    if (!memory) {
+      return (
+        <div className="flex flex-col space-y-2">
+          <div className="relative rounded-lg overflow-hidden aspect-[3/4] shadow-lg bg-gray-200">
+            <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium">
+              Your memory
+            </div>
+          </div>
+          <p className="text-sm text-center font-medium text-gray-400">Your memory</p>
+        </div>
+      );
+    }
+
+    return (
+      <div className="flex flex-col space-y-2">
+        <div className="relative rounded-lg overflow-hidden aspect-[3/4] shadow-lg">
+          <img 
+            src={memory.imageUrl} 
+            alt="Memory"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+        </div>
+        <p className="text-sm text-center font-medium text-gray-800">{memory.caption}</p>
+      </div>
+    );
   };
 
   return (
@@ -149,17 +182,9 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-4 transition-colors duration-300 relative`}
           >
             <div className="relative z-10 h-full grid grid-cols-2 gap-4 p-4">
-              {demoMemories.map((memory, index) => (
-                <div key={index} className="flex flex-col space-y-2">
-                  <div className="relative rounded-lg overflow-hidden aspect-[3/4] shadow-lg">
-                    <img 
-                      src={memory.imageUrl} 
-                      alt="Memory"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                  </div>
-                  <p className="text-sm text-center font-medium text-gray-800">{memory.caption}</p>
+              {[0, 1].map((index) => (
+                <div key={index}>
+                  {renderMemoryCard(memories[index] || null, index)}
                 </div>
               ))}
             </div>
