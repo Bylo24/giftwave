@@ -23,6 +23,7 @@ import MyGifts from "./pages/MyGifts";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import CollectGift from "./pages/CollectGift";
+import Contacts from "./pages/Contacts";
 
 function App() {
   const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ function App() {
                 <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
                 <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
                 <Route path="/collect/:giftId" element={<RequireAuth><CollectGift /></RequireAuth>} />
+                <Route path="/contacts" element={<RequireAuth><Contacts /></RequireAuth>} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AuthProvider>
