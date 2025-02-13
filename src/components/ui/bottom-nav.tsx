@@ -15,29 +15,38 @@ export function BottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 border-t bg-white">
-      <div className="flex justify-around items-center h-16 relative">
-        {navItems.map((item) => (
-          <Link
-            key={item.path}
-            to={item.path}
-            className={cn(
-              "flex flex-col items-center justify-center flex-1 h-full text-xs",
-              location.pathname === item.path ? "text-primary" : "text-gray-500",
-              item.isCenter && "-mt-6"
-            )}
-          >
-            {item.isCenter ? (
-              <div className="bg-primary rounded-full p-4 mb-1">
-                <item.icon className="h-8 w-8 text-white" />
-              </div>
-            ) : (
-              <item.icon className="h-5 w-5 mb-1" />
-            )}
-            <span>{item.label}</span>
-          </Link>
-        ))}
-      </div>
-    </nav>
+    <div className="fixed bottom-4 left-4 right-4 z-50">
+      <nav className="bg-white/80 backdrop-blur-lg border border-gray-200/20 rounded-2xl shadow-lg">
+        <div className="flex justify-around items-center h-16 relative px-2">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={cn(
+                "flex flex-col items-center justify-center flex-1 h-full text-xs relative group transition-all duration-200",
+                location.pathname === item.path 
+                  ? "text-primary" 
+                  : "text-gray-500 hover:text-gray-700",
+                item.isCenter && "-mt-8"
+              )}
+            >
+              {item.isCenter ? (
+                <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 shadow-lg group-hover:shadow-indigo-200/50 transition-all duration-200 -mt-2">
+                  <item.icon className="h-6 w-6 text-white" />
+                </div>
+              ) : (
+                <>
+                  <item.icon className="h-5 w-5 mb-1 transition-transform group-hover:scale-110 duration-200" />
+                  <span className="font-medium opacity-90">{item.label}</span>
+                  {location.pathname === item.path && (
+                    <div className="absolute bottom-0 w-1 h-1 bg-primary rounded-full" />
+                  )}
+                </>
+              )}
+            </Link>
+          ))}
+        </div>
+      </nav>
+    </div>
   );
 }
