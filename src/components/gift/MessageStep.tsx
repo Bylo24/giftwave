@@ -15,7 +15,7 @@ interface MessageStepProps {
   setMessageVideo: (file: File | null) => void;
   isRecordingMessage: boolean;
   startMessageRecording: () => void;
-  stopMessageRecording: () => void;
+  stopMessageRecording: () => Promise<File | null> | File | null;
   onNext: () => void;
 }
 
@@ -84,13 +84,13 @@ export const MessageStep = ({
   };
 
   const handleStopRecording = async () => {
-    const recordedVideo = await Promise.resolve(stopMessageRecording());
+    const recordedVideo = await stopMessageRecording();
     if (recordingTimer.current) {
       clearInterval(recordingTimer.current);
       recordingTimer.current = null;
     }
     
-    if (recordedVideo instanceof File) {
+    if (recordedVideo) {
       await handleMessageUpload(recordedVideo);
     }
   };
