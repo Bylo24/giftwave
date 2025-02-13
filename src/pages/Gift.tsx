@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
@@ -9,6 +9,10 @@ interface ThemeOption {
   emoji: string;
   bgColor: string;
   textColors: string[];
+  pattern: {
+    type: 'dots' | 'grid' | 'waves';
+    color: string;
+  };
 }
 
 interface Memory {
@@ -28,31 +32,51 @@ const themeOptions: ThemeOption[] = [
     text: "HAPPY BIRTHDAY",
     emoji: "🎂",
     bgColor: "bg-[#FFF6E9]",
-    textColors: ["text-[#FF6B6B]", "text-[#4ECDC4]", "text-[#FFD93D]", "text-[#FF6B6B]", "text-[#4ECDC4]"]
+    textColors: ["text-[#FF6B6B]", "text-[#4ECDC4]", "text-[#FFD93D]", "text-[#FF6B6B]", "text-[#4ECDC4]"],
+    pattern: {
+      type: 'dots',
+      color: 'rgba(255, 107, 107, 0.1)'
+    }
   },
   {
     text: "CONGRATULATIONS",
     emoji: "🎉",
     bgColor: "bg-[#F0FFF4]",
-    textColors: ["text-[#38A169]", "text-[#2B6CB0]", "text-[#805AD5]", "text-[#38A169]", "text-[#2B6CB0]"]
+    textColors: ["text-[#38A169]", "text-[#2B6CB0]", "text-[#805AD5]", "text-[#38A169]", "text-[#2B6CB0]"],
+    pattern: {
+      type: 'grid',
+      color: 'rgba(56, 161, 105, 0.1)'
+    }
   },
   {
     text: "MERRY CHRISTMAS",
     emoji: "🎄",
     bgColor: "bg-[#F5F2E8]",
-    textColors: ["text-[#2E5A2C]", "text-[#1B4B6B]", "text-[#EA384C]", "text-[#FF9EBA]", "text-[#C4D6A0]"]
+    textColors: ["text-[#2E5A2C]", "text-[#1B4B6B]", "text-[#EA384C]", "text-[#FF9EBA]", "text-[#C4D6A0]"],
+    pattern: {
+      type: 'waves',
+      color: 'rgba(46, 90, 44, 0.1)'
+    }
   },
   {
     text: "THANK YOU",
     emoji: "💝",
     bgColor: "bg-[#FFF5F5]",
-    textColors: ["text-[#E53E3E]", "text-[#DD6B20]", "text-[#D53F8C]", "text-[#E53E3E]", "text-[#DD6B20]"]
+    textColors: ["text-[#E53E3E]", "text-[#DD6B20]", "text-[#D53F8C]", "text-[#E53E3E]", "text-[#DD6B20]"],
+    pattern: {
+      type: 'dots',
+      color: 'rgba(229, 62, 62, 0.1)'
+    }
   },
   {
     text: "GOOD LUCK",
     emoji: "🍀",
     bgColor: "bg-[#ECFDF5]",
-    textColors: ["text-[#047857]", "text-[#059669]", "text-[#10B981]", "text-[#047857]", "text-[#059669]"]
+    textColors: ["text-[#047857]", "text-[#059669]", "text-[#10B981]", "text-[#047857]", "text-[#059669]"],
+    pattern: {
+      type: 'grid',
+      color: 'rgba(4, 120, 87, 0.1)'
+    }
   }
 ];
 
@@ -87,6 +111,7 @@ const Gift = () => {
     y: number;
     rotation: number;
   }>>([]);
+  const cardRef = useRef<HTMLDivElement>(null);
 
   const goToPreviousStep = () => {
     if (previousSteps.length > 0) {
@@ -103,24 +128,66 @@ const Gift = () => {
     setCurrentStep(nextStep);
   };
 
+  const getPatternStyle = (pattern: ThemeOption['pattern']) => {
+    switch (pattern.type) {
+      case 'dots':
+        return {
+          backgroundImage: `radial-gradient(circle, ${pattern.color} 10%, transparent 11%)`,
+          backgroundSize: '20px 20px'
+        };
+      case 'grid':
+        return {
+          backgroundImage: `linear-gradient(to right, ${pattern.color} 1px, transparent 1px),
+                           linear-gradient(to bottom, ${pattern.color} 1px, transparent 1px)`,
+          backgroundSize: '20px 20px'
+        };
+      case 'waves':
+        return {
+          backgroundImage: `repeating-linear-gradient(45deg, ${pattern.color} 0px, ${pattern.color} 2px,
+                           transparent 2px, transparent 8px)`,
+          backgroundSize: '20px 20px'
+        };
+      default:
+        return {};
+    }
+  };
+
   const handleStickerClick = (emoji: string) => {
-    const cardElement = document.querySelector('.card-container');
-    if (!cardElement) return;
+    if (!cardRef.current) return;
 
-    const rect = cardElement.getBoundingClientRect();
-    const padding = 40; // Keep stickers away from edges
+    const rect = cardRef.current.getBoundingClientRect();
+    const padding = 40;
 
-    // Random position within the card boundaries
+    // Ensure position is relative to card's dimensions
     const position = {
       id: `${emoji}-${Date.now()}`,
       emoji,
-      x: Math.random() * (rect.width - padding * 2) + padding,
-      y: Math.random() * (rect.height - padding * 2) + padding,
-      rotation: Math.random() * 30 - 15 // Random rotation between -15 and 15 degrees
+      x: padding + Math.random() * (rect.width - padding * 2),
+      y: padding + Math.random() * (rect.height - padding * 2),
+      rotation: Math.random() * 30 - 15
     };
 
-    setPlacedStickers([...placedStickers, position]);
+    setPlacedStickers(prev => [...prev, position]);
     setShowStickers(false);
+  };
+
+  const handleDragEnd = (event: any, info: any, stickerId: string) => {
+    if (!cardRef.current) return;
+
+    const rect = cardRef.current.getBoundingClientRect();
+    const padding = 40;
+
+    // Constrain position within card boundaries
+    const x = Math.min(Math.max(info.point.x - rect.left, padding), rect.width - padding);
+    const y = Math.min(Math.max(info.point.y - rect.top, padding), rect.height - padding);
+
+    setPlacedStickers(prev =>
+      prev.map(sticker =>
+        sticker.id === stickerId
+          ? { ...sticker, x, y }
+          : sticker
+      )
+    );
   };
 
   return (
@@ -171,7 +238,9 @@ const Gift = () => {
 
         <div className="flex-1 flex items-center justify-center px-4">
           <div 
-            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container`}
+            ref={cardRef}
+            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container overflow-hidden`}
+            style={getPatternStyle(selectedThemeOption.pattern)}
           >
             <div className="h-full flex flex-col items-center justify-center space-y-8">
               <div className="text-center">
@@ -199,6 +268,8 @@ const Gift = () => {
                   animate={{ scale: 1 }}
                   drag
                   dragMomentum={false}
+                  dragConstraints={cardRef}
+                  onDragEnd={(event, info) => handleDragEnd(event, info, sticker.id)}
                   style={{
                     x: sticker.x,
                     y: sticker.y,
