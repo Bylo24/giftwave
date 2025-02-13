@@ -15,6 +15,8 @@ export type Database = {
           contact_phone: string
           created_at: string
           id: string
+          is_favorite: boolean | null
+          last_gift_sent: string | null
           status: string
           updated_at: string
           user_id: string
@@ -24,6 +26,8 @@ export type Database = {
           contact_phone: string
           created_at?: string
           id?: string
+          is_favorite?: boolean | null
+          last_gift_sent?: string | null
           status?: string
           updated_at?: string
           user_id: string
@@ -33,6 +37,8 @@ export type Database = {
           contact_phone?: string
           created_at?: string
           id?: string
+          is_favorite?: boolean | null
+          last_gift_sent?: string | null
           status?: string
           updated_at?: string
           user_id?: string
