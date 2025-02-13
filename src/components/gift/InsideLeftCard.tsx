@@ -65,7 +65,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const renderMemoryCard = (memory: Memory | null, index: number) => {
     if (!memory) {
       return (
-        <div className="flex flex-col space-y-2 w-full">
+        <div className="flex flex-col space-y-2 w-full pb-4">
           <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg bg-gray-200 w-48 h-48 mx-auto">
             <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium">
               Your memory
@@ -77,7 +77,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     }
 
     return (
-      <div className="flex flex-col space-y-2 w-full">
+      <div className="flex flex-col space-y-2 w-full pb-4">
         <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg w-48 h-48 mx-auto">
           <img 
             src={memory.imageUrl} 
