@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -72,7 +73,7 @@ const InsideRightCard = () => {
             variant="ghost"
             size="icon"
             className="bg-white rounded-full w-10 h-10"
-            onClick={() => navigate(-1)}
+            onClick={() => navigate('/insideleftcard')}
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </Button>
