@@ -25,6 +25,11 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import CollectGift from "./pages/CollectGift";
 import Contacts from "./pages/Contacts";
+import SelectRecipient from "./pages/SelectRecipient";
+import AddMessage from "./pages/AddMessage";
+import AddMemories from "./pages/AddMemories";
+import SelectAmount from "./pages/SelectAmount";
+import PreviewGift from "./pages/PreviewGift";
 
 function App() {
   const queryClient = new QueryClient();
@@ -53,11 +58,11 @@ function App() {
                 <Route path="/search" element={<RequireAuth><SearchResults /></RequireAuth>} />
                 <Route path="/gift" element={<RequireAuth><Gift /></RequireAuth>} />
                 <Route path="/gift-v2" element={<RequireAuth><GiftV2 /></RequireAuth>} />
-                <Route path="/select-recipient" element={<RequireAuth><RecipientStep /></RequireAuth>} />
-                <Route path="/add-message" element={<RequireAuth><MessageStep /></RequireAuth>} />
-                <Route path="/add-memories" element={<RequireAuth><MemoryReplayScreen /></RequireAuth>} />
-                <Route path="/select-amount" element={<RequireAuth><AmountStep /></RequireAuth>} />
-                <Route path="/preview-gift" element={<RequireAuth><PreviewStep /></RequireAuth>} />
+                <Route path="/select-recipient" element={<RequireAuth><SelectRecipient /></RequireAuth>} />
+                <Route path="/add-message" element={<RequireAuth><AddMessage /></RequireAuth>} />
+                <Route path="/add-memories" element={<RequireAuth><AddMemories /></RequireAuth>} />
+                <Route path="/select-amount" element={<RequireAuth><SelectAmount /></RequireAuth>} />
+                <Route path="/preview-gift" element={<RequireAuth><PreviewGift /></RequireAuth>} />
                 <Route path="/my-gifts" element={<RequireAuth><MyGifts /></RequireAuth>} />
                 <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
                 <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
