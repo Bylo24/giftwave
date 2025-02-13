@@ -85,12 +85,12 @@ const Profile = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#F1F1F1] pb-16">
+      <div className="min-h-screen bg-gray-50/50 pb-16">
         <div className="p-4 space-y-4 max-w-2xl mx-auto">
           <div className="animate-pulse space-y-4">
             <div className="h-8 bg-gray-200 rounded w-1/3"></div>
-            <div className="h-64 bg-white rounded"></div>
-            <div className="h-32 bg-white rounded"></div>
+            <div className="h-64 bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg"></div>
+            <div className="h-32 bg-white/80 backdrop-blur-lg rounded-2xl shadow-lg"></div>
             <div className="h-12 bg-gray-200 rounded"></div>
           </div>
         </div>
@@ -100,13 +100,13 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#F1F1F1] pb-16">
+    <div className="min-h-screen bg-gray-50/50 pb-24">
       <div className="p-4 space-y-4 max-w-2xl mx-auto">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-xl font-semibold text-[#2C2E2F]">Profile Settings</h1>
         </div>
         
-        <Card className="p-6 bg-white shadow-sm border-0">
+        <Card className="p-6 bg-white/80 backdrop-blur-lg border border-gray-200/20 shadow-lg">
           <ProfileHeader 
             user={user}
             profile={profile}
@@ -120,7 +120,7 @@ const Profile = () => {
 
         <Button 
           variant="outline"
-          className="w-full border-gray-200 text-gray-700 hover:bg-gray-50 hover:text-gray-900"
+          className="w-full bg-white/80 backdrop-blur-lg border-gray-200/20 text-gray-700 hover:bg-gray-50 hover:text-gray-900 shadow-lg"
           onClick={handleSignOut}
         >
           Sign Out

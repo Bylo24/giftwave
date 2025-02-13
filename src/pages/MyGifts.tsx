@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { Card } from "@/components/ui/card";
 
 const MyGifts = () => {
   const { user } = useAuth();
@@ -46,16 +47,20 @@ const MyGifts = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-background pb-16 flex items-center justify-center">
-        <p>Loading gifts...</p>
+      <div className="min-h-screen bg-gray-50/50 pb-16 flex items-center justify-center">
+        <Card className="p-6 backdrop-blur-lg border border-gray-200/20 shadow-lg">
+          <p className="text-gray-600">Loading gifts...</p>
+        </Card>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background pb-16">
+    <div className="min-h-screen bg-gray-50/50 pb-24">
       <div className="p-4 space-y-6 max-w-2xl mx-auto">
-        <MemoriesGrid gifts={gifts || []} />
+        <Card className="p-6 backdrop-blur-lg border border-gray-200/20 shadow-lg">
+          <MemoriesGrid gifts={gifts || []} />
+        </Card>
       </div>
       <BottomNav />
     </div>

@@ -82,8 +82,8 @@ const Wallet = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-16">
-      <div className="p-4 pt-16 space-y-6">
+    <div className="min-h-screen bg-gray-50/50 pb-24">
+      <div className="p-4 pt-16 space-y-6 max-w-2xl mx-auto">
         <div className="text-center mb-4">
           <h1 className="text-xl font-medium text-gray-800">
             Hey <Link to="/profile" className="text-primary hover:underline">{firstName}</Link>,
@@ -91,7 +91,7 @@ const Wallet = () => {
           <p className="text-gray-600">here's your balance</p>
         </div>
 
-        <Card className="p-6 bg-primary text-white">
+        <Card className="p-6 bg-gradient-to-br from-indigo-500 to-blue-600 text-white backdrop-blur-lg border border-white/10 shadow-xl">
           <div className="flex items-center gap-3 mb-4">
             <WalletIcon className="h-6 w-6" />
             <h2 className="text-lg font-semibold">Your Balance</h2>
@@ -104,7 +104,7 @@ const Wallet = () => {
 
         <div className="grid grid-cols-2 gap-4">
           <Card 
-            className="p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors"
+            className="p-4 text-center cursor-pointer hover:bg-white/80 transition-colors backdrop-blur-lg border border-gray-200/20 shadow-lg"
             onClick={() => {/* Add funds handler */}}
           >
             <Plus className="h-6 w-6 mx-auto mb-2 text-primary" />
@@ -112,7 +112,7 @@ const Wallet = () => {
           </Card>
 
           <Card 
-            className="p-4 text-center cursor-pointer hover:bg-gray-50 transition-colors"
+            className="p-4 text-center cursor-pointer hover:bg-white/80 transition-colors backdrop-blur-lg border border-gray-200/20 shadow-lg"
             onClick={() => {/* Deposit handler */}}
           >
             <Download className="h-6 w-6 mx-auto mb-2 text-primary" />
@@ -122,13 +122,15 @@ const Wallet = () => {
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Payment Methods</h3>
-          <SavedCards />
+          <Card className="backdrop-blur-lg border border-gray-200/20 shadow-lg">
+            <SavedCards />
+          </Card>
           <AddCard />
         </div>
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <Card className="p-4">
+          <Card className="p-4 backdrop-blur-lg border border-gray-200/20 shadow-lg">
             <p className="text-center text-gray-500">No recent transactions</p>
           </Card>
         </div>
