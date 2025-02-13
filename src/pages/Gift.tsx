@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -8,6 +9,7 @@ import { AmountStep } from "@/components/gift/AmountStep";
 import { PreviewStep } from "@/components/gift/PreviewStep";
 import { MemoryStep } from "@/components/gift/MemoryStep";
 import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
+import { GiftCard } from "@/components/gift/GiftCard";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
@@ -76,6 +78,13 @@ const Gift = () => {
   };
 
   const renderStep = () => {
+    const commonCardProps = {
+      theme: selectedTheme,
+      messageVideo,
+      memories,
+      amount,
+    };
+
     switch (currentStep) {
       case 'recipient':
         return (
@@ -83,6 +92,7 @@ const Gift = () => {
             <div className="rounded-lg bg-blue-50 p-4 mb-4">
               <p className="text-sm text-blue-600">Step 1 of 6: Enter the recipient's phone number</p>
             </div>
+            <GiftCard {...commonCardProps} />
             <RecipientStep
               phoneNumber={phoneNumber}
               setPhoneNumber={setPhoneNumber}
@@ -102,6 +112,7 @@ const Gift = () => {
             <div className="rounded-lg bg-blue-50 p-4 mb-4">
               <p className="text-sm text-blue-600">Step 2 of 6: Record or upload your message</p>
             </div>
+            <GiftCard {...commonCardProps} />
             <MessageStep
               messageVideo={messageVideo}
               setMessageVideo={setMessageVideo}
@@ -118,6 +129,7 @@ const Gift = () => {
             <div className="rounded-lg bg-blue-50 p-4 mb-4">
               <p className="text-sm text-blue-600">Step 3 of 6: Choose the gift amount</p>
             </div>
+            <GiftCard {...commonCardProps} />
             <AmountStep
               amount={amount}
               setAmount={setAmount}
@@ -138,6 +150,7 @@ const Gift = () => {
               <p className="text-sm text-blue-600">Step 4 of 6: Add special memories</p>
               <p className="text-xs text-blue-500 mt-1">Your memories are automatically saved when added</p>
             </div>
+            <GiftCard {...commonCardProps} />
             <MemoryReplayScreen
               memories={memories}
               onAddMemory={handleAddMemory}
@@ -176,6 +189,7 @@ const Gift = () => {
             <div className="rounded-lg bg-blue-50 p-4 mb-4">
               <p className="text-sm text-blue-600">Final Step: Complete payment</p>
             </div>
+            <GiftCard {...commonCardProps} />
             <div className="text-center p-6">
               <h2 className="text-xl font-semibold mb-4">Complete Payment</h2>
               <p className="text-gray-600">Payment processing coming soon!</p>
