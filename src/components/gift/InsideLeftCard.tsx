@@ -66,7 +66,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     if (!memory) {
       return (
         <div className="flex flex-col space-y-2 w-full">
-          <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg bg-gray-200 w-32 h-32 mx-auto">
+          <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg bg-gray-200 w-48 h-48 mx-auto">
             <div className="absolute inset-0 flex items-center justify-center text-gray-400 font-medium">
               Your memory
             </div>
@@ -78,7 +78,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
 
     return (
       <div className="flex flex-col space-y-2 w-full">
-        <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg w-32 h-32 mx-auto">
+        <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg w-48 h-48 mx-auto">
           <img 
             src={memory.imageUrl} 
             alt="Memory"
@@ -180,7 +180,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           <div 
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg transition-colors duration-300 relative`}
           >
-            <div className="relative z-10 h-full flex flex-col justify-between py-8">
+            <div className="relative z-10 h-full flex flex-col justify-between py-6">
               {[0, 1].map((index) => (
                 <div key={index} className="flex-1 flex items-center justify-center">
                   {renderMemoryCard(memories[index] || null, index)}
