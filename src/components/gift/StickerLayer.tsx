@@ -52,13 +52,26 @@ export const StickerLayer: React.FC<StickerLayerProps> = ({
                 rotate: rotateValue
               }}
               whileTap={{ scale: selectedSticker === sticker.id ? 1 : 0.95 }}
-              onPinch={(event) => {
-                // Calculate rotation from the gesture
-                const rotation = event.rotation;
-                rotateValue.set(sticker.rotation + rotation);
-                
-                if (onStickerRotate) {
-                  onStickerRotate(sticker.id, sticker.rotation + rotation);
+              whileHover={{ scale: 1.05 }}
+              onPointerDown={(event) => {
+                // Check if it's a touch event with multiple touches (pinch)
+                if (event.pointerType === 'touch' && (event as any).touches?.length === 2) {
+                  const touch1 = (event as any).touches[0];
+                  const touch2 = (event as any).touches[1];
+                  
+                  // Calculate the angle between the two touch points
+                  const angle = Math.atan2(
+                    touch2.clientY - touch1.clientY,
+                    touch2.clientX - touch1.clientX
+                  ) * (180 / Math.PI);
+                  
+                  // Update rotation
+                  const newRotation = sticker.rotation + angle;
+                  rotateValue.set(newRotation);
+                  
+                  if (onStickerRotate) {
+                    onStickerRotate(sticker.id, newRotation);
+                  }
                 }
               }}
             >
