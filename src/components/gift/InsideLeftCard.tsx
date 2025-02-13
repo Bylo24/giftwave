@@ -127,11 +127,11 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                       className="cursor-pointer inline-flex flex-col items-center gap-2"
                     >
                       <Button
-                        size="lg"
-                        className="bg-white hover:bg-white/90"
+                        disabled={isUploading}
+                        className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
                       >
                         <Upload className="mr-2 h-5 w-5" />
-                        Upload Video
+                        {isUploading ? 'Uploading...' : 'Upload Video'}
                       </Button>
                       <p className="text-sm text-gray-500">Select a video from your device</p>
                     </label>
