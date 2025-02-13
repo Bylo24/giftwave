@@ -41,49 +41,37 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     loadFrames();
   }, []);
 
-  const handleMessageUpload = async (file: File) => {
-    if (file.type.startsWith('video/')) {
-      setIsUploading(true);
-      try {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `${crypto.randomUUID()}.${fileExt}`;
-        const filePath = `public/${fileName}`;
-        
-        // Upload the file to Supabase Storage
-        const { error: uploadError } = await supabase.storage
-          .from('gift_videos')
-          .upload(filePath, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
-
-        if (uploadError) {
-          throw uploadError;
-        }
-
-        // Get the public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('gift_videos')
-          .getPublicUrl(filePath);
-
-        setMessageVideo(file);
-        setVideoUrl(publicUrl);
-        toast.success('Video message uploaded successfully!');
-      } catch (error) {
-        console.error('Upload error:', error);
-        toast.error('Failed to upload video. Please try again.');
-      } finally {
-        setIsUploading(false);
-      }
-    } else {
-      toast.error('Please upload a video file');
-    }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      handleMessageUpload(file);
+    if (!file) return;
+
+    if (!file.type.startsWith('video/')) {
+      toast.error('Please upload a video file');
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileName = `${Date.now()}-${file.name}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('gift_videos')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gift_videos')
+        .getPublicUrl(fileName);
+
+      setMessageVideo(file);
+      setVideoUrl(publicUrl);
+      toast.success('Video uploaded successfully!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Failed to upload video');
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -126,7 +114,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                 {messageVideo ? (
                   <>
                     <video
-                      src={videoUrl || URL.createObjectURL(messageVideo)}
+                      src={videoUrl}
                       controls
                       className="w-full h-full object-cover rounded-lg"
                       playsInline
@@ -144,16 +132,17 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                   </>
                 ) : (
                   <div className="text-center">
-                    <input 
-                      type="file" 
+                    <input
+                      type="file"
                       accept="video/*"
-                      className="hidden" 
                       id="video-upload"
+                      className="hidden"
                       onChange={handleFileChange}
+                      disabled={isUploading}
                     />
-                    <label 
+                    <label
                       htmlFor="video-upload"
-                      className="cursor-pointer inline-flex flex-col items-center gap-2"
+                      className="cursor-pointer"
                     >
                       <Button
                         disabled={isUploading}
@@ -162,7 +151,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                         <Upload className="mr-2 h-5 w-5" />
                         {isUploading ? 'Uploading...' : 'Upload Video'}
                       </Button>
-                      <p className="text-sm text-gray-500">Select a video from your device</p>
                     </label>
                   </div>
                 )}
