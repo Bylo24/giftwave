@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Upload, Image, Plus, DollarSign, ArrowRight } from "lucide-react";
@@ -169,7 +168,7 @@ const InsideLeftCard = ({
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           <button onClick={handleNavigateToAmount} className="flex items-center gap-2 px-6 py-2 rounded-full font-medium shadow-lg transition-colors bg-slate-50 text-gray-950">
-            <ArrowLeft className="h-4 w-4" />
+            <DollarSign className="h-4 w-4" />
             Select Amount
             <ArrowRight className="h-4 w-4" />
           </button>
