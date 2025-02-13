@@ -10,17 +10,20 @@ import { useStickerManager } from "@/hooks/useStickerManager";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { stickerOptions } from "@/constants/giftOptions";
 import { toast } from "sonner";
+import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
+import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 
 const GiftContent = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [currentPage, setCurrentPage] = useState<'front' | 'blank' | 'inside-left'>('front');
-  const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>('recipient');
-  const [previousSteps, setPreviousSteps] = useState<Array<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>>([]);
+  const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'reveal' | 'preview' | 'payment'>('recipient');
+  const [previousSteps, setPreviousSteps] = useState<Array<'recipient' | 'message' | 'amount' | 'memory' | 'reveal' | 'preview' | 'payment'>>([]);
   const [selectedTheme] = useState<ThemeType>('holiday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [amount, setAmount] = useState('');
+  const [memories, setMemories] = useState<Array<{ id: string; imageUrl?: string; caption: string; date: Date }>>([]);
 
   const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
   const {
@@ -37,6 +40,14 @@ const GiftContent = () => {
 
   const handleDuplicatePage = () => {
     navigate('/preview');
+  };
+
+  const handleAddMemory = (memory: Omit<{ id: string; imageUrl?: string; caption: string; date: Date }, "id">) => {
+    const newMemory = {
+      ...memory,
+      id: crypto.randomUUID()
+    };
+    setMemories(prev => [...prev, newMemory]);
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -66,6 +77,12 @@ const GiftContent = () => {
   };
 
   const goToNextStep = () => {
+    if (currentStep === 'memory') {
+      setPreviousSteps(prev => [...prev, currentStep]);
+      setCurrentStep('reveal');
+      return;
+    }
+
     if (currentPage === 'front') {
       setCurrentPage('blank');
     } else if (currentPage === 'blank') {
@@ -75,6 +92,36 @@ const GiftContent = () => {
       setCurrentStep('memory');
     }
   };
+
+  if (currentStep === 'reveal') {
+    return (
+      <GiftRevealAnimation
+        messageVideo={messageVideo}
+        amount={amount}
+        memories={memories}
+        onComplete={() => {
+          setPreviousSteps(prev => [...prev, 'reveal']);
+          setCurrentStep('preview');
+        }}
+      />
+    );
+  }
+
+  if (currentStep === 'memory') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+      >
+        <div className="w-full max-w-md">
+          <MemoryReplayScreen
+            memories={memories}
+            onAddMemory={handleAddMemory}
+            onNext={goToNextStep}
+          />
+        </div>
+      </div>
+    );
+  }
 
   if (currentPage === 'front') {
     return (
