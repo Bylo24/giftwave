@@ -75,7 +75,7 @@ const Home = () => {
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-semibold text-gray-900">
-            Send money as a gift, with a personal touch!
+            Send Money As A Gift, With A Personal Touch!
           </h1>
           <button
             onClick={() => navigate("/gift")}
