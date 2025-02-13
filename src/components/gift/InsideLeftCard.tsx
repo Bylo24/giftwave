@@ -1,10 +1,9 @@
 
 import { useState } from "react";
-import { ArrowLeft, Upload } from "lucide-react";
+import { ArrowLeft, Upload, Image, Plus } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { MemoryStage } from "./stages/MemoryStage";
 
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
@@ -16,6 +15,8 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+  const [caption, setCaption] = useState("");
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
 
   // Demo memories - in a real app these would come from props or an API
   const demoMemories = [
@@ -33,44 +34,29 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     const file = event.target.files?.[0];
     if (!file) return;
 
-    console.log('Selected file:', file.name, file.type);
-
-    if (!file.type.startsWith('video/')) {
-      toast.error('Please upload a video file');
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
       return;
     }
 
-    setIsUploading(true);
-    try {
-      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
-      console.log('Uploading file:', fileName);
-      
-      const { data, error: uploadError } = await supabase.storage
-        .from('gift_videos')
-        .upload(fileName, file);
+    setPreviewImage(URL.createObjectURL(file));
+  };
 
-      console.log('Upload response:', { data, error: uploadError });
-
-      if (uploadError) {
-        console.error('Upload error details:', uploadError);
-        throw uploadError;
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('gift_videos')
-        .getPublicUrl(fileName);
-
-      console.log('Public URL:', publicUrl);
-
-      setMessageVideo(file);
-      setVideoUrl(publicUrl);
-      toast.success('Video uploaded successfully!');
-    } catch (error) {
-      console.error('Upload error:', error);
-      toast.error('Failed to upload video. Please try again.');
-    } finally {
-      setIsUploading(false);
+  const handleAddMemory = () => {
+    if (!previewImage) {
+      toast.error('Please upload a photo first');
+      return;
     }
+
+    if (!caption.trim()) {
+      toast.error('Please add a caption');
+      return;
+    }
+
+    // Here you would typically save the memory
+    toast.success('Memory added successfully!');
+    setPreviewImage(null);
+    setCaption('');
   };
 
   return (
@@ -103,40 +89,56 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
         </div>
 
-        {/* Upload Section */}
+        {/* Memory Creation Section */}
         <div className="px-4 py-6">
-          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 max-w-md mx-auto shadow-lg">
-            <div className="space-y-4">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 max-w-md mx-auto shadow-lg space-y-4">
+            <div className="flex flex-col space-y-4">
+              {/* Photo Upload */}
               <div className="text-center">
                 <input
                   type="file"
-                  accept="video/*"
-                  id="video-upload"
+                  accept="image/*"
+                  id="photo-upload"
                   className="hidden"
                   onChange={handleFileChange}
-                  disabled={isUploading}
                 />
                 <label
-                  htmlFor="video-upload"
+                  htmlFor="photo-upload"
                   className="cursor-pointer inline-flex items-center px-4 py-2 bg-white rounded-md shadow hover:bg-gray-50 transition-colors"
                 >
-                  <Upload className="h-5 w-5 mr-2" />
-                  <span className="font-medium">
-                    {isUploading ? 'Uploading...' : 'Upload Video'}
-                  </span>
+                  <Image className="h-5 w-5 mr-2" />
+                  <span className="font-medium">Upload Photo</span>
                 </label>
               </div>
-              
-              {messageVideo && videoUrl && (
-                <div className="rounded-lg overflow-hidden">
-                  <video
-                    src={videoUrl}
-                    controls
-                    className="w-full h-48 object-cover"
-                    playsInline
+
+              {/* Preview */}
+              {previewImage && (
+                <div className="rounded-lg overflow-hidden w-full aspect-[3/4]">
+                  <img 
+                    src={previewImage} 
+                    alt="Preview" 
+                    className="w-full h-full object-cover"
                   />
                 </div>
               )}
+
+              {/* Caption Input */}
+              <input
+                type="text"
+                placeholder="Add a caption..."
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+                className="w-full px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+
+              {/* Add Memory Button */}
+              <button
+                onClick={handleAddMemory}
+                className="w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
+              >
+                <Plus className="h-5 w-5 mr-2" />
+                Add Memory
+              </button>
             </div>
           </div>
         </div>
