@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { Search, Gift, Wallet, Plus, ArrowDown, Palette, History, UserPlus, Settings, Bell } from "lucide-react";
+import { Search, Gift, Wallet, Plus, ArrowDown, History, UserPlus, Settings, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
@@ -109,23 +109,6 @@ const Home = () => {
               </button>
             </div>
           </div>
-        </Card>
-
-        {/* Featured Theme */}
-        <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-0">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <Palette className="h-5 w-5 text-purple-600" />
-              <h2 className="font-semibold text-gray-900">Featured Theme</h2>
-            </div>
-          </div>
-          <div className="aspect-video bg-white rounded-xl shadow-sm mb-4"></div>
-          <button
-            onClick={() => navigate("/gift")}
-            className="w-full py-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors text-sm font-medium"
-          >
-            Customize Your Card
-          </button>
         </Card>
 
         {/* Quick Access */}
