@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -229,7 +228,6 @@ const Gift = () => {
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container overflow-hidden`}
             style={{ position: 'relative' }}
           >
-            {/* Background pattern div moved below content */}
             <div 
               className="absolute inset-0 z-0" 
               style={getPatternStyle(selectedThemeOption.pattern)}
@@ -263,12 +261,12 @@ const Gift = () => {
           </div>
         </div>
 
-        <PatternSelector
-          currentPattern={selectedThemeOption.pattern.type}
-          onPatternChange={handlePatternChange}
-        />
+        <div className="space-y-8 mb-4">
+          <PatternSelector
+            currentPattern={selectedThemeOption.pattern.type}
+            onPatternChange={handlePatternChange}
+          />
 
-        <div className="p-4">
           <div className="flex justify-center max-w-md mx-auto relative">
             <div className="relative group">
               <button 
