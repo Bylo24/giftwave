@@ -17,7 +17,7 @@ export const MemoryStage = ({ memory }: MemoryStageProps) => {
       exit={{ opacity: 0, y: -20 }}
     >
       {memory.imageUrl && (
-        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[9/16]">
+        <div className="relative rounded-2xl overflow-hidden shadow-2xl aspect-[9/16] max-h-[200px] mx-auto">
           <img 
             src={memory.imageUrl} 
             alt="Memory"
@@ -37,4 +37,3 @@ export const MemoryStage = ({ memory }: MemoryStageProps) => {
     </motion.div>
   );
 };
-
