@@ -5,6 +5,7 @@ import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
 import { PatternSelector } from "@/components/gift/PatternSelector";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
+import { MessageStep } from "@/components/gift/MessageStep";
 
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
@@ -16,6 +17,8 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
   const [showStickers, setShowStickers] = useState(false);
+  const [messageVideo, setMessageVideo] = useState<File | null>(null);
+  const [isRecordingMessage, setIsRecordingMessage] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const handleStickerClick = (emoji: string) => {
@@ -105,14 +108,33 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
         </div>
 
+        <div className="px-4 mb-6">
+          <MessageStep
+            messageVideo={messageVideo}
+            setMessageVideo={setMessageVideo}
+            isRecordingMessage={isRecordingMessage}
+            startMessageRecording={() => setIsRecordingMessage(true)}
+            stopMessageRecording={() => setIsRecordingMessage(false)}
+            onNext={onNext}
+          />
+        </div>
+
         <div className="flex-1 flex items-center justify-center px-4 pb-20">
           <div 
             ref={cardRef}
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative`}
           >
             <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8">
-              <div className="w-full aspect-video bg-black/10 rounded-lg flex items-center justify-center">
-                <span className="text-gray-500">Video message will appear here</span>
+              <div className="w-full aspect-video bg-black/10 rounded-lg flex items-center justify-center overflow-hidden">
+                {messageVideo ? (
+                  <video
+                    src={URL.createObjectURL(messageVideo)}
+                    controls
+                    className="w-full h-full object-contain"
+                  />
+                ) : (
+                  <span className="text-gray-500">Record or upload a video message</span>
+                )}
               </div>
             </div>
 
