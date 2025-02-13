@@ -1,40 +1,18 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, X, Grid, Circle, Waves, Ban } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
-import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "@/components/ui/button";
-
-interface ThemeOption {
-  text: string;
-  emoji: string;
-  bgColor: string;
-  screenBgColor: string;
-  textColors: string[];
-  pattern: {
-    type: 'dots' | 'grid' | 'waves' | 'none';
-    color: string;
-  };
-}
-
-interface Memory {
-  id: string;
-  imageUrl?: string;
-  caption: string;
-  date: Date;
-}
-
-interface GiftMemory {
-  caption: string;
-  date: Date;
-}
+import { ThemeOption, PatternType, Sticker } from "@/types/gift";
+import { StickerLayer } from "@/components/gift/StickerLayer";
+import { PatternSelector } from "@/components/gift/PatternSelector";
+import { ThemeSelector } from "@/components/gift/ThemeSelector";
 
 const themeOptions: ThemeOption[] = [
   {
     text: "HAPPY BIRTHDAY",
     emoji: "🎂",
     bgColor: "bg-[#FFF6E9]",
-    screenBgColor: "#FEC6A1", // Soft Orange
+    screenBgColor: "#FEC6A1",
     textColors: ["text-[#FF6B6B]", "text-[#4ECDC4]", "text-[#FFD93D]", "text-[#FF6B6B]", "text-[#4ECDC4]"],
     pattern: {
       type: 'dots',
@@ -45,7 +23,7 @@ const themeOptions: ThemeOption[] = [
     text: "CONGRATULATIONS",
     emoji: "🎉",
     bgColor: "bg-[#F0FFF4]",
-    screenBgColor: "#F2FCE2", // Soft Green
+    screenBgColor: "#F2FCE2",
     textColors: ["text-[#38A169]", "text-[#2B6CB0]", "text-[#805AD5]", "text-[#38A169]", "text-[#2B6CB0]"],
     pattern: {
       type: 'grid',
@@ -56,7 +34,7 @@ const themeOptions: ThemeOption[] = [
     text: "MERRY CHRISTMAS",
     emoji: "🎄",
     bgColor: "bg-[#F5F2E8]",
-    screenBgColor: "#FFDEE2", // Soft Pink
+    screenBgColor: "#FFDEE2",
     textColors: ["text-[#2E5A2C]", "text-[#1B4B6B]", "text-[#EA384C]", "text-[#FF9EBA]", "text-[#C4D6A0]"],
     pattern: {
       type: 'waves',
@@ -67,7 +45,7 @@ const themeOptions: ThemeOption[] = [
     text: "THANK YOU",
     emoji: "💝",
     bgColor: "bg-[#FFF5F5]",
-    screenBgColor: "#E5DEFF", // Soft Purple
+    screenBgColor: "#E5DEFF",
     textColors: ["text-[#E53E3E]", "text-[#DD6B20]", "text-[#D53F8C]", "text-[#E53E3E]", "text-[#DD6B20]"],
     pattern: {
       type: 'dots',
@@ -78,7 +56,7 @@ const themeOptions: ThemeOption[] = [
     text: "GOOD LUCK",
     emoji: "🍀",
     bgColor: "bg-[#ECFDF5]",
-    screenBgColor: "#D3E4FD", // Soft Blue
+    screenBgColor: "#D3E4FD",
     textColors: ["text-[#047857]", "text-[#059669]", "text-[#10B981]", "text-[#047857]", "text-[#059669]"],
     pattern: {
       type: 'grid',
@@ -104,20 +82,9 @@ const Gift = () => {
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
   const [amount, setAmount] = useState('');
-  const [memory, setMemory] = useState<GiftMemory>({
-    caption: '',
-    date: new Date()
-  });
-  const [memories, setMemories] = useState<Memory[]>([]);
   const [selectedThemeOption, setSelectedThemeOption] = useState<ThemeOption>(themeOptions[0]);
   const [showStickers, setShowStickers] = useState(false);
-  const [placedStickers, setPlacedStickers] = useState<Array<{
-    id: string;
-    emoji: string;
-    x: number;
-    y: number;
-    rotation: number;
-  }>>([]);
+  const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -136,7 +103,7 @@ const Gift = () => {
     setCurrentStep(nextStep);
   };
 
-  const handlePatternChange = (type: 'dots' | 'grid' | 'waves' | 'none') => {
+  const handlePatternChange = (type: PatternType) => {
     setSelectedThemeOption(prev => ({
       ...prev,
       pattern: {
@@ -194,8 +161,6 @@ const Gift = () => {
 
     const rect = cardRef.current.getBoundingClientRect();
     const padding = 40;
-
-    // Constrain position within card boundaries
     const x = Math.min(Math.max(info.point.x - rect.left, padding), rect.width - padding);
     const y = Math.min(Math.max(info.point.y - rect.top, padding), rect.height - padding);
 
@@ -240,23 +205,11 @@ const Gift = () => {
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           
-          <div className="relative">
-            <select
-              value={selectedThemeOption.text}
-              onChange={(e) => {
-                const newTheme = themeOptions.find(t => t.text === e.target.value);
-                if (newTheme) setSelectedThemeOption(newTheme);
-              }}
-              className="appearance-none pl-4 pr-10 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium border-0 shadow-lg focus:ring-2 focus:ring-white/50 focus:outline-none cursor-pointer"
-            >
-              {themeOptions.map((theme) => (
-                <option key={theme.text} value={theme.text} className="py-2">
-                  {theme.text}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600 pointer-events-none" />
-          </div>
+          <ThemeSelector
+            themes={themeOptions}
+            selectedTheme={selectedThemeOption}
+            onThemeChange={setSelectedThemeOption}
+          />
           
           <button 
             onClick={() => goToNextStep('message')}
@@ -265,6 +218,11 @@ const Gift = () => {
             Next
           </button>
         </div>
+
+        <PatternSelector
+          currentPattern={selectedThemeOption.pattern.type}
+          onPatternChange={handlePatternChange}
+        />
 
         <div className="flex-1 flex items-center justify-center px-4">
           <div 
@@ -289,78 +247,15 @@ const Gift = () => {
               </div>
             </div>
 
-            <AnimatePresence>
-              {placedStickers.map((sticker) => (
-                <motion.div
-                  key={sticker.id}
-                  className="absolute text-4xl cursor-move"
-                  initial={{ scale: 0, x: sticker.x, y: sticker.y }}
-                  animate={{ 
-                    scale: 1,
-                    x: sticker.x,
-                    y: sticker.y,
-                    rotate: sticker.rotation 
-                  }}
-                  drag
-                  dragMomentum={false}
-                  dragConstraints={cardRef}
-                  onDragEnd={(event, info) => handleDragEnd(event, info, sticker.id)}
-                  onClick={() => handleStickerTap(sticker.id)}
-                  style={{ touchAction: 'none' }}
-                >
-                  {sticker.emoji}
-                  {selectedSticker === sticker.id && (
-                    <motion.div
-                      initial={{ scale: 0 }}
-                      animate={{ scale: 1 }}
-                      className="absolute -top-3 -right-3 bg-red-500 rounded-full p-1 cursor-pointer"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleRemoveSticker(sticker.id);
-                      }}
-                    >
-                      <X className="h-3 w-3 text-white" />
-                    </motion.div>
-                  )}
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            <StickerLayer
+              stickers={placedStickers}
+              selectedSticker={selectedSticker}
+              cardRef={cardRef}
+              onStickerTap={handleStickerTap}
+              onStickerDragEnd={handleDragEnd}
+              onStickerRemove={handleRemoveSticker}
+            />
           </div>
-        </div>
-
-        <div className="flex justify-center gap-2 mb-4 px-4">
-          <Button
-            variant={selectedThemeOption.pattern.type === 'none' ? 'default' : 'outline'}
-            size="icon"
-            onClick={() => handlePatternChange('none')}
-            className="w-10 h-10"
-          >
-            <Ban className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={selectedThemeOption.pattern.type === 'dots' ? 'default' : 'outline'}
-            size="icon"
-            onClick={() => handlePatternChange('dots')}
-            className="w-10 h-10"
-          >
-            <Circle className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={selectedThemeOption.pattern.type === 'grid' ? 'default' : 'outline'}
-            size="icon"
-            onClick={() => handlePatternChange('grid')}
-            className="w-10 h-10"
-          >
-            <Grid className="h-4 w-4" />
-          </Button>
-          <Button
-            variant={selectedThemeOption.pattern.type === 'waves' ? 'default' : 'outline'}
-            size="icon"
-            onClick={() => handlePatternChange('waves')}
-            className="w-10 h-10"
-          >
-            <Waves className="h-4 w-4" />
-          </Button>
         </div>
 
         <div className="p-4">
