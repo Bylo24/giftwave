@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus, Users, Star, Gift, ChevronDown } from "lucide-react";
+import { Search, UserPlus, Users, Star, Gift, ChevronDown, Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -144,6 +144,10 @@ const Contacts = () => {
     }
   }, [isMobile]);
 
+  const goHome = () => {
+    navigate('/home');
+  };
+
   const getFilteredContacts = () => {
     let filtered = contacts.filter(contact =>
       contact.contact_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -171,11 +175,11 @@ const Contacts = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 p-4">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-4 backdrop-blur-md">
         <div className="animate-pulse space-y-4">
-          <div className="h-10 bg-gray-200 rounded-full w-full"></div>
-          <div className="h-20 bg-gray-200 rounded-lg w-full"></div>
-          <div className="h-20 bg-gray-200 rounded-lg w-full"></div>
+          <div className="h-10 bg-white/50 rounded-full w-full"></div>
+          <div className="h-20 bg-white/50 rounded-lg w-full"></div>
+          <div className="h-20 bg-white/50 rounded-lg w-full"></div>
         </div>
       </div>
     );
@@ -184,16 +188,26 @@ const Contacts = () => {
   const filteredContacts = getFilteredContacts();
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2 shadow-sm">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-md">
+      <div className="sticky top-0 bg-white/70 backdrop-blur-lg z-10 px-4 pt-4 pb-2 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <h1 className="text-xl font-semibold">Contacts</h1>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={goHome}
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-blue-100/50"
+            >
+              <Home className="h-5 w-5 text-blue-600" />
+            </Button>
+            <h1 className="text-xl font-semibold">Contacts</h1>
+          </div>
           {!isMobile && (
             <Button
               onClick={requestContactsPermission}
               variant="outline"
               size="sm"
-              className="flex items-center gap-2"
+              className="flex items-center gap-2 bg-white/80 hover:bg-white/90"
             >
               <Users className="h-4 w-4" />
               Import
@@ -207,7 +221,7 @@ const Contacts = () => {
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5"
             />
             <Input 
-              className="pl-10 bg-gray-100 border-0 rounded-full"
+              className="pl-10 bg-white/50 border-0 rounded-full backdrop-blur-sm focus:bg-white/80 transition-all"
               placeholder="Search contacts..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -218,6 +232,7 @@ const Contacts = () => {
             <Button
               variant={sortBy === 'all' ? 'default' : 'outline'}
               size="sm"
+              className={sortBy === 'all' ? '' : 'bg-white/50 hover:bg-white/80'}
               onClick={() => setSortBy('all')}
             >
               All
@@ -225,6 +240,7 @@ const Contacts = () => {
             <Button
               variant={sortBy === 'favorites' ? 'default' : 'outline'}
               size="sm"
+              className={sortBy === 'favorites' ? '' : 'bg-white/50 hover:bg-white/80'}
               onClick={() => setSortBy('favorites')}
             >
               Favorites
@@ -232,6 +248,7 @@ const Contacts = () => {
             <Button
               variant={sortBy === 'recent' ? 'default' : 'outline'}
               size="sm"
+              className={sortBy === 'recent' ? '' : 'bg-white/50 hover:bg-white/80'}
               onClick={() => setSortBy('recent')}
             >
               Recent
@@ -239,6 +256,7 @@ const Contacts = () => {
             <Button
               variant={sortBy === 'giftwave' ? 'default' : 'outline'}
               size="sm"
+              className={sortBy === 'giftwave' ? '' : 'bg-white/50 hover:bg-white/80'}
               onClick={() => setSortBy('giftwave')}
             >
               GiftWave Users
@@ -257,7 +275,7 @@ const Contacts = () => {
                 onClick={requestContactsPermission}
                 variant="outline"
                 size="sm"
-                className="mt-4 flex items-center gap-2 mx-auto"
+                className="mt-4 flex items-center gap-2 mx-auto bg-white/80 hover:bg-white/90"
               >
                 <Users className="h-4 w-4" />
                 Grant Access
@@ -266,7 +284,7 @@ const Contacts = () => {
           </div>
         ) : (
           filteredContacts.map((contact) => (
-            <Card key={contact.id} className="p-4">
+            <Card key={contact.id} className="p-4 bg-white/70 backdrop-blur-sm border-0 shadow-lg hover:bg-white/80 transition-all">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <Avatar className="h-10 w-10">
@@ -278,7 +296,7 @@ const Contacts = () => {
                     <div className="flex items-center gap-2">
                       <h3 className="font-medium">{contact.contact_name}</h3>
                       {contact.status === 'registered' && (
-                        <span className="bg-blue-100 text-blue-600 text-xs px-2 py-0.5 rounded-full">
+                        <span className="bg-blue-100/70 backdrop-blur-sm text-blue-600 text-xs px-2 py-0.5 rounded-full">
                           GiftWave
                         </span>
                       )}
@@ -300,7 +318,7 @@ const Contacts = () => {
                       onClick={() => handleInvite(contact)}
                       variant="outline"
                       size="sm"
-                      className="flex items-center gap-2"
+                      className="flex items-center gap-2 bg-white/80 hover:bg-white/90"
                     >
                       <UserPlus className="h-4 w-4" />
                       Invite
