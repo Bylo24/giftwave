@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -228,7 +229,10 @@ const Gift = () => {
           <div 
             ref={cardRef}
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container overflow-hidden`}
-            style={getPatternStyle(selectedThemeOption.pattern)}
+            style={{
+              ...getPatternStyle(selectedThemeOption.pattern),
+              position: 'relative'
+            }}
           >
             <div className="h-full flex flex-col items-center justify-center space-y-8">
               <div className="text-center">

@@ -39,7 +39,7 @@ export const StickerLayer: React.FC<StickerLayerProps> = ({
           dragConstraints={cardRef}
           onDragEnd={(event, info) => onStickerDragEnd(event, info, sticker.id)}
           onClick={() => onStickerTap(sticker.id)}
-          style={{ touchAction: 'none' }}
+          style={{ touchAction: 'none', pointerEvents: 'auto' }}
         >
           {sticker.emoji}
           {selectedSticker === sticker.id && (
