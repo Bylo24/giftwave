@@ -4,7 +4,7 @@ import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { StickerLayer } from "./StickerLayer";
-import { MessageStep } from "./MessageStep";
+import { VideoStage } from "./stages/VideoStage";
 
 interface Memory {
   imageUrl: string;
@@ -27,6 +27,7 @@ const stickerOptions = [
 
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
   const cardRef = useRef<HTMLDivElement>(null);
+  const [currentView, setCurrentView] = useState<'card' | 'video'>('card');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -36,7 +37,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [showStickers, setShowStickers] = useState(false);
   const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
-  const [isRecordingMessage, setIsRecordingMessage] = useState(false);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -163,6 +163,75 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     );
   };
 
+  if (currentView === 'video') {
+    return (
+      <div className="min-h-screen bg-black">
+        <div className="flex items-center justify-between p-4">
+          <button 
+            onClick={() => setCurrentView('card')}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
+          >
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+        </div>
+        
+        <div className="flex-1 flex flex-col items-center justify-center px-4">
+          <div className="w-full max-w-md space-y-6">
+            <input
+              type="file"
+              accept="video/*"
+              capture="user"
+              onChange={async (e) => {
+                const file = e.target.files?.[0];
+                if (file) {
+                  setIsUploading(true);
+                  try {
+                    const fileExt = file.name.split('.').pop();
+                    const fileName = `${crypto.randomUUID()}.${fileExt}`;
+                    
+                    const { error: uploadError } = await supabase.storage
+                      .from('gift_videos')
+                      .upload(fileName, file);
+
+                    if (uploadError) throw uploadError;
+
+                    const { data: { publicUrl } } = supabase.storage
+                      .from('gift_videos')
+                      .getPublicUrl(fileName);
+
+                    setMessageVideo(file);
+                    setVideoUrl(publicUrl);
+                    toast.success('Video message uploaded successfully!');
+                    setCurrentView('card');
+                  } catch (error) {
+                    console.error('Upload error:', error);
+                    toast.error('Failed to upload video. Please try again.');
+                  } finally {
+                    setIsUploading(false);
+                  }
+                }
+              }}
+              className="hidden"
+              id="video-upload"
+            />
+            <label 
+              htmlFor="video-upload"
+              className="w-full flex flex-col items-center justify-center space-y-4 cursor-pointer"
+            >
+              <div className="w-32 h-32 rounded-full bg-white/10 flex items-center justify-center">
+                <Upload className="h-12 w-12 text-white" />
+              </div>
+              <p className="text-white text-lg font-medium">
+                {isUploading ? 'Uploading...' : 'Upload/Record a video message'}
+              </p>
+              <p className="text-gray-400 text-sm">Videos will be saved automatically</p>
+            </label>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div 
       className="min-h-screen relative transition-colors duration-300"
@@ -186,7 +255,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
           
           <button 
-            onClick={() => setIsRecordingMessage(true)}
+            onClick={() => setCurrentView('video')}
             className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
             Add Video Message
@@ -299,14 +368,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </div>
         </div>
       </div>
-
-      <MessageStep
-        isOpen={isRecordingMessage}
-        onClose={() => setIsRecordingMessage(false)}
-        messageVideo={messageVideo}
-        setMessageVideo={setMessageVideo}
-        onNext={onNext}
-      />
     </div>
   );
 };
