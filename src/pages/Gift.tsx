@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
 import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import InsideLeftCard from "@/components/gift/InsideLeftCard";
@@ -77,6 +77,7 @@ const stickerOptions = [
 
 const Gift = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [currentPage, setCurrentPage] = useState<'front' | 'blank' | 'inside-left'>('front');
   const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>('recipient');
   const [previousSteps, setPreviousSteps] = useState<Array<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>>([]);
@@ -98,6 +99,15 @@ const Gift = () => {
         type
       }
     }));
+  };
+
+  const handleDuplicatePage = () => {
+    const timestamp = Date.now();
+    const searchParams = new URLSearchParams(location.search);
+    const currentInstance = searchParams.get('instance');
+    const nextInstance = currentInstance ? parseInt(currentInstance) + 1 : timestamp;
+    navigate(`/gift?instance=${nextInstance}`, { replace: false });
+    setCurrentPage('front');
   };
 
   const handleStickerClick = (emoji: string) => {
@@ -252,7 +262,7 @@ const Gift = () => {
       <InsideLeftCard
         selectedThemeOption={selectedThemeOption}
         onBack={() => setCurrentPage('blank')}
-        onNext={handleMemoryComplete}
+        onNext={handleDuplicatePage}
       />
     );
   }
