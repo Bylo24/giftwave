@@ -14,8 +14,14 @@ export function BottomNav() {
     },
     { 
       icon: Gift, 
+      label: 'My Gifts', 
+      href: '/my-gifts'
+    },
+    { 
+      icon: Gift, 
       label: 'Gift', 
-      href: '/frontcard' 
+      href: '/frontcard',
+      isCenter: true
     },
     { 
       icon: Wallet, 
@@ -41,7 +47,7 @@ export function BottomNav() {
               onClick={() => navigate(link.href)}
               className="group flex flex-col items-center"
             >
-              {link.label === 'Gift' ? (
+              {link.isCenter ? (
                 <div className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 shadow-lg group-hover:shadow-indigo-200/50 transition-all duration-200 -mt-2">
                   <link.icon className="h-6 w-6 text-white" />
                 </div>
