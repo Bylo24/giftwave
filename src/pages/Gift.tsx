@@ -114,7 +114,7 @@ const Gift = () => {
       setCurrentPage('inside-left');
     } else {
       setPreviousSteps(prev => [...prev, currentStep]);
-      setCurrentStep('amount');
+      setCurrentStep('memory');
     }
   };
 
@@ -242,12 +242,17 @@ const Gift = () => {
     }
   };
 
+  const handleMemoryComplete = () => {
+    setPreviousSteps(prev => [...prev, 'memory']);
+    setCurrentStep('amount');
+  };
+
   if (currentPage === 'inside-left') {
     return (
       <InsideLeftCard
         selectedThemeOption={selectedThemeOption}
         onBack={() => setCurrentPage('blank')}
-        onNext={goToNextStep}
+        onNext={handleMemoryComplete}
       />
     );
   }
