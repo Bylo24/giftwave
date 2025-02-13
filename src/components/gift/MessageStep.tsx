@@ -39,36 +39,25 @@ export const MessageStep = ({
   };
 
   return (
-    <Card className="p-6 space-y-4 bg-gradient-to-br from-orange-50 to-yellow-50">
-      <div className="flex items-center gap-3 mb-4">
-        <div className="p-3 bg-secondary/10 rounded-full animate-pulse">
-          <Video className="h-6 w-6 text-secondary" />
+    <Card className="p-4 space-y-2 bg-gradient-to-br from-orange-50 to-yellow-50">
+      <div className="flex items-center gap-2">
+        <div className="p-2 bg-secondary/10 rounded-full">
+          <Video className="h-4 w-4 text-secondary" />
         </div>
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-secondary to-orange-500 bg-clip-text text-transparent">
+        <h2 className="text-lg font-semibold bg-gradient-to-r from-secondary to-orange-500 bg-clip-text text-transparent">
           Record Your Message
         </h2>
       </div>
-      <p className="text-gray-600">Send them a personal video message they'll love!</p>
-      
-      {videoPreviewUrl && (
-        <div className="relative aspect-video rounded-lg overflow-hidden bg-black">
-          <video
-            src={videoPreviewUrl}
-            controls
-            className="w-full h-full object-contain"
-          />
-        </div>
-      )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <Card className="p-4 cursor-pointer hover:shadow-lg transition-shadow border-2 border-secondary/20">
-          <label className="flex flex-col items-center gap-3 cursor-pointer">
-            <div className="p-3 bg-secondary/10 rounded-full">
-              <Upload className="h-6 w-6 text-secondary" />
+      <div className="grid grid-cols-2 gap-2">
+        <Card className="p-3 cursor-pointer hover:shadow-lg transition-shadow border-2 border-secondary/20">
+          <label className="flex items-center gap-2 cursor-pointer">
+            <div className="p-2 bg-secondary/10 rounded-full">
+              <Upload className="h-4 w-4 text-secondary" />
             </div>
-            <div className="text-center">
-              <p className="font-medium">Upload Message</p>
-              <p className="text-sm text-gray-500">Max size: 100MB</p>
+            <div>
+              <p className="text-sm font-medium">Upload Message</p>
+              <p className="text-xs text-gray-500">Max 100MB</p>
             </div>
             <input
               type="file"
@@ -80,35 +69,28 @@ export const MessageStep = ({
         </Card>
 
         <Card 
-          className="p-4 cursor-pointer hover:shadow-lg transition-shadow border-2 border-secondary/20"
+          className="p-3 cursor-pointer hover:shadow-lg transition-shadow border-2 border-secondary/20"
           onClick={isRecordingMessage ? stopMessageRecording : startMessageRecording}
         >
-          <div className="flex flex-col items-center gap-3">
-            <div className="p-3 bg-secondary/10 rounded-full">
+          <div className="flex items-center gap-2">
+            <div className="p-2 bg-secondary/10 rounded-full">
               {isRecordingMessage ? (
-                <Video className="h-6 w-6 text-red-500 animate-pulse" />
+                <Video className="h-4 w-4 text-red-500 animate-pulse" />
               ) : (
-                <Camera className="h-6 w-6 text-secondary" />
+                <Camera className="h-4 w-4 text-secondary" />
               )}
             </div>
-            <div className="text-center">
-              <p className="font-medium">
+            <div>
+              <p className="text-sm font-medium">
                 {isRecordingMessage ? 'Stop Recording' : 'Record Message'}
               </p>
-              <p className="text-sm text-gray-500">
-                {isRecordingMessage ? 'Recording in progress...' : 'Create a new message'}
+              <p className="text-xs text-gray-500">
+                {isRecordingMessage ? 'Recording...' : 'Create new'}
               </p>
             </div>
           </div>
         </Card>
       </div>
-
-      <Button 
-        className="w-full bg-gradient-to-r from-secondary to-orange-500 hover:opacity-90 transition-opacity"
-        onClick={onNext}
-      >
-        {messageVideo ? 'Continue' : 'Skip Message'}
-      </Button>
     </Card>
   );
 };

@@ -108,7 +108,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
         </div>
 
-        <div className="px-4 mb-6">
+        <div className="px-4 mb-2">
           <MessageStep
             messageVideo={messageVideo}
             setMessageVideo={setMessageVideo}
@@ -122,15 +122,16 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
         <div className="flex-1 flex items-center justify-center px-4 pb-20">
           <div 
             ref={cardRef}
-            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative`}
+            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-4 transition-colors duration-300 relative`}
           >
-            <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8">
-              <div className="w-full aspect-video bg-black/10 rounded-lg flex items-center justify-center overflow-hidden">
+            <div className="relative z-10 h-full flex flex-col items-center justify-center">
+              <div className="w-full h-[85%] bg-black/10 rounded-lg flex items-center justify-center overflow-hidden">
                 {messageVideo ? (
                   <video
                     src={URL.createObjectURL(messageVideo)}
                     controls
-                    className="w-full h-full object-contain"
+                    className="w-full h-full object-cover"
+                    playsInline
                   />
                 ) : (
                   <span className="text-gray-500">Record or upload a video message</span>
