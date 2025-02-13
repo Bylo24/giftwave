@@ -10,6 +10,16 @@ export interface GiftTheme {
   };
   icon: string;
   animations: string[];
+  templates: Array<{
+    id: string;
+    name: string;
+    imageUrl: string;
+  }>;
+  stickers: Array<{
+    id: string;
+    emoji: string;
+    name: string;
+  }>;
 }
 
 export const giftThemes: Record<ThemeType, GiftTheme> = {
@@ -22,7 +32,25 @@ export const giftThemes: Record<ThemeType, GiftTheme> = {
       accent: 'text-purple-500'
     },
     icon: '🎂',
-    animations: ['animate-bounce', 'animate-pulse']
+    animations: ['animate-bounce', 'animate-pulse'],
+    templates: [
+      {
+        id: 'birthday-1',
+        name: 'Balloons & Confetti',
+        imageUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05'
+      },
+      {
+        id: 'birthday-2',
+        name: 'Party Time',
+        imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb'
+      }
+    ],
+    stickers: [
+      { id: 'sticker-1', emoji: '🎈', name: 'Balloon' },
+      { id: 'sticker-2', emoji: '🎂', name: 'Cake' },
+      { id: 'sticker-3', emoji: '🎁', name: 'Gift' },
+      { id: 'sticker-4', emoji: '🎉', name: 'Party' }
+    ]
   },
   wedding: {
     id: 'wedding',
@@ -33,7 +61,19 @@ export const giftThemes: Record<ThemeType, GiftTheme> = {
       accent: 'text-rose-400'
     },
     icon: '💒',
-    animations: ['animate-fade-in', 'animate-scale-in']
+    animations: ['animate-fade-in', 'animate-scale-in'],
+    templates: [
+      {
+        id: 'wedding-1',
+        name: 'Elegant Roses',
+        imageUrl: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07'
+      }
+    ],
+    stickers: [
+      { id: 'sticker-5', emoji: '💍', name: 'Ring' },
+      { id: 'sticker-6', emoji: '🕊️', name: 'Dove' },
+      { id: 'sticker-7', emoji: '💐', name: 'Bouquet' }
+    ]
   },
   holiday: {
     id: 'holiday',
@@ -44,7 +84,19 @@ export const giftThemes: Record<ThemeType, GiftTheme> = {
       accent: 'text-red-500'
     },
     icon: '🎄',
-    animations: ['animate-bounce', 'animate-pulse']
+    animations: ['animate-bounce', 'animate-pulse'],
+    templates: [
+      {
+        id: 'holiday-1',
+        name: 'Snowflakes',
+        imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb'
+      }
+    ],
+    stickers: [
+      { id: 'sticker-8', emoji: '❄️', name: 'Snowflake' },
+      { id: 'sticker-9', emoji: '🎁', name: 'Gift' },
+      { id: 'sticker-10', emoji: '🎉', name: 'Party' }
+    ]
   },
   celebration: {
     id: 'celebration',
@@ -55,7 +107,19 @@ export const giftThemes: Record<ThemeType, GiftTheme> = {
       accent: 'text-blue-500'
     },
     icon: '🎉',
-    animations: ['animate-fade-in', 'animate-scale-in']
+    animations: ['animate-fade-in', 'animate-scale-in'],
+    templates: [
+      {
+        id: 'celebration-1',
+        name: 'Confetti',
+        imageUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05'
+      }
+    ],
+    stickers: [
+      { id: 'sticker-11', emoji: '🎊', name: 'Party' },
+      { id: 'sticker-12', emoji: '🎉', name: 'Gift' },
+      { id: 'sticker-13', emoji: '🎈', name: 'Balloon' }
+    ]
   },
   achievement: {
     id: 'achievement',
@@ -66,7 +130,19 @@ export const giftThemes: Record<ThemeType, GiftTheme> = {
       accent: 'text-yellow-500'
     },
     icon: '🏆',
-    animations: ['animate-bounce', 'animate-pulse']
+    animations: ['animate-bounce', 'animate-pulse'],
+    templates: [
+      {
+        id: 'achievement-1',
+        name: 'Gold Medal',
+        imageUrl: 'https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07'
+      }
+    ],
+    stickers: [
+      { id: 'sticker-14', emoji: '🏆', name: 'Gold Medal' },
+      { id: 'sticker-15', emoji: '🎉', name: 'Party' },
+      { id: 'sticker-16', emoji: '🎈', name: 'Balloon' }
+    ]
   },
   custom: {
     id: 'custom',
@@ -77,6 +153,26 @@ export const giftThemes: Record<ThemeType, GiftTheme> = {
       accent: 'text-gray-500'
     },
     icon: '🎨',
-    animations: ['animate-fade-in']
+    animations: ['animate-fade-in'],
+    templates: [
+      {
+        id: 'custom-1',
+        name: 'Custom Template',
+        imageUrl: 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05'
+      }
+    ],
+    stickers: [
+      { id: 'sticker-17', emoji: '🎨', name: 'Custom Sticker' },
+      { id: 'sticker-18', emoji: '🎉', name: 'Party' },
+      { id: 'sticker-19', emoji: '🎈', name: 'Balloon' }
+    ]
   }
 };
+
+export interface StickerPosition {
+  id: string;
+  emoji: string;
+  x: number;
+  y: number;
+  rotation: number;
+}

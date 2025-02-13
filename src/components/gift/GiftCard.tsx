@@ -1,10 +1,17 @@
-
 import { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { ChevronLeft, ChevronRight, Template, Sticker } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThemeType } from "@/utils/giftThemes";
+import { ThemeType, giftThemes, StickerPosition } from "@/utils/giftThemes";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface GiftCardProps {
   theme: ThemeType;
@@ -23,6 +30,20 @@ type CardPage = 'front' | 'left' | 'right' | 'back';
 export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProps) => {
   const [currentPage, setCurrentPage] = useState<CardPage>('front');
   const [isRevealed, setIsRevealed] = useState(false);
+  const [selectedTemplate, setSelectedTemplate] = useState(giftThemes[theme].templates[0]);
+  const [placedStickers, setPlacedStickers] = useState<StickerPosition[]>([]);
+  const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
+
+  const handleDragEnd = (info: any, sticker: { id: string; emoji: string }) => {
+    const position = {
+      id: `${sticker.id}-${Date.now()}`,
+      emoji: sticker.emoji,
+      x: info.point.x,
+      y: info.point.y,
+      rotation: Math.random() * 30 - 15 // Random rotation between -15 and 15 degrees
+    };
+    setPlacedStickers([...placedStickers, position]);
+  };
 
   const getPageIndex = (page: CardPage) => {
     const pages: CardPage[] = ['front', 'left', 'right', 'back'];
@@ -49,18 +70,105 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
     switch (currentPage) {
       case 'front':
         return (
-          <div className="w-full h-full flex flex-col items-center justify-between p-6 bg-white rounded-lg">
-            <div className="flex-1 flex flex-col items-center justify-center space-y-4">
-              <div className="text-6xl">🎉</div>
-              <h2 className="text-2xl font-bold text-center bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+          <div 
+            className="w-full h-full flex flex-col items-center justify-between p-6 bg-white rounded-lg relative overflow-hidden"
+            style={{
+              backgroundImage: `url(${selectedTemplate.imageUrl})`,
+              backgroundSize: 'cover',
+              backgroundPosition: 'center'
+            }}
+          >
+            <div className="absolute inset-0 bg-black/20" />
+            
+            {placedStickers.map((sticker) => (
+              <motion.div
+                key={sticker.id}
+                className="absolute text-4xl"
+                style={{
+                  x: sticker.x,
+                  y: sticker.y,
+                  rotate: sticker.rotation,
+                  cursor: 'move'
+                }}
+              >
+                {sticker.emoji}
+              </motion.div>
+            ))}
+
+            <div className="relative flex-1 flex flex-col items-center justify-center space-y-4">
+              <div className="text-6xl">{giftThemes[theme].icon}</div>
+              <h2 className="text-2xl font-bold text-center text-white">
                 You've received a gift!
               </h2>
-              <p className="text-gray-600 text-center">Swipe or tap to open</p>
+              <p className="text-white/90 text-center">Swipe or tap to open</p>
             </div>
-            <div className="flex gap-4 text-sm text-gray-500">
-              <span>Templates</span>
-              <span>Text</span>
-              <span>Stickers</span>
+
+            <div className="relative flex gap-4">
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="secondary" size="sm" className="bg-white/90 hover:bg-white">
+                    <Template className="h-4 w-4 mr-2" />
+                    Templates
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Choose a Template</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[300px] w-full pr-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      {giftThemes[theme].templates.map((template) => (
+                        <div
+                          key={template.id}
+                          className={`relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-all ${
+                            selectedTemplate.id === template.id ? 'ring-2 ring-primary' : ''
+                          }`}
+                          onClick={() => setSelectedTemplate(template)}
+                        >
+                          <img
+                            src={template.imageUrl}
+                            alt={template.name}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-black/20" />
+                          <div className="absolute bottom-2 left-2 right-2">
+                            <p className="text-sm text-white">{template.name}</p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button variant="secondary" size="sm" className="bg-white/90 hover:bg-white">
+                    <Sticker className="h-4 w-4 mr-2" />
+                    Stickers
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Add Stickers</DialogTitle>
+                  </DialogHeader>
+                  <ScrollArea className="h-[300px] w-full pr-4">
+                    <div className="grid grid-cols-4 gap-4">
+                      {giftThemes[theme].stickers.map((sticker) => (
+                        <motion.div
+                          key={sticker.id}
+                          className="aspect-square rounded-lg bg-gray-100 flex items-center justify-center text-3xl cursor-move"
+                          drag
+                          dragSnapToOrigin
+                          onDragEnd={(_, info) => handleDragEnd(info, sticker)}
+                        >
+                          {sticker.emoji}
+                        </motion.div>
+                      ))}
+                    </div>
+                  </ScrollArea>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         );
