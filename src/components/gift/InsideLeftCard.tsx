@@ -103,12 +103,41 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
         </div>
 
-        {/* Memories Section */}
-        <div className="px-4 py-6 space-y-4">
-          <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
-            {demoMemories.map((memory, index) => (
-              <MemoryStage key={index} memory={memory} />
-            ))}
+        {/* Upload Section */}
+        <div className="px-4 py-6">
+          <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 max-w-md mx-auto shadow-lg">
+            <div className="space-y-4">
+              <div className="text-center">
+                <input
+                  type="file"
+                  accept="video/*"
+                  id="video-upload"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={isUploading}
+                />
+                <label
+                  htmlFor="video-upload"
+                  className="cursor-pointer inline-flex items-center px-4 py-2 bg-white rounded-md shadow hover:bg-gray-50 transition-colors"
+                >
+                  <Upload className="h-5 w-5 mr-2" />
+                  <span className="font-medium">
+                    {isUploading ? 'Uploading...' : 'Upload Video'}
+                  </span>
+                </label>
+              </div>
+              
+              {messageVideo && videoUrl && (
+                <div className="rounded-lg overflow-hidden">
+                  <video
+                    src={videoUrl}
+                    controls
+                    className="w-full h-48 object-cover"
+                    playsInline
+                  />
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -117,37 +146,20 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           <div 
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-4 transition-colors duration-300 relative`}
           >
-            <div className="relative z-10 h-full flex flex-col items-center justify-center">
-              <div className="w-full h-[85%] rounded-lg flex items-center justify-center overflow-hidden relative">
-                {messageVideo ? (
-                  <video
-                    src={videoUrl}
-                    controls
-                    className="w-full h-full object-cover rounded-lg"
-                    playsInline
-                  />
-                ) : (
-                  <div className="text-center">
-                    <input
-                      type="file"
-                      accept="video/*"
-                      id="video-upload"
-                      className="hidden"
-                      onChange={handleFileChange}
-                      disabled={isUploading}
+            <div className="relative z-10 h-full grid grid-cols-2 gap-4 p-4">
+              {demoMemories.map((memory, index) => (
+                <div key={index} className="flex flex-col space-y-2">
+                  <div className="relative rounded-lg overflow-hidden aspect-[3/4] shadow-lg">
+                    <img 
+                      src={memory.imageUrl} 
+                      alt="Memory"
+                      className="w-full h-full object-cover"
                     />
-                    <label
-                      htmlFor="video-upload"
-                      className="cursor-pointer inline-flex items-center px-4 py-2 bg-white rounded-md shadow hover:bg-gray-50 transition-colors"
-                    >
-                      <Upload className="h-5 w-5 mr-2" />
-                      <span className="font-medium">
-                        {isUploading ? 'Uploading...' : 'Upload Video'}
-                      </span>
-                    </label>
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
                   </div>
-                )}
-              </div>
+                  <p className="text-sm text-center font-medium text-gray-800">{memory.caption}</p>
+                </div>
+              ))}
             </div>
           </div>
         </div>
