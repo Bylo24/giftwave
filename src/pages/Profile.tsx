@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { ProfileLinks } from "@/components/profile/ProfileLinks";
-import { Bell, Shield, Moon, Globe, Gift } from "lucide-react";
+import { Shield, Moon, Globe, Gift } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 
 const Profile = () => {
@@ -21,7 +20,6 @@ const Profile = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [notifications, setNotifications] = useState(true);
 
   const fetchProfile = async () => {
     if (user) {
@@ -122,22 +120,6 @@ const Profile = () => {
         </Card>
 
         <Card className="divide-y divide-border bg-card/80 backdrop-blur-lg border-border shadow-lg overflow-hidden">
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-blue-100 dark:bg-blue-900 rounded-full">
-                <Bell className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Push Notifications</p>
-                <p className="text-sm text-muted-foreground">Get notified about new gifts</p>
-              </div>
-            </div>
-            <Switch 
-              checked={notifications} 
-              onCheckedChange={setNotifications} 
-            />
-          </div>
-
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-full">
