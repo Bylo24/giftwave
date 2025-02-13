@@ -1,9 +1,10 @@
 
-import { Video, Upload, Camera } from "lucide-react";
+import { Video, Upload, Camera, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface MessageStepProps {
   messageVideo: File | null;
@@ -23,30 +24,68 @@ export const MessageStep = ({
   onNext,
 }: MessageStepProps) => {
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleMessageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleMessageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       if (file.type.startsWith('video/')) {
-        setMessageVideo(file);
-        const url = URL.createObjectURL(file);
-        setVideoPreviewUrl(url);
-        toast.success('Video message uploaded successfully!');
+        setIsUploading(true);
+        try {
+          const fileExt = file.name.split('.').pop();
+          const fileName = `${crypto.randomUUID()}.${fileExt}`;
+          
+          const { error: uploadError } = await supabase.storage
+            .from('gift_videos')
+            .upload(fileName, file);
+
+          if (uploadError) throw uploadError;
+
+          const { data: { publicUrl } } = supabase.storage
+            .from('gift_videos')
+            .getPublicUrl(fileName);
+
+          setMessageVideo(file);
+          setVideoPreviewUrl(publicUrl);
+          toast.success('Video message uploaded successfully!');
+        } catch (error) {
+          console.error('Upload error:', error);
+          toast.error('Failed to upload video. Please try again.');
+        } finally {
+          setIsUploading(false);
+        }
       } else {
         toast.error('Please upload a video file');
       }
     }
   };
 
+  const handleRemoveVideo = () => {
+    setMessageVideo(null);
+    setVideoPreviewUrl(null);
+  };
+
   return (
     <Card className="p-4 space-y-2 bg-gradient-to-br from-orange-50 to-yellow-50">
-      <div className="flex items-center gap-2">
-        <div className="p-2 bg-secondary/10 rounded-full">
-          <Video className="h-4 w-4 text-secondary" />
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <div className="p-2 bg-secondary/10 rounded-full">
+            <Video className="h-4 w-4 text-secondary" />
+          </div>
+          <h2 className="text-lg font-semibold bg-gradient-to-r from-secondary to-orange-500 bg-clip-text text-transparent">
+            Record Your Message
+          </h2>
         </div>
-        <h2 className="text-lg font-semibold bg-gradient-to-r from-secondary to-orange-500 bg-clip-text text-transparent">
-          Record Your Message
-        </h2>
+        {messageVideo && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="text-gray-500 hover:text-red-500"
+            onClick={handleRemoveVideo}
+          >
+            <X className="h-4 w-4" />
+          </Button>
+        )}
       </div>
 
       <div className="grid grid-cols-2 gap-2">
@@ -64,6 +103,7 @@ export const MessageStep = ({
               accept="video/*"
               className="hidden"
               onChange={handleMessageUpload}
+              disabled={isUploading}
             />
           </label>
         </Card>
