@@ -243,7 +243,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
         <div className="flex-1 flex items-center justify-center px-4 pb-24">
           <div 
             ref={cardRef}
-            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg transition-colors duration-300 relative`}
+            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg transition-colors duration-300 relative overflow-hidden`}
           >
             <div className="relative z-10 h-full flex flex-col justify-between py-8">
               {[0, 1].map((index) => (
@@ -265,7 +265,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </div>
         </div>
 
-        <div className="fixed bottom-8 left-0 right-0 flex justify-center">
+        <div className="fixed bottom-8 left-0 right-0 flex justify-center z-50">
           <div className="relative">
             <button 
               onClick={() => setShowStickers(!showStickers)}
