@@ -64,7 +64,7 @@ const Home = () => {
             Send Money As A Gift, With A Personal Touch!
           </h1>
           <button
-            onClick={() => navigate("/gift")}
+            onClick={() => navigate("/frontcard")}
             className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:opacity-90 transition-opacity shadow-lg font-medium text-lg flex items-center justify-center gap-2"
           >
             <Gift className="h-6 w-6" />
