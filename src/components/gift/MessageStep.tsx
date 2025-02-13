@@ -83,6 +83,7 @@ export const MessageStep = ({
                   <input 
                     type="file" 
                     accept="video/*"
+                    capture="user"
                     className="hidden" 
                     id="video-upload"
                     onChange={handleFileChange}
@@ -96,7 +97,7 @@ export const MessageStep = ({
                       className="bg-black/10 hover:bg-black/20 text-gray-700"
                       disabled={isUploading}
                     >
-                      {isUploading ? 'Uploading...' : 'Upload a video message'}
+                      {isUploading ? 'Uploading...' : 'Upload/Record a video message'}
                     </Button>
                   </label>
                   <p className="text-sm text-gray-500 mt-2">Videos will be saved automatically</p>

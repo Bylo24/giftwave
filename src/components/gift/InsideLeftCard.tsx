@@ -82,7 +82,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                       onClick={() => setIsRecordingModalOpen(true)}
                       className="bg-black/10 hover:bg-black/20 text-gray-700"
                     >
-                      Upload a video message
+                      Upload/Record a video message
                     </Button>
                     <p className="text-sm text-gray-500 mt-2">Videos will be saved automatically</p>
                   </div>
