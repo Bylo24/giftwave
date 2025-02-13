@@ -2,13 +2,14 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Search, UserPlus, Users, Star, Gift, ChevronDown, Home } from "lucide-react";
+import { Search, UserPlus, Users, Star, Gift, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar } from "@/components/ui/avatar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { BottomNav } from "@/components/ui/bottom-nav";
 
 interface Contact {
   id: string;
@@ -175,12 +176,13 @@ const Contacts = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-4 backdrop-blur-md">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 p-4 backdrop-blur-md pb-24">
         <div className="animate-pulse space-y-4">
           <div className="h-10 bg-white/50 rounded-full w-full"></div>
           <div className="h-20 bg-white/50 rounded-lg w-full"></div>
           <div className="h-20 bg-white/50 rounded-lg w-full"></div>
         </div>
+        <BottomNav />
       </div>
     );
   }
@@ -188,20 +190,10 @@ const Contacts = () => {
   const filteredContacts = getFilteredContacts();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-md">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-md pb-24">
       <div className="sticky top-0 bg-white/70 backdrop-blur-lg z-10 px-4 pt-4 pb-2 shadow-sm">
         <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            <Button
-              onClick={goHome}
-              variant="ghost"
-              size="icon"
-              className="rounded-full hover:bg-blue-100/50"
-            >
-              <Home className="h-5 w-5 text-blue-600" />
-            </Button>
-            <h1 className="text-xl font-semibold">Contacts</h1>
-          </div>
+          <h1 className="text-xl font-semibold">Contacts</h1>
           {!isMobile && (
             <Button
               onClick={requestContactsPermission}
@@ -340,6 +332,7 @@ const Contacts = () => {
           ))
         )}
       </div>
+      <BottomNav />
     </div>
   );
 };
