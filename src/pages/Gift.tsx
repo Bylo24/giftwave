@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, ChevronDown } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
 
 interface ThemeOption {
@@ -56,6 +56,14 @@ const themeOptions: ThemeOption[] = [
   }
 ];
 
+const stickerOptions = [
+  { emoji: "⭐", name: "Star" },
+  { emoji: "💫", name: "Sparkle" },
+  { emoji: "✨", name: "Glitter" },
+  { emoji: "🌟", name: "Glow" },
+  { emoji: "💝", name: "Heart" },
+];
+
 const Gift = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>('recipient');
@@ -71,6 +79,7 @@ const Gift = () => {
   });
   const [memories, setMemories] = useState<Memory[]>([]);
   const [selectedThemeOption, setSelectedThemeOption] = useState<ThemeOption>(themeOptions[0]);
+  const [showStickers, setShowStickers] = useState(false);
 
   const goToPreviousStep = () => {
     if (previousSteps.length > 0) {
@@ -107,31 +116,34 @@ const Gift = () => {
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           
-          <select
-            value={selectedThemeOption.text}
-            onChange={(e) => {
-              const newTheme = themeOptions.find(t => t.text === e.target.value);
-              if (newTheme) setSelectedThemeOption(newTheme);
-            }}
-            className="px-4 py-2 bg-white rounded-full text-gray-800 font-medium"
-          >
-            {themeOptions.map((theme) => (
-              <option key={theme.text} value={theme.text}>
-                {theme.text}
-              </option>
-            ))}
-          </select>
+          <div className="relative">
+            <select
+              value={selectedThemeOption.text}
+              onChange={(e) => {
+                const newTheme = themeOptions.find(t => t.text === e.target.value);
+                if (newTheme) setSelectedThemeOption(newTheme);
+              }}
+              className="appearance-none pl-4 pr-10 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium border-0 shadow-lg focus:ring-2 focus:ring-white/50 focus:outline-none cursor-pointer"
+            >
+              {themeOptions.map((theme) => (
+                <option key={theme.text} value={theme.text} className="py-2">
+                  {theme.text}
+                </option>
+              ))}
+            </select>
+            <ChevronDown className="absolute right-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-600 pointer-events-none" />
+          </div>
           
           <button 
             onClick={() => goToNextStep('message')}
-            className="px-6 py-2 bg-white rounded-full text-gray-800 font-medium"
+            className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
             Next
           </button>
         </div>
 
-        <div className="flex-1 px-4 pt-4">
-          <div className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md mx-auto shadow-lg p-8 transition-colors duration-300`}>
+        <div className="flex-1 flex items-center justify-center px-4">
+          <div className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300`}>
             <div className="h-full flex flex-col items-center justify-center space-y-8">
               <div className="text-center">
                 {selectedThemeOption.text.split('').map((letter, index) => (
@@ -152,13 +164,31 @@ const Gift = () => {
         </div>
 
         <div className="p-4">
-          <div className="flex justify-center max-w-md mx-auto">
-            <button className="flex flex-col items-center space-y-1">
-              <div className="w-12 h-12 flex items-center justify-center bg-white/90 rounded-full shadow-lg">
-                <span className="text-2xl">⭐</span>
-              </div>
-              <span className="text-xs text-white font-medium">Stickers</span>
-            </button>
+          <div className="flex justify-center max-w-md mx-auto relative">
+            <div className="relative group">
+              <button 
+                onClick={() => setShowStickers(!showStickers)}
+                className="flex flex-col items-center space-y-1"
+              >
+                <div className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg group-hover:bg-white/95 transition-colors">
+                  <span className="text-2xl">⭐</span>
+                </div>
+                <span className="text-xs text-white font-medium">Stickers</span>
+              </button>
+              
+              {showStickers && (
+                <div className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl grid grid-cols-5 gap-2 min-w-[200px]">
+                  {stickerOptions.map((sticker, index) => (
+                    <button 
+                      key={index}
+                      className="w-10 h-10 flex items-center justify-center hover:bg-white/50 rounded-full transition-colors"
+                    >
+                      <span className="text-2xl">{sticker.emoji}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
