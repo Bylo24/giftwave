@@ -38,10 +38,6 @@ const GiftContent = () => {
     handleStickerRotate
   } = useStickerManager();
 
-  const handleDuplicatePage = () => {
-    setCurrentStep('amount');
-  };
-
   const handleAddMemory = (memory: Omit<{ id: string; imageUrl?: string; caption: string; date: Date }, "id">) => {
     const newMemory = {
       ...memory,
@@ -191,7 +187,7 @@ const GiftContent = () => {
       <InsideLeftCard
         selectedThemeOption={selectedThemeOption}
         onBack={() => setCurrentPage('blank')}
-        onNext={handleDuplicatePage}
+        onNext={goToNextStep}
       />
     );
   }
