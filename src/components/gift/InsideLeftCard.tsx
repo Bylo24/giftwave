@@ -1,7 +1,6 @@
-
 import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Upload, Image, Plus } from "lucide-react";
+import { ArrowLeft, Upload, Image, Plus, DollarSign } from "lucide-react";
 import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -36,6 +35,10 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [showStickers, setShowStickers] = useState(false);
   const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
+
+  const handleNavigateToAmount = () => {
+    onNext();
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -182,6 +185,13 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+          <button
+            onClick={handleNavigateToAmount}
+            className="flex items-center gap-2 px-6 py-2 bg-green-500 text-white rounded-full font-medium shadow-lg hover:bg-green-600 transition-colors"
+          >
+            <DollarSign className="h-4 w-4" />
+            Select Amount
           </button>
         </div>
 
