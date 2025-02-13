@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -31,10 +30,15 @@ const InsideRightCard = () => {
 
     // For now, we'll use a placeholder URL since we don't have image upload set up
     setPendingImage('/placeholder.svg');
-    toast.info('Please add a caption for your memory');
+    toast.info('Please add a caption to create your memory');
   };
 
   const handleAddMemory = () => {
+    if (!pendingImage) {
+      toast.error('Please upload a photo first');
+      return;
+    }
+
     if (!caption.trim()) {
       toast.error('Please add a caption for your memory');
       return;
@@ -49,6 +53,7 @@ const InsideRightCard = () => {
     setMemories(prev => [...prev, memory]);
     setCaption("");
     setPendingImage(undefined);
+    toast.success('Memory added successfully');
   };
 
   return (
@@ -91,14 +96,32 @@ const InsideRightCard = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <Button
-              variant="outline"
-              className="w-full py-6 border-2 border-dashed rounded-2xl"
-              onClick={() => document.getElementById('photo-upload')?.click()}
-            >
-              <Upload className="mr-2 h-5 w-5" />
-              Upload Photo
-            </Button>
+            {!pendingImage ? (
+              <Button
+                variant="outline"
+                className="w-full py-6 border-2 border-dashed rounded-2xl"
+                onClick={() => document.getElementById('photo-upload')?.click()}
+              >
+                <Upload className="mr-2 h-5 w-5" />
+                Upload Photo
+              </Button>
+            ) : (
+              <div className="relative rounded-2xl overflow-hidden shadow-lg aspect-square mb-4">
+                <img 
+                  src={pendingImage} 
+                  alt="Pending upload"
+                  className="w-full h-full object-cover"
+                />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                  onClick={() => setPendingImage(undefined)}
+                >
+                  Change
+                </Button>
+              </div>
+            )}
 
             <Input
               id="photo-upload"
@@ -118,7 +141,7 @@ const InsideRightCard = () => {
             <Button
               className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-6"
               onClick={handleAddMemory}
-              disabled={!caption.trim()}
+              disabled={!pendingImage || !caption.trim()}
             >
               <Plus className="mr-2 h-5 w-5" />
               Add Memory
