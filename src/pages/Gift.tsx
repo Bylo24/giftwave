@@ -104,10 +104,11 @@ const Gift = () => {
   const handleDuplicatePage = () => {
     const timestamp = Date.now();
     const searchParams = new URLSearchParams(location.search);
-    const currentInstance = searchParams.get('instance');
-    const nextInstance = currentInstance ? parseInt(currentInstance) + 1 : timestamp;
-    navigate(`/gift?instance=${nextInstance}`, { replace: false });
-    setCurrentPage('front');
+    const currentInstance = searchParams.get('instance') || '0';
+    const nextInstance = parseInt(currentInstance) + 1;
+    
+    // Force a complete reload by using window.location
+    window.location.href = `/gift?instance=${nextInstance}`;
   };
 
   const handleStickerClick = (emoji: string) => {
