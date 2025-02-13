@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
 type Step = 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment';
+type CardView = 'card' | 'message' | 'envelope';
 
 interface GiftMemory {
   caption: string;
@@ -32,7 +33,7 @@ const Gift = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>('recipient');
   const [previousSteps, setPreviousSteps] = useState<Step[]>([]);
-  const [selectedTheme] = useState<ThemeType>('birthday');
+  const [selectedTheme] = useState<ThemeType>('christmas');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
@@ -42,6 +43,7 @@ const Gift = () => {
     date: new Date()
   });
   const [memories, setMemories] = useState<Memory[]>([]);
+  const [currentView, setCurrentView] = useState<CardView>('card');
 
   const goToPreviousStep = () => {
     if (previousSteps.length > 0) {
@@ -58,223 +60,144 @@ const Gift = () => {
     setCurrentStep(nextStep);
   };
 
-  const handleAddMemory = (newMemory: Omit<Memory, "id">) => {
-    const memoryWithId = {
-      ...newMemory,
-      id: crypto.randomUUID(),
-    };
-    setMemories(prev => [...prev, memoryWithId]);
-    toast.success("Memory added successfully!");
-  };
-
-  const startMessageRecording = () => {
-    setIsRecordingMessage(true);
-    toast.info("Recording started...");
-  };
-
-  const stopMessageRecording = () => {
-    setIsRecordingMessage(false);
-    toast.success("Recording stopped!");
-  };
-
-  const renderStep = () => {
-    const commonCardProps = {
-      theme: selectedTheme,
-      messageVideo,
-      memories,
-      amount,
-    };
-
-    switch (currentStep) {
-      case 'recipient':
-        return (
-          <div className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4 mb-4">
-              <p className="text-sm text-blue-600">Step 1 of 6: Enter the recipient's phone number</p>
-            </div>
-            <GiftCard {...commonCardProps} />
-            <RecipientStep
-              phoneNumber={phoneNumber}
-              setPhoneNumber={setPhoneNumber}
-              onNext={() => {
-                if (!phoneNumber) {
-                  toast.error("Please enter a phone number to continue");
-                  return;
-                }
-                goToNextStep('message');
-              }}
-            />
-          </div>
-        );
-      case 'message':
-        return (
-          <div className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4 mb-4">
-              <p className="text-sm text-blue-600">Step 2 of 6: Record or upload your message</p>
-            </div>
-            <GiftCard {...commonCardProps} />
-            <MessageStep
-              messageVideo={messageVideo}
-              setMessageVideo={setMessageVideo}
-              isRecordingMessage={isRecordingMessage}
-              startMessageRecording={startMessageRecording}
-              stopMessageRecording={stopMessageRecording}
-              onNext={() => goToNextStep('amount')}
-            />
-          </div>
-        );
-      case 'amount':
-        return (
-          <div className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4 mb-4">
-              <p className="text-sm text-blue-600">Step 3 of 6: Choose the gift amount</p>
-            </div>
-            <GiftCard {...commonCardProps} />
-            <AmountStep
-              amount={amount}
-              setAmount={setAmount}
-              onNext={() => {
-                if (!amount) {
-                  toast.error("Please enter an amount to continue");
-                  return;
-                }
-                goToNextStep('memory');
-              }}
-            />
-          </div>
-        );
-      case 'memory':
-        return (
-          <div className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4 mb-4">
-              <p className="text-sm text-blue-600">Step 4 of 6: Add special memories</p>
-              <p className="text-xs text-blue-500 mt-1">Your memories are automatically saved when added</p>
-            </div>
-            <GiftCard {...commonCardProps} />
-            <MemoryReplayScreen
-              memories={memories}
-              onAddMemory={handleAddMemory}
-              onNext={() => {
-                if (memories.length === 0) {
-                  if (window.confirm("Are you sure you want to continue without adding any memories? Click 'Add Memory' to lock it in.")) {
-                    goToNextStep('preview');
-                  }
-                } else {
-                  goToNextStep('preview');
-                }
-              }}
-            />
-          </div>
-        );
-      case 'preview':
-        return (
-          <div className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4 mb-4">
-              <p className="text-sm text-blue-600">Step 5 of 6: Review your gift</p>
-            </div>
-            <PreviewStep
-              theme={selectedTheme}
-              phoneNumber={phoneNumber}
-              amount={amount}
-              messageVideo={messageVideo}
-              memory={memory}
-              memories={memories}
-              onNext={() => goToNextStep('payment')}
-            />
-          </div>
-        );
-      case 'payment':
-        return (
-          <div className="space-y-4">
-            <div className="rounded-lg bg-blue-50 p-4 mb-4">
-              <p className="text-sm text-blue-600">Final Step: Complete payment</p>
-            </div>
-            <GiftCard {...commonCardProps} />
-            <div className="text-center p-6">
-              <h2 className="text-xl font-semibold mb-4">Complete Payment</h2>
-              <p className="text-gray-600">Payment processing coming soon!</p>
-            </div>
-          </div>
-        );
-      default:
-        return null;
-    }
-  };
-
-  const getStepTitle = () => {
-    switch (currentStep) {
-      case 'recipient':
-        return 'Select Your Recipient';
-      case 'message':
-        return 'Record Your Message';
-      case 'amount':
-        return 'Choose Amount';
-      case 'memory':
-        return 'Add Memories';
-      case 'preview':
-        return 'Preview & Send';
-      case 'payment':
-        return "Complete Payment";
-      default:
-        return 'Create a Gift';
-    }
-  };
-
-  const getStepDescription = () => {
-    switch (currentStep) {
-      case 'recipient':
-        return 'Choose who you want to send a gift to by phone number, and let us do the rest!';
-      case 'message':
-        return 'Record a heartfelt video message or upload one from your device.';
-      case 'amount':
-        return 'Choose how much you would like to gift.';
-      case 'memory':
-        return 'Add special photos and memories to make your gift more meaningful.';
-      case 'preview':
-        return 'Review your gift, confirm the details, and proceed to payment.';
-      case 'payment':
-        return 'Complete your payment to send this special gift!';
-      default:
-        return '';
-    }
-  };
-
-  const getProgressPercentage = () => {
-    const steps: Step[] = ['recipient', 'message', 'amount', 'memory', 'preview', 'payment'];
-    const currentIndex = steps.indexOf(currentStep);
-    return ((currentIndex + 1) / steps.length) * 100;
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-blue-50 pb-16">
-      <div className="p-4 space-y-6 max-w-2xl mx-auto">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-[#8AB878] relative">
+      {/* Polka dot pattern overlay */}
+      <div 
+        className="absolute inset-0" 
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 10%, transparent 11%)',
+          backgroundSize: '30px 30px',
+          backgroundPosition: '0 0, 15px 15px'
+        }}
+      />
+      
+      {/* Main content */}
+      <div className="relative z-10 min-h-screen flex flex-col">
+        {/* Top navigation */}
+        <div className="flex items-center justify-between p-4">
           <button 
             onClick={goToPreviousStep}
-            className="p-2 hover:bg-white/80 rounded-full transition-colors"
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
-          <div className="flex-1">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              {getStepTitle()}
-            </h1>
-            <p className="text-sm text-gray-600 mt-1">{getStepDescription()}</p>
+          
+          <button className="w-10 h-10 flex items-center justify-center bg-white rounded-full">
+            <div className="h-5 w-5 text-gray-600">1</div>
+          </button>
+          
+          <button 
+            onClick={() => goToNextStep('message')}
+            className="px-6 py-2 bg-white rounded-full text-gray-800 font-medium"
+          >
+            Next
+          </button>
+        </div>
+
+        {/* Card content */}
+        <div className="flex-1 px-4 pt-4">
+          <div className="bg-[#F5F2E8] rounded-lg aspect-[3/4] w-full max-w-md mx-auto shadow-lg p-8">
+            <div className="h-full flex flex-col items-center justify-between">
+              <div className="text-center space-y-4">
+                <div className="space-y-2">
+                  <span className="text-8xl font-serif text-[#2E5A2C]">M</span>
+                  <span className="text-8xl font-serif text-[#1B4B6B]">E</span>
+                  <span className="text-8xl font-serif text-[#EA384C]">R</span>
+                  <span className="text-8xl font-serif text-[#FF9EBA]">R</span>
+                  <span className="text-8xl font-serif text-[#C4D6A0]">Y</span>
+                </div>
+                <div className="text-center mt-8">
+                  <div className="text-[#EA384C] text-6xl">🧦</div>
+                </div>
+              </div>
+              
+              <div className="text-center text-[#2E5A2C] space-y-4">
+                <p className="text-lg leading-relaxed">
+                  Wishing you peace, joy and<br />
+                  love this holiday season. I miss<br />
+                  you like crazy and can't wait<br />
+                  to see you in February.
+                </p>
+                <p className="text-xl">
+                  Love,<br />
+                  Allison
+                </p>
+              </div>
+            </div>
           </div>
         </div>
 
-        <div className="w-full bg-gray-200 rounded-full h-2">
-          <div 
-            className="bg-gradient-to-r from-purple-500 to-pink-500 h-2 rounded-full transition-all duration-300 ease-in-out"
-            style={{ width: `${getProgressPercentage()}%` }}
-          />
+        {/* Bottom controls */}
+        <div className="p-4 space-y-4">
+          {/* View selector */}
+          <div className="bg-white rounded-full p-1 flex justify-between max-w-md mx-auto">
+            <button 
+              onClick={() => setCurrentView('card')}
+              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium ${
+                currentView === 'card' ? 'bg-gray-900 text-white' : 'text-gray-600'
+              }`}
+            >
+              Card
+            </button>
+            <button 
+              onClick={() => setCurrentView('message')}
+              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium ${
+                currentView === 'message' ? 'bg-gray-900 text-white' : 'text-gray-600'
+              }`}
+            >
+              Message
+            </button>
+            <button 
+              onClick={() => setCurrentView('envelope')}
+              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium ${
+                currentView === 'envelope' ? 'bg-gray-900 text-white' : 'text-gray-600'
+              }`}
+            >
+              Envelope
+            </button>
+          </div>
+
+          {/* Tools */}
+          <div className="flex justify-between items-center max-w-md mx-auto px-4">
+            <button className="flex flex-col items-center space-y-1">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <img src="/lovable-uploads/209f908f-8bcc-4832-823d-f6dc2c0a1e50.png" alt="Templates" className="w-8 h-8" />
+              </div>
+              <span className="text-xs text-gray-500">Templates</span>
+            </button>
+            <button className="flex flex-col items-center space-y-1">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <span className="text-3xl">T</span>
+              </div>
+              <span className="text-xs text-gray-500">Text</span>
+            </button>
+            <button className="flex flex-col items-center space-y-1">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <span className="text-3xl">⭐</span>
+              </div>
+              <span className="text-xs text-gray-500">Stickers</span>
+            </button>
+            <button className="flex flex-col items-center space-y-1">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <span className="text-3xl">📷</span>
+              </div>
+              <span className="text-xs text-gray-500">Video</span>
+            </button>
+            <button className="flex flex-col items-center space-y-1">
+              <div className="w-12 h-12 flex items-center justify-center">
+                <span className="text-3xl">📎</span>
+              </div>
+              <span className="text-xs text-gray-500">Props</span>
+            </button>
+          </div>
         </div>
 
-        <div className="animate-fade-in">
-          {renderStep()}
+        {/* iPhone home indicator */}
+        <div className="h-8 flex items-center justify-center">
+          <div className="w-32 h-1 bg-white rounded-full" />
         </div>
       </div>
-      <BottomNav />
     </div>
   );
 };
