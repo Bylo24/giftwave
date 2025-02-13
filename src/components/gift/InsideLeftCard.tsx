@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
-import { MessageStep } from "@/components/gift/MessageStep";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
@@ -23,7 +24,44 @@ const videoFrames = [
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [selectedFrame, setSelectedFrame] = useState<string>('frame1');
-  const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleMessageUpload = async (file: File) => {
+    if (file.type.startsWith('video/')) {
+      setIsUploading(true);
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError } = await supabase.storage
+          .from('gift_videos')
+          .upload(fileName, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('gift_videos')
+          .getPublicUrl(fileName);
+
+        setMessageVideo(file);
+        toast.success('Video message uploaded successfully!');
+      } catch (error) {
+        console.error('Upload error:', error);
+        toast.error('Failed to upload video. Please try again.');
+      } finally {
+        setIsUploading(false);
+      }
+    } else {
+      toast.error('Please upload a video file');
+    }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      handleMessageUpload(file);
+    }
+  };
 
   return (
     <div 
@@ -77,13 +115,26 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                   </>
                 ) : (
                   <div className="text-center">
-                    <Button
-                      variant="ghost"
-                      onClick={() => setIsRecordingModalOpen(true)}
-                      className="bg-black/10 hover:bg-black/20 text-gray-700"
+                    <input 
+                      type="file" 
+                      accept="video/*"
+                      capture="user"
+                      className="hidden" 
+                      id="video-upload"
+                      onChange={handleFileChange}
+                    />
+                    <label 
+                      htmlFor="video-upload"
+                      className="cursor-pointer inline-block"
                     >
-                      Upload/Record a video message
-                    </Button>
+                      <Button
+                        variant="ghost"
+                        className="bg-black/10 hover:bg-black/20 text-gray-700"
+                        disabled={isUploading}
+                      >
+                        {isUploading ? 'Uploading...' : 'Upload/Record a video message'}
+                      </Button>
+                    </label>
                     <p className="text-sm text-gray-500 mt-2">Videos will be saved automatically</p>
                   </div>
                 )}
@@ -117,14 +168,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
             </div>
           </div>
         </div>
-
-        <MessageStep
-          isOpen={isRecordingModalOpen}
-          onClose={() => setIsRecordingModalOpen(false)}
-          messageVideo={messageVideo}
-          setMessageVideo={setMessageVideo}
-          onNext={onNext}
-        />
       </div>
     </div>
   );
