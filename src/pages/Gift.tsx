@@ -33,7 +33,7 @@ const Gift = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>('recipient');
   const [previousSteps, setPreviousSteps] = useState<Step[]>([]);
-  const [selectedTheme] = useState<ThemeType>('christmas');
+  const [selectedTheme] = useState<ThemeType>('holiday');  // Changed from 'christmas' to 'holiday'
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
