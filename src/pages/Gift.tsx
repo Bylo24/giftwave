@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, ChevronDown } from "lucide-react";
@@ -8,6 +9,7 @@ interface ThemeOption {
   text: string;
   emoji: string;
   bgColor: string;
+  screenBgColor: string;
   textColors: string[];
   pattern: {
     type: 'dots' | 'grid' | 'waves';
@@ -32,6 +34,7 @@ const themeOptions: ThemeOption[] = [
     text: "HAPPY BIRTHDAY",
     emoji: "🎂",
     bgColor: "bg-[#FFF6E9]",
+    screenBgColor: "#FEC6A1", // Soft Orange
     textColors: ["text-[#FF6B6B]", "text-[#4ECDC4]", "text-[#FFD93D]", "text-[#FF6B6B]", "text-[#4ECDC4]"],
     pattern: {
       type: 'dots',
@@ -42,6 +45,7 @@ const themeOptions: ThemeOption[] = [
     text: "CONGRATULATIONS",
     emoji: "🎉",
     bgColor: "bg-[#F0FFF4]",
+    screenBgColor: "#F2FCE2", // Soft Green
     textColors: ["text-[#38A169]", "text-[#2B6CB0]", "text-[#805AD5]", "text-[#38A169]", "text-[#2B6CB0]"],
     pattern: {
       type: 'grid',
@@ -52,6 +56,7 @@ const themeOptions: ThemeOption[] = [
     text: "MERRY CHRISTMAS",
     emoji: "🎄",
     bgColor: "bg-[#F5F2E8]",
+    screenBgColor: "#FFDEE2", // Soft Pink
     textColors: ["text-[#2E5A2C]", "text-[#1B4B6B]", "text-[#EA384C]", "text-[#FF9EBA]", "text-[#C4D6A0]"],
     pattern: {
       type: 'waves',
@@ -62,6 +67,7 @@ const themeOptions: ThemeOption[] = [
     text: "THANK YOU",
     emoji: "💝",
     bgColor: "bg-[#FFF5F5]",
+    screenBgColor: "#E5DEFF", // Soft Purple
     textColors: ["text-[#E53E3E]", "text-[#DD6B20]", "text-[#D53F8C]", "text-[#E53E3E]", "text-[#DD6B20]"],
     pattern: {
       type: 'dots',
@@ -72,6 +78,7 @@ const themeOptions: ThemeOption[] = [
     text: "GOOD LUCK",
     emoji: "🍀",
     bgColor: "bg-[#ECFDF5]",
+    screenBgColor: "#D3E4FD", // Soft Blue
     textColors: ["text-[#047857]", "text-[#059669]", "text-[#10B981]", "text-[#047857]", "text-[#059669]"],
     pattern: {
       type: 'grid',
@@ -191,7 +198,10 @@ const Gift = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#8AB878] relative">
+    <div 
+      className="min-h-screen relative transition-colors duration-300"
+      style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+    >
       <div 
         className="absolute inset-0" 
         style={{
