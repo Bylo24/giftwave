@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, X, Grid, Circle, Waves } from "lucide-react";
+import { ArrowLeft, ChevronDown, X, Grid, Circle, Waves, Ban } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,7 @@ interface ThemeOption {
   screenBgColor: string;
   textColors: string[];
   pattern: {
-    type: 'dots' | 'grid' | 'waves';
+    type: 'dots' | 'grid' | 'waves' | 'none';
     color: string;
   };
 }
@@ -136,7 +136,7 @@ const Gift = () => {
     setCurrentStep(nextStep);
   };
 
-  const handlePatternChange = (type: 'dots' | 'grid' | 'waves') => {
+  const handlePatternChange = (type: 'dots' | 'grid' | 'waves' | 'none') => {
     setSelectedThemeOption(prev => ({
       ...prev,
       pattern: {
@@ -165,6 +165,7 @@ const Gift = () => {
                            transparent 2px, transparent 8px)`,
           backgroundSize: '20px 20px'
         };
+      case 'none':
       default:
         return {};
     }
@@ -328,6 +329,14 @@ const Gift = () => {
         </div>
 
         <div className="flex justify-center gap-2 mb-4 px-4">
+          <Button
+            variant={selectedThemeOption.pattern.type === 'none' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => handlePatternChange('none')}
+            className="w-10 h-10"
+          >
+            <Ban className="h-4 w-4" />
+          </Button>
           <Button
             variant={selectedThemeOption.pattern.type === 'dots' ? 'default' : 'outline'}
             size="icon"
