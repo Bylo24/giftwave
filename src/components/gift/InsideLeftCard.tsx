@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ArrowLeft, Upload, Image, Plus } from "lucide-react";
-import { ThemeOption } from "@/types/gift";
+import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { StickerLayer } from "./StickerLayer";
 
 interface Memory {
   imageUrl: string;
@@ -24,6 +25,7 @@ const stickerOptions = [
 ];
 
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
+  const cardRef = useRef<HTMLDivElement>(null);
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -31,6 +33,8 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [memories, setMemories] = useState<Memory[]>([]);
   const [showStickers, setShowStickers] = useState(false);
+  const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
+  const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -72,8 +76,60 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   };
 
   const handleStickerClick = (emoji: string) => {
-    toast.success('Sticker selected!');
+    if (!cardRef.current) return;
+
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = Math.random() * (rect.width - 80) + 40;
+    const y = Math.random() * (rect.height - 80) + 40;
+
+    setPlacedStickers(prev => [...prev, {
+      id: `${emoji}-${Date.now()}`,
+      emoji,
+      x,
+      y,
+      rotation: Math.random() * 360
+    }]);
     setShowStickers(false);
+  };
+
+  const handleStickerDragEnd = (event: any, info: any, stickerId: string) => {
+    if (!cardRef.current) return;
+
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = info.point.x - rect.left;
+    const y = info.point.y - rect.top;
+
+    const maxX = rect.width - 40;
+    const maxY = rect.height - 40;
+    const constrainedX = Math.min(Math.max(0, x), maxX);
+    const constrainedY = Math.min(Math.max(0, y), maxY);
+
+    setPlacedStickers(prev =>
+      prev.map(sticker =>
+        sticker.id === stickerId
+          ? { ...sticker, x: constrainedX, y: constrainedY }
+          : sticker
+      )
+    );
+  };
+
+  const handleStickerTap = (stickerId: string) => {
+    setSelectedSticker(selectedSticker === stickerId ? null : stickerId);
+  };
+
+  const handleStickerRemove = (stickerId: string) => {
+    setPlacedStickers(prev => prev.filter(sticker => sticker.id !== stickerId));
+    setSelectedSticker(null);
+  };
+
+  const handleStickerRotate = (stickerId: string, newRotation: number) => {
+    setPlacedStickers(prev =>
+      prev.map(sticker =>
+        sticker.id === stickerId
+          ? { ...sticker, rotation: newRotation }
+          : sticker
+      )
+    );
   };
 
   const renderMemoryCard = (memory: Memory | null, index: number) => {
@@ -135,11 +191,9 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
         </div>
 
-        {/* Memory Creation Section */}
         <div className="px-4 py-6">
           <div className="bg-white/90 backdrop-blur-sm rounded-lg p-6 max-w-md mx-auto shadow-lg space-y-4">
             <div className="flex flex-col space-y-4">
-              {/* Photo Upload */}
               <div className="text-center">
                 <input
                   type="file"
@@ -157,7 +211,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                 </label>
               </div>
 
-              {/* Preview */}
               {previewImage && (
                 <div className="rounded-lg overflow-hidden w-full aspect-square">
                   <img 
@@ -168,7 +221,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                 </div>
               )}
 
-              {/* Caption Input */}
               <input
                 type="text"
                 placeholder="Add a caption..."
@@ -177,7 +229,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                 className="w-full px-4 py-2 rounded-md border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
 
-              {/* Add Memory Button */}
               <button
                 onClick={handleAddMemory}
                 className="w-full flex items-center justify-center px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors"
@@ -189,9 +240,9 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </div>
         </div>
 
-        {/* Card Section */}
         <div className="flex-1 flex items-center justify-center px-4 pb-24">
           <div 
+            ref={cardRef}
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg transition-colors duration-300 relative`}
           >
             <div className="relative z-10 h-full flex flex-col justify-between py-8">
@@ -201,10 +252,19 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                 </div>
               ))}
             </div>
+
+            <StickerLayer
+              stickers={placedStickers}
+              selectedSticker={selectedSticker}
+              cardRef={cardRef}
+              onStickerTap={handleStickerTap}
+              onStickerDragEnd={handleStickerDragEnd}
+              onStickerRemove={handleStickerRemove}
+              onStickerRotate={handleStickerRotate}
+            />
           </div>
         </div>
 
-        {/* Sticker Section */}
         <div className="fixed bottom-8 left-0 right-0 flex justify-center">
           <div className="relative">
             <button 
