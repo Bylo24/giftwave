@@ -83,11 +83,15 @@ export const MessageStep = ({
     }, 1000);
   };
 
-  const handleStopRecording = () => {
-    stopMessageRecording();
+  const handleStopRecording = async () => {
+    const recordedVideo = await stopMessageRecording();
     if (recordingTimer.current) {
       clearInterval(recordingTimer.current);
       recordingTimer.current = null;
+    }
+    
+    if (recordedVideo) {
+      await handleMessageUpload(recordedVideo);
     }
   };
 
