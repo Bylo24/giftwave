@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
@@ -9,11 +9,12 @@ import { stickerOptions } from "@/constants/giftOptions";
 import { useStickerManager } from "@/hooks/useStickerManager";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
+import { ThemeOption } from "@/types/gift";
 
 const FrontCardContent = () => {
   const navigate = useNavigate();
   const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
-  const cardRef = useState<HTMLDivElement | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const {
     placedStickers,
     selectedSticker,
@@ -93,7 +94,7 @@ const FrontCardContent = () => {
 
         <div className="flex-1 flex items-center justify-center px-4">
           <div 
-            ref={(el) => cardRef[1](el)}
+            ref={cardRef}
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container overflow-hidden`}
           >
             <div 
@@ -121,7 +122,7 @@ const FrontCardContent = () => {
             <StickerLayer
               stickers={placedStickers}
               selectedSticker={selectedSticker}
-              cardRef={cardRef[0]}
+              cardRef={cardRef.current}
               onStickerTap={handleStickerTap}
               onStickerDragEnd={handleStickerDragEnd}
               onStickerRemove={handleStickerRemove}
