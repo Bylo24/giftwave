@@ -39,7 +39,7 @@ const GiftContent = () => {
   } = useStickerManager();
 
   const handleDuplicatePage = () => {
-    navigate('/preview');
+    setCurrentStep('amount');
   };
 
   const handleAddMemory = (memory: Omit<{ id: string; imageUrl?: string; caption: string; date: Date }, "id">) => {
@@ -99,6 +99,7 @@ const GiftContent = () => {
         messageVideo={messageVideo}
         amount={amount}
         memories={memories}
+        memory={null}
         onComplete={() => {
           setPreviousSteps(prev => [...prev, 'reveal']);
           setCurrentStep('preview');
@@ -116,6 +117,22 @@ const GiftContent = () => {
           <MemoryReplayScreen
             memories={memories}
             onAddMemory={handleAddMemory}
+            onNext={goToNextStep}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  if (currentStep === 'amount') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+      >
+        <div className="w-full max-w-md">
+          <AmountStep
+            amount={amount}
+            setAmount={setAmount}
             onNext={goToNextStep}
           />
         </div>
@@ -176,22 +193,6 @@ const GiftContent = () => {
         onBack={() => setCurrentPage('blank')}
         onNext={handleDuplicatePage}
       />
-    );
-  }
-
-  if (currentStep === 'amount') {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
-      >
-        <div className="w-full max-w-md">
-          <AmountStep
-            amount={amount}
-            setAmount={setAmount}
-            onNext={goToNextStep}
-          />
-        </div>
-      </div>
     );
   }
 
