@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -143,15 +142,14 @@ const Gift = () => {
     if (!cardRef.current) return;
 
     const rect = cardRef.current.getBoundingClientRect();
-    const padding = 40;
-    const centerX = rect.width / 2 - padding;
-    const centerY = rect.height / 2 - padding;
+    const x = rect.width / 2 - 20; // Center X with offset for sticker size
+    const y = rect.height / 2 - 20; // Center Y with offset for sticker size
 
     setPlacedStickers(prev => [...prev, {
       id: `${emoji}-${Date.now()}`,
       emoji,
-      x: centerX,
-      y: centerY,
+      x,
+      y,
       rotation: Math.random() * 30 - 15
     }]);
     setShowStickers(false);
@@ -160,10 +158,8 @@ const Gift = () => {
   const handleDragEnd = (event: any, info: any, stickerId: string) => {
     if (!cardRef.current) return;
 
-    const rect = cardRef.current.getBoundingClientRect();
-    const padding = 40;
-    const x = Math.min(Math.max(info.point.x - rect.left, padding), rect.width - padding);
-    const y = Math.min(Math.max(info.point.y - rect.top, padding), rect.height - padding);
+    const x = info.point.x;
+    const y = info.point.y;
 
     setPlacedStickers(prev =>
       prev.map(sticker =>
@@ -234,7 +230,7 @@ const Gift = () => {
               position: 'relative'
             }}
           >
-            <div className="h-full flex flex-col items-center justify-center space-y-8">
+            <div className="h-full flex flex-col items-center justify-center space-y-8 pointer-events-none">
               <div className="text-center">
                 {selectedThemeOption.text.split('').map((letter, index) => (
                   <span 
