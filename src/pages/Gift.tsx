@@ -102,13 +102,9 @@ const Gift = () => {
   };
 
   const handleDuplicatePage = () => {
-    const timestamp = Date.now();
-    const searchParams = new URLSearchParams(location.search);
-    const currentInstance = searchParams.get('instance') || '0';
-    const nextInstance = parseInt(currentInstance) + 1;
-    
-    // Just navigate to a new instance while preserving the current one
-    navigate(`/gift?instance=${nextInstance}`);
+    setCurrentStep('memory');
+    setCurrentPage('front');
+    navigate('/blank');
   };
 
   const handleStickerClick = (emoji: string) => {
