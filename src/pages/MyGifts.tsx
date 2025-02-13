@@ -47,8 +47,8 @@ const MyGifts = () => {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50/50 pb-16 flex items-center justify-center">
-        <Card className="p-6 backdrop-blur-lg border border-gray-200/20 shadow-lg">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 pb-16 flex items-center justify-center">
+        <Card className="p-6 backdrop-blur-lg border border-white/20 shadow-xl rounded-3xl bg-white/70">
           <p className="text-gray-600">Loading gifts...</p>
         </Card>
       </div>
@@ -56,9 +56,14 @@ const MyGifts = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 pb-24">
       <div className="p-4 space-y-6 max-w-2xl mx-auto">
-        <Card className="p-6 backdrop-blur-lg border border-gray-200/20 shadow-lg">
+        <div className="sticky top-0 z-10 backdrop-blur-lg bg-white/80 -mx-4 px-4 py-4 border-b border-white/20">
+          <h1 className="text-xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+            My Gifts
+          </h1>
+        </div>
+        <Card className="p-6 backdrop-blur-lg border border-white/20 shadow-xl rounded-3xl bg-white/70">
           <MemoriesGrid gifts={gifts || []} />
         </Card>
       </div>
