@@ -53,6 +53,33 @@ export type Database = {
           },
         ]
       }
+      gift_card_templates: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string
+          name: string
+          theme: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url: string
+          name: string
+          theme: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string
+          name?: string
+          theme?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       gift_memories: {
         Row: {
           caption: string

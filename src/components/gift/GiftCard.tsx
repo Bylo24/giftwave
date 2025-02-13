@@ -1,10 +1,10 @@
 
-import { useState } from "react";
-import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Layout, Sticker } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ThemeType, giftThemes, StickerPosition } from "@/utils/giftThemes";
+import { ThemeType } from "@/utils/giftThemes";
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { fetchTemplatesByTheme, GiftCardTemplate } from "@/utils/giftCardTemplates";
+import { toast } from "sonner";
 
 interface GiftCardProps {
   theme: ThemeType;
@@ -31,9 +33,32 @@ type CardPage = 'front' | 'left' | 'right' | 'back';
 export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProps) => {
   const [currentPage, setCurrentPage] = useState<CardPage>('front');
   const [isRevealed, setIsRevealed] = useState(false);
-  const [selectedTemplate, setSelectedTemplate] = useState(giftThemes[theme].templates[0]);
-  const [placedStickers, setPlacedStickers] = useState<StickerPosition[]>([]);
-  const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
+  const [templates, setTemplates] = useState<GiftCardTemplate[]>([]);
+  const [selectedTemplate, setSelectedTemplate] = useState<GiftCardTemplate | null>(null);
+  const [placedStickers, setPlacedStickers] = useState<Array<{
+    id: string;
+    emoji: string;
+    x: number;
+    y: number;
+    rotation: number;
+  }>>([]);
+
+  useEffect(() => {
+    const loadTemplates = async () => {
+      try {
+        const themeTemplates = await fetchTemplatesByTheme(theme);
+        setTemplates(themeTemplates);
+        if (themeTemplates.length > 0) {
+          setSelectedTemplate(themeTemplates[0]);
+        }
+      } catch (error) {
+        toast.error("Failed to load templates");
+        console.error(error);
+      }
+    };
+
+    loadTemplates();
+  }, [theme]);
 
   const handleDragEnd = (info: any, sticker: { id: string; emoji: string }) => {
     const position = {
@@ -41,7 +66,7 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
       emoji: sticker.emoji,
       x: info.point.x,
       y: info.point.y,
-      rotation: Math.random() * 30 - 15 // Random rotation between -15 and 15 degrees
+      rotation: Math.random() * 30 - 15
     };
     setPlacedStickers([...placedStickers, position]);
   };
@@ -74,7 +99,7 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
           <div 
             className="w-full h-full flex flex-col items-center justify-between p-6 bg-white rounded-lg relative overflow-hidden"
             style={{
-              backgroundImage: `url(${selectedTemplate.imageUrl})`,
+              backgroundImage: selectedTemplate ? `url(${selectedTemplate.image_url})` : undefined,
               backgroundSize: 'cover',
               backgroundPosition: 'center'
             }}
@@ -97,7 +122,7 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
             ))}
 
             <div className="relative flex-1 flex flex-col items-center justify-center space-y-4">
-              <div className="text-6xl">{giftThemes[theme].icon}</div>
+              <div className="text-6xl">🎁</div>
               <h2 className="text-2xl font-bold text-center text-white">
                 You've received a gift!
               </h2>
@@ -118,16 +143,16 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
                   </DialogHeader>
                   <ScrollArea className="h-[300px] w-full pr-4">
                     <div className="grid grid-cols-2 gap-4">
-                      {giftThemes[theme].templates.map((template) => (
+                      {templates.map((template) => (
                         <div
                           key={template.id}
                           className={`relative aspect-[3/4] rounded-lg overflow-hidden cursor-pointer transition-all ${
-                            selectedTemplate.id === template.id ? 'ring-2 ring-primary' : ''
+                            selectedTemplate?.id === template.id ? 'ring-2 ring-primary' : ''
                           }`}
                           onClick={() => setSelectedTemplate(template)}
                         >
                           <img
-                            src={template.imageUrl}
+                            src={template.image_url}
                             alt={template.name}
                             className="w-full h-full object-cover"
                           />
@@ -155,15 +180,16 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
                   </DialogHeader>
                   <ScrollArea className="h-[300px] w-full pr-4">
                     <div className="grid grid-cols-4 gap-4">
-                      {giftThemes[theme].stickers.map((sticker) => (
+                      {/* Add your sticker options here */}
+                      {['🎈', '🎁', '🎊', '🎉', '💝', '💖', '✨', '⭐'].map((emoji, index) => (
                         <motion.div
-                          key={sticker.id}
+                          key={index}
                           className="aspect-square rounded-lg bg-gray-100 flex items-center justify-center text-3xl cursor-move"
                           drag
                           dragSnapToOrigin
-                          onDragEnd={(_, info) => handleDragEnd(info, sticker)}
+                          onDragEnd={(_, info) => handleDragEnd(info, { id: String(index), emoji })}
                         >
-                          {sticker.emoji}
+                          {emoji}
                         </motion.div>
                       ))}
                     </div>
@@ -189,10 +215,6 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
                 <p className="text-gray-500">Video message will appear here</p>
               )}
             </div>
-            <div className="mt-4 flex justify-center gap-4 text-sm text-gray-500">
-              <span>Video Frames</span>
-              <span>Retake</span>
-            </div>
           </div>
         );
 
@@ -216,10 +238,6 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
                 <p className="text-center text-gray-500">Memories will appear here</p>
               )}
             </div>
-            <div className="flex justify-center gap-4 text-sm text-gray-500">
-              <span>Frames</span>
-              <span>Stickers</span>
-            </div>
           </div>
         );
 
@@ -234,17 +252,13 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
                 <motion.div
                   initial={{ scale: 0 }}
                   animate={{ scale: 1 }}
-                  className="w-24 h-24 rounded-full bg-red-500 flex items-center justify-center"
+                  className="w-24 h-24 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center"
                 >
                   <span className="text-2xl font-bold text-white">${amount}</span>
                 </motion.div>
               ) : (
                 <p className="text-gray-500">Tap to reveal amount</p>
               )}
-              <p className="text-sm text-gray-500">Collect gift here</p>
-            </div>
-            <div className="mt-4 flex justify-center gap-4 text-sm text-gray-500">
-              <span>Frames</span>
             </div>
           </div>
         );
