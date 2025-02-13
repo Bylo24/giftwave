@@ -19,6 +19,7 @@ import PromoCode from "./pages/PromoCode";
 import Wallet from "./pages/Wallet";
 import SearchResults from "./pages/SearchResults";
 import Gift from "./pages/Gift";
+import GiftV2 from "./pages/GiftV2";
 import MyGifts from "./pages/MyGifts";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
@@ -51,6 +52,7 @@ function App() {
                 <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
                 <Route path="/search" element={<RequireAuth><SearchResults /></RequireAuth>} />
                 <Route path="/gift" element={<RequireAuth><Gift /></RequireAuth>} />
+                <Route path="/gift-v2" element={<RequireAuth><GiftV2 /></RequireAuth>} />
                 <Route path="/my-gifts" element={<RequireAuth><MyGifts /></RequireAuth>} />
                 <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
                 <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
