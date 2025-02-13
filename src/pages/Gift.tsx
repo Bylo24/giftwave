@@ -241,12 +241,6 @@ const Gift = () => {
               <ArrowLeft className="h-5 w-5 text-gray-600" />
             </button>
             
-            <ThemeSelector
-              themes={themeOptions}
-              selectedTheme={selectedThemeOption}
-              onThemeChange={setSelectedThemeOption}
-            />
-            
             <button 
               onClick={goToNextStep}
               className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
