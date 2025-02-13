@@ -10,8 +10,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { ProfileLinks } from "@/components/profile/ProfileLinks";
-import { Shield, Moon, Globe, Gift } from "lucide-react";
+import { Shield, Moon, Globe, Gift, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -20,6 +26,23 @@ const Profile = () => {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [language, setLanguage] = useState("English (US)");
+
+  const languages = [
+    "English (US)",
+    "Español",
+    "Français",
+    "Deutsch",
+    "Italiano",
+    "日本語",
+    "한국어",
+    "中文",
+  ];
+
+  const handleLanguageChange = (newLanguage: string) => {
+    setLanguage(newLanguage);
+    toast.success(`Language changed to ${newLanguage}`);
+  };
 
   const fetchProfile = async () => {
     if (user) {
@@ -143,9 +166,31 @@ const Profile = () => {
               </div>
               <div>
                 <p className="font-medium text-foreground">Language</p>
-                <p className="text-sm text-muted-foreground">English (US)</p>
+                <p className="text-sm text-muted-foreground">Select your preferred language</p>
               </div>
             </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button 
+                  variant="outline" 
+                  className="bg-card/80 backdrop-blur-lg border-border"
+                >
+                  {language}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-[160px]">
+                {languages.map((lang) => (
+                  <DropdownMenuItem
+                    key={lang}
+                    onClick={() => handleLanguageChange(lang)}
+                    className="cursor-pointer"
+                  >
+                    {lang}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
 
           <div className="p-4 flex items-center justify-between">
