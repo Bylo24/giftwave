@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      gift_card_designs: {
+        Row: {
+          created_at: string
+          frame_style: string | null
+          gift_id: string | null
+          id: string
+          page: Database["public"]["Enums"]["card_page_type"]
+          sticker_positions: Json | null
+          template_id: string | null
+          text_content: Json | null
+          video_frame_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          frame_style?: string | null
+          gift_id?: string | null
+          id?: string
+          page: Database["public"]["Enums"]["card_page_type"]
+          sticker_positions?: Json | null
+          template_id?: string | null
+          text_content?: Json | null
+          video_frame_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          frame_style?: string | null
+          gift_id?: string | null
+          id?: string
+          page?: Database["public"]["Enums"]["card_page_type"]
+          sticker_positions?: Json | null
+          template_id?: string | null
+          text_content?: Json | null
+          video_frame_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "gift_card_designs_gift_id_fkey"
+            columns: ["gift_id"]
+            isOneToOne: false
+            referencedRelation: "gifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       gift_memories: {
         Row: {
           caption: string
@@ -153,7 +197,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      card_page_type: "front" | "inside_left" | "inside_right" | "back"
     }
     CompositeTypes: {
       [_ in never]: never
