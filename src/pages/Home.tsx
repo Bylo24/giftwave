@@ -2,10 +2,9 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { Search, Gift, Heart, Bell, Video, CreditCard, Zap, Palette, ArrowRight, ChevronRight, Phone, Upload, DollarSign, Mail } from "lucide-react";
+import { Search, Gift, Wallet, Plus, ArrowDown, Palette, History, UserPlus, Settings, Bell } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Home = () => {
@@ -25,24 +24,14 @@ const Home = () => {
     }
   };
 
-  const steps = [
-    { icon: Phone, text: "Choose recipient by phone number" },
-    { icon: Video, text: "Record a video message" },
-    { icon: DollarSign, text: "Select amount and pay" },
-    { icon: Gift, text: "They open an interactive gift" },
-    { icon: Zap, text: "Instant claiming" }
-  ];
-
-  const features = [
-    { icon: Video, title: "Video Messages", description: "Make your gift feel more personal", color: "blue" },
-    { icon: Gift, title: "Animated Gift Reveal", description: "Fun, interactive unwrapping", color: "green" },
-    { icon: CreditCard, title: "Secure Payments", description: "Card, wallet, or bank transfer", color: "purple" },
-    { icon: Zap, title: "Instant Claiming", description: "Claim gifts immediately", color: "yellow" },
-    { icon: Palette, title: "Personalized Cards", description: "Customize with stickers & themes", color: "pink" }
+  const quickActions = [
+    { icon: Gift, label: "My Gifts", route: "/my-gifts", color: "pink" },
+    { icon: History, label: "History", route: "/my-gifts", color: "purple" },
+    { icon: UserPlus, label: "Invite", route: "/invite", color: "blue" }
   ];
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2 shadow-sm">
         <div className="flex items-center justify-between gap-4 mb-4">
@@ -51,11 +40,19 @@ const Home = () => {
             alt="GiftWave Logo"
             className="h-8 w-auto"
           />
-          <div 
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-            onClick={() => navigate("/notifications")}
-          >
-            <Bell className="h-6 w-6 text-gray-700" />
+          <div className="flex items-center gap-2">
+            <button 
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={() => navigate("/profile")}
+            >
+              <Settings className="h-6 w-6 text-gray-700" />
+            </button>
+            <button 
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              onClick={() => navigate("/notifications")}
+            >
+              <Bell className="h-6 w-6 text-gray-700" />
+            </button>
           </div>
         </div>
 
@@ -75,167 +72,85 @@ const Home = () => {
       </div>
 
       {/* Main Content */}
-      <div className="px-4 py-6 space-y-8 pb-24">
+      <div className="px-4 py-6 space-y-6 pb-24">
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-semibold text-gray-900">
-            Send Money as a Gift, Instantly & Personally
+            Send money as a gift, with a personal touch!
           </h1>
-          <p className="text-gray-600 text-sm">
-            Personalized video messages, interactive gift reveals, and secure payments.
-          </p>
           <button
             onClick={() => navigate("/gift")}
-            className="w-full px-6 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors font-medium"
+            className="w-full px-6 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-2xl hover:opacity-90 transition-opacity shadow-lg font-medium text-lg flex items-center justify-center gap-2"
           >
-            Send a Gift Now
+            <Gift className="h-6 w-6" />
+            Send a Gift
           </button>
         </div>
 
-        {/* How It Works */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">How It Works</h2>
-          <div className="space-y-4">
-            {steps.map((step, index) => (
-              <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
-                <div className="bg-white p-3 rounded-full shadow-sm">
-                  <step.icon className="h-6 w-6 text-gray-700" />
-                </div>
-                <p className="text-sm text-gray-700 font-medium flex-1">{step.text}</p>
-                <ArrowRight className="h-5 w-5 text-gray-400" />
-              </div>
-            ))}
+        {/* Wallet Overview */}
+        <Card className="p-6 bg-gradient-to-br from-indigo-500 to-blue-600 text-white">
+          <div className="flex items-center gap-3 mb-4">
+            <Wallet className="h-6 w-6" />
+            <h2 className="text-lg font-semibold">Your Balance</h2>
           </div>
-        </div>
-
-        {/* Features */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Key Features</h2>
           <div className="space-y-4">
-            {features.map((feature, index) => (
-              <Card 
-                key={index}
-                className="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer"
-              >
-                <div className={`bg-${feature.color}-100 p-3 rounded-xl`}>
-                  <feature.icon className={`h-6 w-6 text-${feature.color}-600`} />
-                </div>
-                <div>
-                  <h3 className="font-medium text-sm">{feature.title}</h3>
-                  <p className="text-xs text-gray-500 mt-0.5">{feature.description}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        {/* Social Proof */}
-        <Card className="p-4 bg-gradient-to-br from-purple-50 to-white border-0">
-          <div className="text-center space-y-2">
-            <h3 className="font-semibold text-lg">Over 10,000 gifts sent!</h3>
-            <p className="text-sm text-gray-600">Join thousands of happy users</p>
-            <div className="flex justify-center gap-2 pt-2">
-              <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
-                ⭐️ 4.9/5 rating
-              </span>
-              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
-                💝 Trusted by many
-              </span>
+            <div className="space-y-1">
+              <p className="text-3xl font-bold">$0.00</p>
+              <p className="text-sm opacity-80">Available balance</p>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <button className="flex items-center justify-center gap-2 bg-white/20 hover:bg-white/30 transition-colors rounded-xl py-2 text-sm font-medium">
+                <Plus className="h-4 w-4" />
+                Add Money
+              </button>
+              <button className="flex items-center justify-center gap-2 bg-white/20 hover:bg-white/30 transition-colors rounded-xl py-2 text-sm font-medium">
+                <ArrowDown className="h-4 w-4" />
+                Withdraw
+              </button>
             </div>
           </div>
         </Card>
 
-        {/* Pricing */}
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">Simple Pricing</h2>
-          <div className="space-y-3">
-            <Card className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">$25 Gift</p>
-                <p className="text-xs text-gray-500">10% fee</p>
-              </div>
-              <p className="text-sm font-medium text-gray-700">$2.50 fee</p>
-            </Card>
-            <Card className="p-4 flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium">$100 Gift</p>
-                <p className="text-xs text-gray-500">3% fee</p>
-              </div>
-              <p className="text-sm font-medium text-gray-700">$3.00 fee</p>
-            </Card>
+        {/* Featured Theme */}
+        <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50 border-0">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Palette className="h-5 w-5 text-purple-600" />
+              <h2 className="font-semibold text-gray-900">Featured Theme</h2>
+            </div>
           </div>
+          <div className="aspect-video bg-white rounded-xl shadow-sm mb-4"></div>
+          <button
+            onClick={() => navigate("/gift")}
+            className="w-full py-2.5 bg-purple-600 text-white rounded-xl hover:bg-purple-700 transition-colors text-sm font-medium"
+          >
+            Customize Your Card
+          </button>
+        </Card>
+
+        {/* Quick Access */}
+        <div className="grid grid-cols-3 gap-4">
+          {quickActions.map((action, index) => (
+            <Card 
+              key={index}
+              className={`p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-${action.color}-50 to-white border-0`}
+              onClick={() => navigate(action.route)}
+            >
+              <div className="flex flex-col items-center gap-2">
+                <div className={`bg-${action.color}-100 p-2.5 rounded-xl`}>
+                  <action.icon className={`h-5 w-5 text-${action.color}-600`} />
+                </div>
+                <span className="text-xs font-medium text-gray-700">{action.label}</span>
+              </div>
+            </Card>
+          ))}
         </div>
 
-        {/* Sign In Card */}
-        {!user && (
-          <Card className="p-4 bg-gradient-to-b from-gray-50 to-white border-0">
-            <div className="text-center space-y-3">
-              <p className="text-sm text-gray-600">
-                Sign in to start sending gifts
-              </p>
-              <button
-                onClick={() => navigate("/login")}
-                className="w-full px-4 py-2.5 bg-black text-white rounded-full hover:bg-gray-800 transition-colors text-sm font-medium"
-              >
-                Sign In
-              </button>
-            </div>
-          </Card>
-        )}
-
-        {/* FAQ Section */}
-        <div className="bg-white rounded-xl">
-          <h3 className="font-medium text-lg mb-4">Common Questions</h3>
-          <ScrollArea className="h-[280px]">
-            <div className="space-y-5 pr-4">
-              <div className="space-y-1.5">
-                <h4 className="font-medium text-sm">How does GiftWave work?</h4>
-                <p className="text-xs leading-relaxed text-gray-600">
-                  GiftWave lets you send digital gifts to your friends and family. Choose a gift, add a personal message, and we'll deliver it instantly!
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="font-medium text-sm">What types of gifts can I send?</h4>
-                <p className="text-xs leading-relaxed text-gray-600">
-                  You can send digital gift cards, custom messages, and even schedule future gifts for special occasions.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="font-medium text-sm">How do I redeem a gift?</h4>
-                <p className="text-xs leading-relaxed text-gray-600">
-                  When you receive a gift, you'll get a notification. Simply click on the gift to view and redeem it instantly.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="font-medium text-sm">Can I send gifts internationally?</h4>
-                <p className="text-xs leading-relaxed text-gray-600">
-                  Yes! GiftWave works globally, allowing you to send gifts to friends and family anywhere in the world.
-                </p>
-              </div>
-              <div className="space-y-1.5">
-                <h4 className="font-medium text-sm">Are there any fees?</h4>
-                <p className="text-xs leading-relaxed text-gray-600">
-                  GiftWave keeps things simple! We charge a small fee to ensure secure transactions, high-quality video messages, and a seamless gifting experience.
-                </p>
-              </div>
-            </div>
-          </ScrollArea>
-        </div>
-
-        {/* Contact Support */}
-        <Card 
-          className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-gray-50 via-white to-white border-0"
-          onClick={() => window.location.href = "mailto:support@giftwave.app"}
-        >
-          <div className="flex items-center gap-4">
-            <div className="bg-gray-100 p-2.5 rounded-xl">
-              <Mail className="h-5 w-5 text-gray-600" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-medium text-sm">Need help?</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Contact our support team</p>
-            </div>
-            <ChevronRight className="h-5 w-5 text-gray-400" />
+        {/* Recent Activity */}
+        <Card className="p-4">
+          <h3 className="font-medium text-gray-900 mb-4">Recent Activity</h3>
+          <div className="text-center text-sm text-gray-500 py-4">
+            No recent transactions
           </div>
         </Card>
       </div>
