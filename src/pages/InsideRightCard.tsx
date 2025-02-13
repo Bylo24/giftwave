@@ -123,24 +123,26 @@ const InsideRightCard = () => {
           </motion.div>
 
           {/* Memories Display */}
-          <motion.div 
-            className="bg-white rounded-3xl p-6 min-h-[400px]"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-          >
-            <div className="space-y-8">
-              {memories.map((memory) => (
-                <MemoryStage key={memory.id} memory={memory} />
-              ))}
-              {memories.length === 0 && (
-                <div className="flex flex-col items-center justify-center h-[400px] text-gray-400">
-                  <Star className="h-12 w-12 mb-4" />
-                  <p>Add your first memory</p>
-                </div>
-              )}
-            </div>
-          </motion.div>
+          <div className="flex items-center justify-center">
+            <motion.div 
+              className="bg-white rounded-3xl p-6 w-full max-w-md aspect-[3/4]"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+            >
+              <div className="h-full overflow-auto space-y-8">
+                {memories.map((memory) => (
+                  <MemoryStage key={memory.id} memory={memory} />
+                ))}
+                {memories.length === 0 && (
+                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                    <Star className="h-12 w-12 mb-4" />
+                    <p>Add your first memory</p>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
     </div>
