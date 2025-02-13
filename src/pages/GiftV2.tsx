@@ -4,9 +4,16 @@ import { useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
+import { AmountStep } from "@/components/gift/AmountStep";
 
 const GiftV2Content = () => {
   const navigate = useNavigate();
+  const [amount, setAmount] = useState("");
+
+  const handleNext = () => {
+    // We'll handle the next step later
+    console.log("Selected amount:", amount);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
@@ -25,11 +32,12 @@ const GiftV2Content = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3 }}
       >
-        <div className="max-w-md mx-auto bg-white rounded-2xl shadow-xl p-6">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Send a Gift</h1>
-          <p className="text-gray-600">
-            Create a personalized digital gift card with your own memories and messages.
-          </p>
+        <div className="max-w-md mx-auto">
+          <AmountStep 
+            amount={amount}
+            setAmount={setAmount}
+            onNext={handleNext}
+          />
         </div>
       </motion.div>
     </div>
