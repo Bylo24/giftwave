@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -10,6 +9,7 @@ import { PreviewStep } from "@/components/gift/PreviewStep";
 import { MemoryStep } from "@/components/gift/MemoryStep";
 import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { GiftCard } from "@/components/gift/GiftCard";
+import { EditableText } from "@/components/gift/EditableText";
 import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 
@@ -33,7 +33,7 @@ const Gift = () => {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<Step>('recipient');
   const [previousSteps, setPreviousSteps] = useState<Step[]>([]);
-  const [selectedTheme] = useState<ThemeType>('holiday');  // Changed from 'christmas' to 'holiday'
+  const [selectedTheme] = useState<ThemeType>('holiday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
@@ -44,6 +44,10 @@ const Gift = () => {
   });
   const [memories, setMemories] = useState<Memory[]>([]);
   const [currentView, setCurrentView] = useState<CardView>('card');
+  const [messageText, setMessageText] = useState(
+    "Wishing you peace, joy and\nlove this holiday season. I miss\nyou like crazy and can't wait\nto see you in February."
+  );
+  const [signatureText, setSignatureText] = useState("Love,\nAllison");
 
   const goToPreviousStep = () => {
     if (previousSteps.length > 0) {
@@ -62,7 +66,6 @@ const Gift = () => {
 
   return (
     <div className="min-h-screen bg-[#8AB878] relative">
-      {/* Polka dot pattern overlay */}
       <div 
         className="absolute inset-0" 
         style={{
@@ -72,9 +75,7 @@ const Gift = () => {
         }}
       />
       
-      {/* Main content */}
       <div className="relative z-10 min-h-screen flex flex-col">
-        {/* Top navigation */}
         <div className="flex items-center justify-between p-4">
           <button 
             onClick={goToPreviousStep}
@@ -95,7 +96,6 @@ const Gift = () => {
           </button>
         </div>
 
-        {/* Card content */}
         <div className="flex-1 px-4 pt-4">
           <div className="bg-[#F5F2E8] rounded-lg aspect-[3/4] w-full max-w-md mx-auto shadow-lg p-8">
             <div className="h-full flex flex-col items-center justify-between">
@@ -112,25 +112,23 @@ const Gift = () => {
                 </div>
               </div>
               
-              <div className="text-center text-[#2E5A2C] space-y-4">
-                <p className="text-lg leading-relaxed">
-                  Wishing you peace, joy and<br />
-                  love this holiday season. I miss<br />
-                  you like crazy and can't wait<br />
-                  to see you in February.
-                </p>
-                <p className="text-xl">
-                  Love,<br />
-                  Allison
-                </p>
+              <div className="text-center text-[#2E5A2C] space-y-4 w-full">
+                <EditableText
+                  initialText={messageText}
+                  onTextChange={setMessageText}
+                  className="text-lg leading-relaxed"
+                />
+                <EditableText
+                  initialText={signatureText}
+                  onTextChange={setSignatureText}
+                  className="text-xl"
+                />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Bottom controls */}
         <div className="p-4 space-y-4">
-          {/* View selector */}
           <div className="bg-white rounded-full p-1 flex justify-between max-w-md mx-auto">
             <button 
               onClick={() => setCurrentView('card')}
@@ -158,7 +156,6 @@ const Gift = () => {
             </button>
           </div>
 
-          {/* Tools */}
           <div className="flex justify-between items-center max-w-md mx-auto px-4">
             <button className="flex flex-col items-center space-y-1">
               <div className="w-12 h-12 flex items-center justify-center">
@@ -193,7 +190,6 @@ const Gift = () => {
           </div>
         </div>
 
-        {/* iPhone home indicator */}
         <div className="h-8 flex items-center justify-center">
           <div className="w-32 h-1 bg-white rounded-full" />
         </div>
