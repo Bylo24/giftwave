@@ -18,6 +18,7 @@ const InsideRightCard = () => {
   const navigate = useNavigate();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [caption, setCaption] = useState("");
+  const [pendingImage, setPendingImage] = useState<string | undefined>();
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -29,24 +30,25 @@ const InsideRightCard = () => {
     }
 
     // For now, we'll use a placeholder URL since we don't have image upload set up
-    const memory: Memory = {
-      id: crypto.randomUUID(),
-      imageUrl: '/placeholder.svg',
-      caption: caption || 'Your memory'
-    };
-
-    setMemories(prev => [...prev, memory]);
-    setCaption("");
+    setPendingImage('/placeholder.svg');
+    toast.info('Please add a caption for your memory');
   };
 
   const handleAddMemory = () => {
+    if (!caption.trim()) {
+      toast.error('Please add a caption for your memory');
+      return;
+    }
+
     const memory: Memory = {
       id: crypto.randomUUID(),
-      caption: caption || 'Your memory'
+      imageUrl: pendingImage,
+      caption: caption
     };
 
     setMemories(prev => [...prev, memory]);
     setCaption("");
+    setPendingImage(undefined);
   };
 
   return (
@@ -116,6 +118,7 @@ const InsideRightCard = () => {
             <Button
               className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-6"
               onClick={handleAddMemory}
+              disabled={!caption.trim()}
             >
               <Plus className="mr-2 h-5 w-5" />
               Add Memory
