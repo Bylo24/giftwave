@@ -102,9 +102,14 @@ const Gift = () => {
   };
 
   const handleDuplicatePage = () => {
+    const timeoutId = setTimeout(() => {
+      navigate('/blank');
+    }, 0);
+
     setCurrentStep('memory');
     setCurrentPage('front');
-    navigate('/blank');
+
+    return () => clearTimeout(timeoutId);
   };
 
   const handleStickerClick = (emoji: string) => {
