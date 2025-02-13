@@ -10,7 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { ProfileLinks } from "@/components/profile/ProfileLinks";
-import { Shield, Moon, Globe, Gift, ChevronDown } from "lucide-react";
+import { Shield, Globe, Gift, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
@@ -22,7 +22,6 @@ import {
 const Profile = () => {
   const navigate = useNavigate();
   const { user, signOut } = useAuth();
-  const { isDarkMode, toggleDarkMode } = useDarkMode();
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -143,22 +142,6 @@ const Profile = () => {
         </Card>
 
         <Card className="divide-y divide-border bg-card/80 backdrop-blur-lg border-border shadow-lg overflow-hidden">
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-indigo-100 dark:bg-indigo-900 rounded-full">
-                <Moon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Dark Mode</p>
-                <p className="text-sm text-muted-foreground">Toggle dark theme</p>
-              </div>
-            </div>
-            <Switch 
-              checked={isDarkMode} 
-              onCheckedChange={toggleDarkMode} 
-            />
-          </div>
-
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
