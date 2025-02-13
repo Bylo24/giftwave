@@ -31,6 +31,7 @@ import AddMemories from "./pages/AddMemories";
 import SelectAmount from "./pages/SelectAmount";
 import PreviewGift from "./pages/PreviewGift";
 import FrontCard from "./pages/FrontCard";
+import InsideLeftCard from "./pages/InsideLeftCard";
 
 function App() {
   const queryClient = new QueryClient();
@@ -60,6 +61,7 @@ function App() {
                 <Route path="/gift" element={<RequireAuth><Gift /></RequireAuth>} />
                 <Route path="/gift-v2" element={<RequireAuth><GiftV2 /></RequireAuth>} />
                 <Route path="/frontcard" element={<RequireAuth><FrontCard /></RequireAuth>} />
+                <Route path="/insideleftcard" element={<RequireAuth><InsideLeftCard /></RequireAuth>} />
                 <Route path="/select-recipient" element={<RequireAuth><SelectRecipient /></RequireAuth>} />
                 <Route path="/add-message" element={<RequireAuth><AddMessage /></RequireAuth>} />
                 <Route path="/add-memories" element={<RequireAuth><AddMemories /></RequireAuth>} />
