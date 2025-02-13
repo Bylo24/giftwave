@@ -26,24 +26,24 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white pb-16">
-      <div className="p-4 space-y-4">
-        <div className="flex justify-center mb-6">
+    <div className="min-h-screen bg-gray-50 pb-16">
+      <div className="p-4 space-y-6 max-w-2xl mx-auto">
+        <div className="flex justify-center mb-8">
           <img 
             src="/lovable-uploads/d0eaee07-4183-4bee-82ec-c2b979790c51.png"
             alt="GiftWave Logo"
-            className="h-16 w-auto"
+            className="h-16 w-auto animate-fade-in"
           />
         </div>
 
-        <div className="flex items-center justify-between gap-4">
-          <div className="relative flex-1 max-w-[500px]">
+        <div className="flex items-center justify-between gap-4 animate-fade-in">
+          <div className="relative flex-1">
             <Search 
               className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer" 
               onClick={handleSearch}
             />
             <Input 
-              className="pl-10 bg-gray-50 cursor-text" 
+              className="pl-10 bg-white shadow-sm border-gray-100 rounded-xl" 
               placeholder="Search profiles or add contacts"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value)}
@@ -51,15 +51,15 @@ const Home = () => {
             />
           </div>
           <div 
-            className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors"
+            className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors bg-white shadow-sm"
             onClick={() => navigate("/notifications")}
           >
             <Bell className="h-6 w-6 text-gray-600" />
           </div>
         </div>
 
-        <div className="text-center space-y-1">
-          <h1 className="text-xl font-semibold text-gray-900">
+        <div className="text-center space-y-2 animate-fade-in">
+          <h1 className="text-2xl font-semibold text-gray-900">
             Welcome to GiftWave!
           </h1>
           <p className="text-sm text-gray-500">
@@ -69,14 +69,16 @@ const Home = () => {
 
         <div className="space-y-4">
           <Card 
-            className="p-6 space-y-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            className="p-6 space-y-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-blue-50 to-white shadow-sm border-0"
             onClick={() => navigate("/gift")}
           >
             <div className="flex justify-center">
-              <Gift className="h-12 w-12 text-primary" />
+              <div className="bg-blue-500/10 p-4 rounded-2xl">
+                <Gift className="h-12 w-12 text-blue-500" />
+              </div>
             </div>
             <div className="text-center space-y-2">
-              <h2 className="font-medium">Send someone a gift</h2>
+              <h2 className="font-medium text-lg">Send someone a gift</h2>
               <p className="text-sm text-gray-500">
                 Show them you care with a thoughtful gift
               </p>
@@ -84,14 +86,16 @@ const Home = () => {
           </Card>
 
           <Card 
-            className="p-6 space-y-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            className="p-6 space-y-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-green-50 to-white shadow-sm border-0"
             onClick={() => navigate("/my-gifts")}
           >
             <div className="flex justify-center">
-              <Gift className="h-12 w-12 text-secondary" />
+              <div className="bg-green-500/10 p-4 rounded-2xl">
+                <Gift className="h-12 w-12 text-green-500" />
+              </div>
             </div>
             <div className="text-center space-y-2">
-              <h2 className="font-medium">See my gifts</h2>
+              <h2 className="font-medium text-lg">See my gifts</h2>
               <p className="text-sm text-gray-500">
                 View all your sent and received gifts
               </p>
@@ -99,20 +103,20 @@ const Home = () => {
           </Card>
 
           <Card 
-            className="p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-50 transition-colors"
+            className="p-4 flex items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-pink-50 to-white shadow-sm border-0"
             onClick={() => navigate("/promo")}
           >
-            <div className="bg-pink-50 p-2 rounded-full">
+            <div className="bg-pink-500/10 p-3 rounded-xl">
               <Heart className="h-6 w-6 text-pink-500" />
             </div>
             <div className="flex-1">
-              <h3 className="font-medium">Enter your promo code</h3>
+              <h3 className="font-medium text-lg">Enter your promo code</h3>
               <p className="text-sm text-gray-500">Have a code? Enter it here</p>
             </div>
           </Card>
 
           {!user && (
-            <Card className="p-4">
+            <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-sm border-0">
               <div className="text-center space-y-4">
                 <p className="text-sm text-gray-500">
                   Sign in or create an account to start sending and receiving gifts!
@@ -120,7 +124,7 @@ const Home = () => {
                 <div className="flex gap-4 justify-center">
                   <button
                     onClick={() => navigate("/login")}
-                    className="px-4 py-2 bg-primary text-white rounded-md hover:bg-primary/90 transition-colors"
+                    className="px-6 py-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors shadow-sm hover:shadow-md"
                   >
                     Sign In
                   </button>
@@ -129,10 +133,10 @@ const Home = () => {
             </Card>
           )}
 
-          <Card className="p-4">
-            <h3 className="font-medium mb-4">Frequently Asked Questions</h3>
-            <ScrollArea className="h-[200px] w-full rounded-md">
-              <div className="space-y-4 pr-4">
+          <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-sm border-0">
+            <h3 className="font-medium text-lg mb-4">Frequently Asked Questions</h3>
+            <ScrollArea className="h-[200px] w-full rounded-xl">
+              <div className="space-y-6 pr-4">
                 <div className="space-y-2">
                   <h4 className="font-medium text-sm">How does GiftWave work?</h4>
                   <p className="text-sm text-gray-500">
