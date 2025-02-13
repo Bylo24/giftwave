@@ -1,7 +1,6 @@
-
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown } from "lucide-react";
+import { ArrowLeft, ChevronDown, X } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -118,6 +117,7 @@ const Gift = () => {
     y: number;
     rotation: number;
   }>>([]);
+  const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
 
   const goToPreviousStep = () => {
@@ -195,6 +195,15 @@ const Gift = () => {
           : sticker
       )
     );
+  };
+
+  const handleStickerTap = (stickerId: string) => {
+    setSelectedSticker(selectedSticker === stickerId ? null : stickerId);
+  };
+
+  const handleRemoveSticker = (stickerId: string) => {
+    setPlacedStickers(prev => prev.filter(sticker => sticker.id !== stickerId));
+    setSelectedSticker(null);
   };
 
   return (
@@ -280,6 +289,7 @@ const Gift = () => {
                   dragMomentum={false}
                   dragConstraints={cardRef}
                   onDragEnd={(event, info) => handleDragEnd(event, info, sticker.id)}
+                  onClick={() => handleStickerTap(sticker.id)}
                   style={{
                     x: sticker.x,
                     y: sticker.y,
@@ -288,6 +298,19 @@ const Gift = () => {
                   }}
                 >
                   {sticker.emoji}
+                  {selectedSticker === sticker.id && (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      className="absolute -top-3 -right-3 bg-red-500 rounded-full p-1 cursor-pointer"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveSticker(sticker.id);
+                      }}
+                    >
+                      <X className="h-3 w-3 text-white" />
+                    </motion.div>
+                  )}
                 </motion.div>
               ))}
             </AnimatePresence>
