@@ -1,6 +1,7 @@
+
 import { useState } from "react";
 import { motion, AnimatePresence, useMotionValue, useTransform } from "framer-motion";
-import { ChevronLeft, ChevronRight, Template, Sticker } from "lucide-react";
+import { ChevronLeft, ChevronRight, Layout, Sticker } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ThemeType, giftThemes, StickerPosition } from "@/utils/giftThemes";
@@ -107,7 +108,7 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="secondary" size="sm" className="bg-white/90 hover:bg-white">
-                    <Template className="h-4 w-4 mr-2" />
+                    <Layout className="h-4 w-4 mr-2" />
                     Templates
                   </Button>
                 </DialogTrigger>
