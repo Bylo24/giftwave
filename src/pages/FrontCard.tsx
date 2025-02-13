@@ -1,34 +1,51 @@
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
-import { ThemeSelector } from "@/components/gift/ThemeSelector";
-import { PatternSelector } from "@/components/gift/PatternSelector";
+import { ThemeOption, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
-import { stickerOptions } from "@/constants/giftOptions";
-import { useStickerManager } from "@/hooks/useStickerManager";
-import { Button } from "@/components/ui/button";
+import { PatternSelector } from "@/components/gift/PatternSelector";
+import { ThemeSelector } from "@/components/gift/ThemeSelector";
 import { ArrowLeft } from "lucide-react";
-import { ThemeOption } from "@/types/gift";
+import { Button } from "@/components/ui/button";
 
-const FrontCardContent = () => {
+interface FrontCardProps {
+  selectedThemeOption: ThemeOption;
+  placedStickers: Sticker[];
+  selectedSticker: string | null;
+  showStickers: boolean;
+  stickerOptions: Array<{ emoji: string; name: string }>;
+  onBack: () => void;
+  onNext: () => void;
+  onPatternChange: (type: 'dots' | 'grid' | 'waves' | 'none') => void;
+  onThemeChange: (theme: ThemeOption) => void;
+  onShowStickers: (show: boolean) => void;
+  onStickerClick: (emoji: string) => void;
+  onStickerTap: (stickerId: string) => void;
+  onStickerDragEnd: (event: any, info: any, stickerId: string) => void;
+  onStickerRemove: (stickerId: string) => void;
+  onStickerRotate: (stickerId: string, rotation: number) => void;
+}
+
+export const FrontCard = ({
+  selectedThemeOption,
+  placedStickers,
+  selectedSticker,
+  showStickers,
+  stickerOptions,
+  onPatternChange,
+  onThemeChange,
+  onShowStickers,
+  onStickerClick,
+  onStickerTap,
+  onStickerDragEnd,
+  onStickerRemove,
+  onStickerRotate
+}: FrontCardProps) => {
   const navigate = useNavigate();
-  const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
   const cardRef = useRef<HTMLDivElement>(null);
-  const {
-    placedStickers,
-    selectedSticker,
-    showStickers,
-    setShowStickers,
-    handleStickerClick,
-    handleStickerDragEnd,
-    handleStickerTap,
-    handleStickerRemove,
-    handleStickerRotate
-  } = useStickerManager();
 
-  const handleNext = () => {
-    navigate('/select-recipient');
+  const handleBackClick = () => {
+    navigate('/home');
   };
 
   const getPatternStyle = (pattern: ThemeOption['pattern']) => {
@@ -72,8 +89,8 @@ const FrontCardContent = () => {
       <div className="relative z-10 min-h-screen flex flex-col">
         <div className="flex items-center justify-between p-4">
           <button 
-            onClick={() => navigate(-1)}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-lg"
+            onClick={handleBackClick}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
@@ -81,11 +98,11 @@ const FrontCardContent = () => {
           <ThemeSelector
             themes={[selectedThemeOption]}
             selectedTheme={selectedThemeOption}
-            onThemeChange={setSelectedThemeOption}
+            onThemeChange={onThemeChange}
           />
           
           <Button 
-            onClick={handleNext}
+            onClick={() => navigate('/insideleftcard')}
             className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
             Next
@@ -123,23 +140,23 @@ const FrontCardContent = () => {
               stickers={placedStickers}
               selectedSticker={selectedSticker}
               cardRef={cardRef}
-              onStickerTap={handleStickerTap}
-              onStickerDragEnd={handleStickerDragEnd}
-              onStickerRemove={handleStickerRemove}
-              onStickerRotate={handleStickerRotate}
+              onStickerTap={onStickerTap}
+              onStickerDragEnd={onStickerDragEnd}
+              onStickerRemove={onStickerRemove}
+              onStickerRotate={onStickerRotate}
             />
           </div>
         </div>
 
         <PatternSelector
           currentPattern={selectedThemeOption.pattern.type}
-          onPatternChange={handlePatternChange}
+          onPatternChange={onPatternChange}
         />
 
         <div className="flex justify-center pb-8 relative">
           <div className="relative">
             <button 
-              onClick={() => setShowStickers(!showStickers)}
+              onClick={() => onShowStickers(!showStickers)}
               className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors"
             >
               <span className="text-2xl">⭐</span>
@@ -151,7 +168,7 @@ const FrontCardContent = () => {
                   <button 
                     key={index}
                     className="w-10 h-10 flex items-center justify-center hover:bg-white/50 rounded-full transition-colors"
-                    onClick={() => handleStickerClick(sticker.emoji)}
+                    onClick={() => onStickerClick(sticker.emoji)}
                   >
                     <span className="text-2xl">{sticker.emoji}</span>
                   </button>
@@ -164,13 +181,3 @@ const FrontCardContent = () => {
     </div>
   );
 };
-
-const FrontCard = () => {
-  return (
-    <ThemeProvider>
-      <FrontCardContent />
-    </ThemeProvider>
-  );
-};
-
-export default FrontCard;
