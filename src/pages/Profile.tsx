@@ -125,13 +125,13 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background transition-colors duration-200 pb-24">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 transition-colors duration-200 pb-24">
       <div className="p-4 space-y-4 max-w-2xl mx-auto">
         <div className="sticky top-0 z-10 backdrop-blur-lg bg-background/80 -mx-4 px-4 py-4 border-b border-border">
           <h1 className="text-xl font-semibold text-foreground">Profile Settings</h1>
         </div>
         
-        <Card className="p-6 bg-card/80 backdrop-blur-lg border-border shadow-lg">
+        <Card className="p-6 bg-white/70 backdrop-blur-lg border border-white/20 shadow-xl rounded-3xl">
           <ProfileHeader 
             user={user}
             profile={profile}
