@@ -1,5 +1,5 @@
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { ArrowLeft } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
 import { MessageStep } from "@/components/gift/MessageStep";
@@ -22,10 +22,8 @@ const videoFrames = [
 
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
-  const [isRecordingMessage, setIsRecordingMessage] = useState(false);
   const [selectedFrame, setSelectedFrame] = useState<string>('frame1');
   const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
-  const cardRef = useRef<HTMLDivElement>(null);
 
   return (
     <div 
@@ -59,7 +57,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
 
         <div className="flex-1 flex items-center justify-center px-4 pb-20">
           <div 
-            ref={cardRef}
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-4 transition-colors duration-300 relative`}
           >
             <div className="relative z-10 h-full flex flex-col items-center justify-center">
@@ -85,7 +82,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                       onClick={() => setIsRecordingModalOpen(true)}
                       className="bg-black/10 hover:bg-black/20 text-gray-700"
                     >
-                      Record or upload a video message
+                      Upload a video message
                     </Button>
                     <p className="text-sm text-gray-500 mt-2">Videos will be saved automatically</p>
                   </div>
@@ -126,9 +123,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           onClose={() => setIsRecordingModalOpen(false)}
           messageVideo={messageVideo}
           setMessageVideo={setMessageVideo}
-          isRecordingMessage={isRecordingMessage}
-          startMessageRecording={() => setIsRecordingMessage(true)}
-          stopMessageRecording={() => setIsRecordingMessage(false)}
           onNext={onNext}
         />
       </div>
