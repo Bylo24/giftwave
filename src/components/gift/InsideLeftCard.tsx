@@ -1,11 +1,12 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Upload } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { fetchFrames, Frame } from "@/utils/giftCardTemplates";
 
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
@@ -13,18 +14,31 @@ interface InsideLeftCardProps {
   onNext: () => void;
 }
 
-const videoFrames = [
-  { id: 'frame1', src: '/frames/frame1.png', name: 'Classic Gold' },
-  { id: 'frame2', src: '/frames/frame2.png', name: 'Modern Silver' },
-  { id: 'frame3', src: '/frames/frame3.png', name: 'Vintage Bronze' },
-  { id: 'frame4', src: '/frames/frame4.png', name: 'Floral' },
-  { id: 'frame5', src: '/frames/frame5.png', name: 'Minimalist' },
-];
-
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
-  const [selectedFrame, setSelectedFrame] = useState<string>('frame1');
+  const [selectedFrame, setSelectedFrame] = useState<string>('classic_gold');
   const [isUploading, setIsUploading] = useState(false);
+  const [frames, setFrames] = useState<Frame[]>([]);
+  const [isLoadingFrames, setIsLoadingFrames] = useState(true);
+
+  useEffect(() => {
+    const loadFrames = async () => {
+      try {
+        const framesData = await fetchFrames();
+        setFrames(framesData);
+        if (framesData.length > 0) {
+          setSelectedFrame(framesData[0].id);
+        }
+      } catch (error) {
+        console.error('Error loading frames:', error);
+        toast.error('Failed to load video frames');
+      } finally {
+        setIsLoadingFrames(false);
+      }
+    };
+
+    loadFrames();
+  }, []);
 
   const handleMessageUpload = async (file: File) => {
     if (file.type.startsWith('video/')) {
@@ -107,11 +121,16 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                       className="w-full h-full object-cover rounded-lg"
                       playsInline
                     />
-                    <img 
-                      src={videoFrames.find(f => f.id === selectedFrame)?.src}
-                      alt="Video frame"
-                      className="absolute inset-0 w-full h-full pointer-events-none"
-                    />
+                    {frames.map((frame) => (
+                      frame.id === selectedFrame && (
+                        <img 
+                          key={frame.id}
+                          src={frame.image_url}
+                          alt={frame.name}
+                          className="absolute inset-0 w-full h-full pointer-events-none"
+                        />
+                      )
+                    ))}
                   </>
                 ) : (
                   <div className="text-center">
@@ -146,23 +165,29 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           <div className="px-4 max-w-md mx-auto">
             <div className="overflow-x-auto">
               <div className="flex gap-3 pb-4">
-                {videoFrames.map((frame) => (
-                  <Card
-                    key={frame.id}
-                    className={`flex-shrink-0 w-20 h-20 cursor-pointer transition-all ${
-                      selectedFrame === frame.id 
-                        ? 'ring-2 ring-secondary scale-110' 
-                        : 'hover:scale-105'
-                    }`}
-                    onClick={() => setSelectedFrame(frame.id)}
-                  >
-                    <img
-                      src={frame.src}
-                      alt={frame.name}
-                      className="w-full h-full object-cover rounded-lg"
-                    />
-                  </Card>
-                ))}
+                {isLoadingFrames ? (
+                  <div className="flex justify-center w-full py-4">
+                    <div className="animate-pulse bg-gray-200 h-20 w-20 rounded-lg"></div>
+                  </div>
+                ) : (
+                  frames.map((frame) => (
+                    <Card
+                      key={frame.id}
+                      className={`flex-shrink-0 w-20 h-20 cursor-pointer transition-all ${
+                        selectedFrame === frame.id 
+                          ? 'ring-2 ring-secondary scale-110' 
+                          : 'hover:scale-105'
+                      }`}
+                      onClick={() => setSelectedFrame(frame.id)}
+                    >
+                      <img
+                        src={frame.image_url}
+                        alt={frame.name}
+                        className="w-full h-full object-cover rounded-lg"
+                      />
+                    </Card>
+                  ))
+                )}
               </div>
             </div>
           </div>

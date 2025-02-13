@@ -8,6 +8,13 @@ export interface GiftCardTemplate {
   image_url: string;
 }
 
+export interface Frame {
+  id: string;
+  name: string;
+  description: string | null;
+  image_url: string;
+}
+
 export const fetchTemplatesByTheme = async (theme: string) => {
   const { data, error } = await supabase
     .from('gift_card_templates')
@@ -20,6 +27,20 @@ export const fetchTemplatesByTheme = async (theme: string) => {
   }
 
   return data as GiftCardTemplate[];
+};
+
+export const fetchFrames = async (): Promise<Frame[]> => {
+  const { data, error } = await supabase
+    .from('frames')
+    .select('*')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Error fetching frames:', error);
+    throw error;
+  }
+
+  return data;
 };
 
 export const uploadGiftAsset = async (file: File, path: string) => {
