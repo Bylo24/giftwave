@@ -4,6 +4,7 @@ import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { StickerLayer } from "./StickerLayer";
+import { MessageStep } from "./MessageStep";
 
 interface Memory {
   imageUrl: string;
@@ -35,6 +36,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [showStickers, setShowStickers] = useState(false);
   const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
+  const [isRecordingMessage, setIsRecordingMessage] = useState(false);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -184,6 +186,13 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
           
           <button 
+            onClick={() => setIsRecordingMessage(true)}
+            className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
+          >
+            Add Video Message
+          </button>
+          
+          <button 
             onClick={onNext}
             className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
@@ -290,6 +299,14 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </div>
         </div>
       </div>
+
+      <MessageStep
+        isOpen={isRecordingMessage}
+        onClose={() => setIsRecordingMessage(false)}
+        messageVideo={messageVideo}
+        setMessageVideo={setMessageVideo}
+        onNext={onNext}
+      />
     </div>
   );
 };
