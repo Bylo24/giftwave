@@ -1,19 +1,11 @@
 import { useState, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { ArrowLeft, Upload, Image, Plus, DollarSign } from "lucide-react";
+import { ArrowLeft, Upload, Image, Plus, DollarSign, ArrowRight } from "lucide-react";
 import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { StickerLayer } from "./StickerLayer";
-interface Memory {
-  imageUrl: string;
-  caption: string;
-}
-interface InsideLeftCardProps {
-  selectedThemeOption: ThemeOption;
-  onBack: () => void;
-  onNext: () => void;
-}
+
 const stickerOptions = [{
   emoji: "⭐",
   name: "Star"
@@ -30,6 +22,18 @@ const stickerOptions = [{
   emoji: "💝",
   name: "Heart"
 }];
+
+interface Memory {
+  imageUrl: string;
+  caption: string;
+}
+
+interface InsideLeftCardProps {
+  selectedThemeOption: ThemeOption;
+  onBack: () => void;
+  onNext: () => void;
+}
+
 const InsideLeftCard = ({
   selectedThemeOption,
   onBack,
@@ -44,9 +48,11 @@ const InsideLeftCard = ({
   const [showStickers, setShowStickers] = useState(false);
   const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
+
   const handleNavigateToAmount = () => {
     onNext();
   };
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -56,6 +62,7 @@ const InsideLeftCard = ({
     }
     setPreviewImage(URL.createObjectURL(file));
   };
+
   const handleAddMemory = () => {
     if (!previewImage) {
       toast.error('Please upload a photo first');
@@ -78,6 +85,7 @@ const InsideLeftCard = ({
     setPreviewImage(null);
     setCaption('');
   };
+
   const handleStickerClick = (emoji: string) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -92,6 +100,7 @@ const InsideLeftCard = ({
     }]);
     setShowStickers(false);
   };
+
   const handleStickerDragEnd = (event: any, info: any, stickerId: string) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -107,19 +116,23 @@ const InsideLeftCard = ({
       y: constrainedY
     } : sticker));
   };
+
   const handleStickerTap = (stickerId: string) => {
     setSelectedSticker(selectedSticker === stickerId ? null : stickerId);
   };
+
   const handleStickerRemove = (stickerId: string) => {
     setPlacedStickers(prev => prev.filter(sticker => sticker.id !== stickerId));
     setSelectedSticker(null);
   };
+
   const handleStickerRotate = (stickerId: string, newRotation: number) => {
     setPlacedStickers(prev => prev.map(sticker => sticker.id === stickerId ? {
       ...sticker,
       rotation: newRotation
     } : sticker));
   };
+
   const renderMemoryCard = (memory: Memory | null, index: number) => {
     if (!memory) {
       return <div className="flex flex-col space-y-2 w-full">
@@ -139,6 +152,7 @@ const InsideLeftCard = ({
         <p className="text-sm text-center font-medium text-gray-800">{memory.caption}</p>
       </div>;
   };
+
   return <div className="min-h-screen relative transition-colors duration-300" style={{
     backgroundColor: selectedThemeOption.screenBgColor
   }}>
@@ -156,6 +170,7 @@ const InsideLeftCard = ({
           <button onClick={handleNavigateToAmount} className="flex items-center gap-2 px-6 py-2 rounded-full font-medium shadow-lg transition-colors bg-slate-50 text-gray-950">
             <DollarSign className="h-4 w-4" />
             Select Amount
+            <ArrowRight className="h-4 w-4" />
           </button>
         </div>
 
@@ -212,4 +227,5 @@ const InsideLeftCard = ({
       </div>
     </div>;
 };
+
 export default InsideLeftCard;
