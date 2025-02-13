@@ -122,7 +122,7 @@ const FrontCardContent = () => {
             <StickerLayer
               stickers={placedStickers}
               selectedSticker={selectedSticker}
-              cardRef={cardRef.current}
+              cardRef={cardRef}
               onStickerTap={handleStickerTap}
               onStickerDragEnd={handleStickerDragEnd}
               onStickerRemove={handleStickerRemove}
