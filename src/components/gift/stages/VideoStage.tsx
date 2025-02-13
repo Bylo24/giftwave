@@ -26,4 +26,3 @@ export const VideoStage = ({ videoUrl }: VideoStageProps) => {
     </motion.div>
   );
 };
-
