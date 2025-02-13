@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, ChevronDown, X } from "lucide-react";
+import { ArrowLeft, ChevronDown, X, Grid, Circle, Waves } from "lucide-react";
 import { ThemeType } from "@/utils/giftThemes";
 import { motion, AnimatePresence } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
 interface ThemeOption {
   text: string;
@@ -135,6 +136,16 @@ const Gift = () => {
     setCurrentStep(nextStep);
   };
 
+  const handlePatternChange = (type: 'dots' | 'grid' | 'waves') => {
+    setSelectedThemeOption(prev => ({
+      ...prev,
+      pattern: {
+        ...prev.pattern,
+        type
+      }
+    }));
+  };
+
   const getPatternStyle = (pattern: ThemeOption['pattern']) => {
     switch (pattern.type) {
       case 'dots':
@@ -164,17 +175,16 @@ const Gift = () => {
 
     const rect = cardRef.current.getBoundingClientRect();
     const padding = 40;
+    const centerX = rect.width / 2 - padding;
+    const centerY = rect.height / 2 - padding;
 
-    // Ensure position is relative to card's dimensions
-    const position = {
+    setPlacedStickers(prev => [...prev, {
       id: `${emoji}-${Date.now()}`,
       emoji,
-      x: padding + Math.random() * (rect.width - padding * 2),
-      y: padding + Math.random() * (rect.height - padding * 2),
+      x: centerX,
+      y: centerY,
       rotation: Math.random() * 30 - 15
-    };
-
-    setPlacedStickers(prev => [...prev, position]);
+    }]);
     setShowStickers(false);
   };
 
@@ -283,19 +293,19 @@ const Gift = () => {
                 <motion.div
                   key={sticker.id}
                   className="absolute text-4xl cursor-move"
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
+                  initial={{ scale: 0, x: sticker.x, y: sticker.y }}
+                  animate={{ 
+                    scale: 1,
+                    x: sticker.x,
+                    y: sticker.y,
+                    rotate: sticker.rotation 
+                  }}
                   drag
                   dragMomentum={false}
                   dragConstraints={cardRef}
                   onDragEnd={(event, info) => handleDragEnd(event, info, sticker.id)}
                   onClick={() => handleStickerTap(sticker.id)}
-                  style={{
-                    x: sticker.x,
-                    y: sticker.y,
-                    rotate: sticker.rotation,
-                    touchAction: 'none'
-                  }}
+                  style={{ touchAction: 'none' }}
                 >
                   {sticker.emoji}
                   {selectedSticker === sticker.id && (
@@ -315,6 +325,33 @@ const Gift = () => {
               ))}
             </AnimatePresence>
           </div>
+        </div>
+
+        <div className="flex justify-center gap-2 mb-4 px-4">
+          <Button
+            variant={selectedThemeOption.pattern.type === 'dots' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => handlePatternChange('dots')}
+            className="w-10 h-10"
+          >
+            <Circle className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={selectedThemeOption.pattern.type === 'grid' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => handlePatternChange('grid')}
+            className="w-10 h-10"
+          >
+            <Grid className="h-4 w-4" />
+          </Button>
+          <Button
+            variant={selectedThemeOption.pattern.type === 'waves' ? 'default' : 'outline'}
+            size="icon"
+            onClick={() => handlePatternChange('waves')}
+            className="w-10 h-10"
+          >
+            <Waves className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="p-4">
