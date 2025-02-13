@@ -35,6 +35,7 @@ export const StickerLayer: React.FC<StickerLayerProps> = ({
               y: sticker.y,
               rotate: sticker.rotation 
             }}
+            transition={{ duration: 0.15 }} // Sped up the animation
             drag
             dragMomentum={false}
             dragConstraints={cardRef}
@@ -47,6 +48,7 @@ export const StickerLayer: React.FC<StickerLayerProps> = ({
               <motion.div
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
+                transition={{ duration: 0.15 }} // Matched the timing
                 className="absolute -top-3 -right-3 bg-red-500 rounded-full p-1 cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();

@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -222,21 +223,19 @@ const Gift = () => {
           </button>
         </div>
 
-        <PatternSelector
-          currentPattern={selectedThemeOption.pattern.type}
-          onPatternChange={handlePatternChange}
-        />
-
         <div className="flex-1 flex items-center justify-center px-4">
           <div 
             ref={cardRef}
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container overflow-hidden`}
-            style={{
-              ...getPatternStyle(selectedThemeOption.pattern),
-              position: 'relative'
-            }}
+            style={{ position: 'relative' }}
           >
-            <div className="h-full flex flex-col items-center justify-center space-y-8 pointer-events-none">
+            {/* Background pattern div moved below content */}
+            <div 
+              className="absolute inset-0 z-0" 
+              style={getPatternStyle(selectedThemeOption.pattern)}
+            />
+            
+            <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8 pointer-events-none">
               <div className="text-center">
                 {selectedThemeOption.text.split('').map((letter, index) => (
                   <span 
@@ -263,6 +262,11 @@ const Gift = () => {
             />
           </div>
         </div>
+
+        <PatternSelector
+          currentPattern={selectedThemeOption.pattern.type}
+          onPatternChange={handlePatternChange}
+        />
 
         <div className="p-4">
           <div className="flex justify-center max-w-md mx-auto relative">
