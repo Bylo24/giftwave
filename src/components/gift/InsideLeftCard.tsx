@@ -1,5 +1,5 @@
 import { useState, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { ArrowLeft, Upload, Image, Plus } from "lucide-react";
 import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
@@ -27,6 +27,7 @@ const stickerOptions = [
 
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const cardRef = useRef<HTMLDivElement>(null);
   const [caption, setCaption] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -36,7 +37,8 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
 
   const handleNext = () => {
-    navigate('/gift');
+    const timestamp = Date.now();
+    navigate(`/gift?instance=${timestamp}`, { replace: false });
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
