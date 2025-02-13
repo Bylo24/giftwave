@@ -26,152 +26,147 @@ const Home = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-16">
-      <div className="p-4 space-y-6 max-w-2xl mx-auto">
-        <div className="flex justify-center mb-8">
+    <div className="min-h-screen bg-white">
+      {/* Header Section */}
+      <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2 shadow-sm">
+        <div className="flex items-center justify-between gap-4 mb-4">
           <img 
             src="/lovable-uploads/d0eaee07-4183-4bee-82ec-c2b979790c51.png"
             alt="GiftWave Logo"
-            className="h-16 w-auto animate-fade-in"
+            className="h-8 w-auto"
           />
-        </div>
-
-        <div className="flex items-center justify-between gap-4 animate-fade-in">
-          <div className="relative flex-1">
-            <Search 
-              className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4 cursor-pointer" 
-              onClick={handleSearch}
-            />
-            <Input 
-              className="pl-10 bg-white shadow-sm border-gray-100 rounded-xl" 
-              placeholder="Search profiles or add contacts"
-              value={searchInput}
-              onChange={(e) => setSearchInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-            />
-          </div>
           <div 
-            className="cursor-pointer p-2 hover:bg-gray-100 rounded-full transition-colors bg-white shadow-sm"
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
             onClick={() => navigate("/notifications")}
           >
-            <Bell className="h-6 w-6 text-gray-600" />
+            <Bell className="h-6 w-6 text-gray-700" />
           </div>
         </div>
 
-        <div className="text-center space-y-2 animate-fade-in">
-          <h1 className="text-2xl font-semibold text-gray-900">
-            Welcome to GiftWave!
-          </h1>
-          <p className="text-sm text-gray-500">
-            What would you like to do first?
-          </p>
-        </div>
-
-        <div className="space-y-4">
-          <Card 
-            className="p-6 space-y-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-blue-50 to-white shadow-sm border-0"
-            onClick={() => navigate("/gift")}
-          >
-            <div className="flex justify-center">
-              <div className="bg-blue-500/10 p-4 rounded-2xl">
-                <Gift className="h-12 w-12 text-blue-500" />
-              </div>
-            </div>
-            <div className="text-center space-y-2">
-              <h2 className="font-medium text-lg">Send someone a gift</h2>
-              <p className="text-sm text-gray-500">
-                Show them you care with a thoughtful gift
-              </p>
-            </div>
-          </Card>
-
-          <Card 
-            className="p-6 space-y-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-green-50 to-white shadow-sm border-0"
-            onClick={() => navigate("/my-gifts")}
-          >
-            <div className="flex justify-center">
-              <div className="bg-green-500/10 p-4 rounded-2xl">
-                <Gift className="h-12 w-12 text-green-500" />
-              </div>
-            </div>
-            <div className="text-center space-y-2">
-              <h2 className="font-medium text-lg">See my gifts</h2>
-              <p className="text-sm text-gray-500">
-                View all your sent and received gifts
-              </p>
-            </div>
-          </Card>
-
-          <Card 
-            className="p-4 flex items-center gap-4 cursor-pointer hover:scale-[1.02] transition-all duration-300 bg-gradient-to-br from-pink-50 to-white shadow-sm border-0"
-            onClick={() => navigate("/promo")}
-          >
-            <div className="bg-pink-500/10 p-3 rounded-xl">
-              <Heart className="h-6 w-6 text-pink-500" />
-            </div>
-            <div className="flex-1">
-              <h3 className="font-medium text-lg">Enter your promo code</h3>
-              <p className="text-sm text-gray-500">Have a code? Enter it here</p>
-            </div>
-          </Card>
-
-          {!user && (
-            <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-sm border-0">
-              <div className="text-center space-y-4">
-                <p className="text-sm text-gray-500">
-                  Sign in or create an account to start sending and receiving gifts!
-                </p>
-                <div className="flex gap-4 justify-center">
-                  <button
-                    onClick={() => navigate("/login")}
-                    className="px-6 py-2.5 bg-blue-500 text-white rounded-xl hover:bg-blue-600 transition-colors shadow-sm hover:shadow-md"
-                  >
-                    Sign In
-                  </button>
-                </div>
-              </div>
-            </Card>
-          )}
-
-          <Card className="p-6 bg-gradient-to-br from-gray-50 to-white shadow-sm border-0">
-            <h3 className="font-medium text-lg mb-4">Frequently Asked Questions</h3>
-            <ScrollArea className="h-[200px] w-full rounded-xl">
-              <div className="space-y-6 pr-4">
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">How does GiftWave work?</h4>
-                  <p className="text-sm text-gray-500">
-                    GiftWave lets you send digital gifts to your friends and family. Choose a gift, add a personal message, and we'll deliver it instantly!
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">What types of gifts can I send?</h4>
-                  <p className="text-sm text-gray-500">
-                    You can send digital gift cards, custom messages, and even schedule future gifts for special occasions.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">How do I redeem a gift?</h4>
-                  <p className="text-sm text-gray-500">
-                    When you receive a gift, you'll get a notification. Simply click on the gift to view and redeem it instantly.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Can I send gifts internationally?</h4>
-                  <p className="text-sm text-gray-500">
-                    Yes! GiftWave works globally, allowing you to send gifts to friends and family anywhere in the world.
-                  </p>
-                </div>
-                <div className="space-y-2">
-                  <h4 className="font-medium text-sm">Are there any fees?</h4>
-                  <p className="text-sm text-gray-500">
-                    GiftWave keeps things simple! We charge a small fee to ensure secure transactions, high-quality video messages, and a seamless gifting experience. This helps us keep the platform running smoothly while adding those special touches that make your gifts feel truly personal.
-                  </p>
-                </div>
-              </div>
-            </ScrollArea>
-          </Card>
+        <div className="relative">
+          <Search 
+            className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" 
+            onClick={handleSearch}
+          />
+          <Input 
+            className="pl-10 bg-gray-100 border-0 rounded-full text-sm" 
+            placeholder="Search profiles or add contacts"
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyPress={handleKeyPress}
+          />
         </div>
       </div>
+
+      {/* Main Content */}
+      <div className="px-4 py-6 space-y-6 pb-24">
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 gap-4">
+          <Card 
+            className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-blue-50 via-white to-white border-0"
+            onClick={() => navigate("/gift")}
+          >
+            <div className="flex flex-col items-center space-y-3">
+              <div className="bg-blue-100 p-3 rounded-xl">
+                <Gift className="h-6 w-6 text-blue-600" />
+              </div>
+              <div className="text-center">
+                <h2 className="font-medium text-sm">Send a Gift</h2>
+                <p className="text-xs text-gray-500 mt-1">Show you care</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card 
+            className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-green-50 via-white to-white border-0"
+            onClick={() => navigate("/my-gifts")}
+          >
+            <div className="flex flex-col items-center space-y-3">
+              <div className="bg-green-100 p-3 rounded-xl">
+                <Gift className="h-6 w-6 text-green-600" />
+              </div>
+              <div className="text-center">
+                <h2 className="font-medium text-sm">My Gifts</h2>
+                <p className="text-xs text-gray-500 mt-1">View history</p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Promo Section */}
+        <Card 
+          className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-pink-50 via-white to-white border-0"
+          onClick={() => navigate("/promo")}
+        >
+          <div className="flex items-center gap-4">
+            <div className="bg-pink-100 p-2.5 rounded-xl">
+              <Heart className="h-5 w-5 text-pink-600" />
+            </div>
+            <div>
+              <h3 className="font-medium text-sm">Got a promo code?</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Tap here to enter it</p>
+            </div>
+          </div>
+        </Card>
+
+        {/* Sign In Card */}
+        {!user && (
+          <Card className="p-4 bg-gradient-to-b from-gray-50 to-white border-0">
+            <div className="text-center space-y-3">
+              <p className="text-sm text-gray-600">
+                Sign in to start sending gifts
+              </p>
+              <button
+                onClick={() => navigate("/login")}
+                className="w-full px-4 py-2.5 bg-black text-white rounded-full hover:bg-gray-800 transition-colors text-sm font-medium"
+              >
+                Sign In
+              </button>
+            </div>
+          </Card>
+        )}
+
+        {/* FAQ Section */}
+        <div className="bg-white rounded-xl">
+          <h3 className="font-medium text-base mb-4 px-1">Common Questions</h3>
+          <ScrollArea className="h-[280px]">
+            <div className="space-y-5 pr-4">
+              <div className="space-y-1.5">
+                <h4 className="font-medium text-sm">How does GiftWave work?</h4>
+                <p className="text-xs leading-relaxed text-gray-600">
+                  GiftWave lets you send digital gifts to your friends and family. Choose a gift, add a personal message, and we'll deliver it instantly!
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <h4 className="font-medium text-sm">What types of gifts can I send?</h4>
+                <p className="text-xs leading-relaxed text-gray-600">
+                  You can send digital gift cards, custom messages, and even schedule future gifts for special occasions.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <h4 className="font-medium text-sm">How do I redeem a gift?</h4>
+                <p className="text-xs leading-relaxed text-gray-600">
+                  When you receive a gift, you'll get a notification. Simply click on the gift to view and redeem it instantly.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <h4 className="font-medium text-sm">Can I send gifts internationally?</h4>
+                <p className="text-xs leading-relaxed text-gray-600">
+                  Yes! GiftWave works globally, allowing you to send gifts to friends and family anywhere in the world.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <h4 className="font-medium text-sm">Are there any fees?</h4>
+                <p className="text-xs leading-relaxed text-gray-600">
+                  GiftWave keeps things simple! We charge a small fee to ensure secure transactions, high-quality video messages, and a seamless gifting experience.
+                </p>
+              </div>
+            </div>
+          </ScrollArea>
+        </div>
+      </div>
+
+      {/* Bottom Navigation */}
       <BottomNav />
     </div>
   );
