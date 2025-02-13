@@ -45,15 +45,17 @@ export const LoginForm = () => {
             </div>
           </div>
 
-          <div className="flex justify-center">
-            <GoogleAuthButton isLoading={isLoading} />
-          </div>
+          <div className="flex flex-col space-y-6">
+            <div className="flex justify-center">
+              <GoogleAuthButton isLoading={isLoading} />
+            </div>
 
-          <AuthToggle
-            isSignUp={isSignUp}
-            setIsSignUp={setIsSignUp}
-            isLoading={isLoading}
-          />
+            <AuthToggle
+              isSignUp={isSignUp}
+              setIsSignUp={setIsSignUp}
+              isLoading={isLoading}
+            />
+          </div>
         </div>
       </div>
     </div>
