@@ -37,3 +37,4 @@ export const MemoryStage = ({ memory }: MemoryStageProps) => {
     </motion.div>
   );
 };
+

@@ -75,12 +75,6 @@ const GiftContent = () => {
   const goToNextStep = () => {
     if (currentStep === 'memory') {
       setPreviousSteps(prev => [...prev, currentStep]);
-      setCurrentStep('amount');
-      return;
-    }
-
-    if (currentStep === 'amount') {
-      setPreviousSteps(prev => [...prev, currentStep]);
       setCurrentStep('reveal');
       return;
     }
