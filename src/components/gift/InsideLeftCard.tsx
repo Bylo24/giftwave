@@ -118,7 +118,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                     <input 
                       type="file" 
                       accept="video/*"
-                      capture="user"
                       className="hidden" 
                       id="video-upload"
                       onChange={handleFileChange}
