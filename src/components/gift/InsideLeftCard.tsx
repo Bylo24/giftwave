@@ -21,6 +21,8 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
     const file = event.target.files?.[0];
     if (!file) return;
 
+    console.log('Selected file:', file.name, file.type);
+
     if (!file.type.startsWith('video/')) {
       toast.error('Please upload a video file');
       return;
@@ -28,24 +30,32 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
 
     setIsUploading(true);
     try {
-      const fileName = `${Date.now()}-${file.name}`;
+      const fileName = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '')}`;
+      console.log('Uploading file:', fileName);
       
-      const { error: uploadError } = await supabase.storage
+      const { data, error: uploadError } = await supabase.storage
         .from('gift_videos')
         .upload(fileName, file);
 
-      if (uploadError) throw uploadError;
+      console.log('Upload response:', { data, error: uploadError });
+
+      if (uploadError) {
+        console.error('Upload error details:', uploadError);
+        throw uploadError;
+      }
 
       const { data: { publicUrl } } = supabase.storage
         .from('gift_videos')
         .getPublicUrl(fileName);
+
+      console.log('Public URL:', publicUrl);
 
       setMessageVideo(file);
       setVideoUrl(publicUrl);
       toast.success('Video uploaded successfully!');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Failed to upload video');
+      toast.error('Failed to upload video. Please try again.');
     } finally {
       setIsUploading(false);
     }
@@ -110,7 +120,9 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                     >
                       <Button
                         disabled={isUploading}
-                        className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
+                        variant="outline"
+                        size="lg"
+                        className="bg-white/90 backdrop-blur-sm text-gray-800 shadow-lg hover:bg-white/95"
                       >
                         <Upload className="mr-2 h-5 w-5" />
                         {isUploading ? 'Uploading...' : 'Upload Video'}
