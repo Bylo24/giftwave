@@ -4,6 +4,7 @@ import { ArrowLeft, Upload } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { MemoryStage } from "./stages/MemoryStage";
 
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
@@ -15,6 +16,18 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isUploading, setIsUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
+
+  // Demo memories - in a real app these would come from props or an API
+  const demoMemories = [
+    {
+      imageUrl: "https://images.unsplash.com/photo-1522673607200-164d1627a267?auto=format&fit=crop&w=300",
+      caption: "That time we went on an adventure"
+    },
+    {
+      imageUrl: "https://images.unsplash.com/photo-1516205651411-aef33a44f7c2?auto=format&fit=crop&w=300",
+      caption: "Remember this moment?"
+    }
+  ];
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -90,6 +103,16 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
         </div>
 
+        {/* Memories Section */}
+        <div className="px-4 py-6 space-y-4">
+          <div className="grid grid-cols-2 gap-4 max-w-2xl mx-auto">
+            {demoMemories.map((memory, index) => (
+              <MemoryStage key={index} memory={memory} />
+            ))}
+          </div>
+        </div>
+
+        {/* Card Section */}
         <div className="flex-1 flex items-center justify-center px-4 pb-20">
           <div 
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-4 transition-colors duration-300 relative`}
