@@ -44,7 +44,7 @@ const InsideLeftCardContent = () => {
       showStickers={showStickers}
       stickerOptions={stickerOptions}
       onBack={() => navigate(-1)}
-      onNext={() => navigate('/add-memories')}
+      onNext={() => navigate('/insiderightcard')}
       onPatternChange={handlePatternChange}
       onShowStickers={setShowStickers}
       onStickerClick={handleStickerClick}
