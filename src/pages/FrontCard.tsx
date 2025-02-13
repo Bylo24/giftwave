@@ -7,42 +7,25 @@ import { PatternSelector } from "@/components/gift/PatternSelector";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
+import { useStickerManager } from "@/hooks/useStickerManager";
+import { stickerOptions } from "@/constants/giftOptions";
 
-interface FrontCardProps {
-  selectedThemeOption: ThemeOption;
-  placedStickers: Sticker[];
-  selectedSticker: string | null;
-  showStickers: boolean;
-  stickerOptions: Array<{ emoji: string; name: string }>;
-  onBack: () => void;
-  onNext: () => void;
-  onPatternChange: (type: 'dots' | 'grid' | 'waves' | 'none') => void;
-  onThemeChange: (theme: ThemeOption) => void;
-  onShowStickers: (show: boolean) => void;
-  onStickerClick: (emoji: string) => void;
-  onStickerTap: (stickerId: string) => void;
-  onStickerDragEnd: (event: any, info: any, stickerId: string) => void;
-  onStickerRemove: (stickerId: string) => void;
-  onStickerRotate: (stickerId: string, rotation: number) => void;
-}
-
-export const FrontCard = ({
-  selectedThemeOption,
-  placedStickers,
-  selectedSticker,
-  showStickers,
-  stickerOptions,
-  onPatternChange,
-  onThemeChange,
-  onShowStickers,
-  onStickerClick,
-  onStickerTap,
-  onStickerDragEnd,
-  onStickerRemove,
-  onStickerRotate
-}: FrontCardProps) => {
+const FrontCardContent = () => {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
+  const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
+  const {
+    placedStickers,
+    selectedSticker,
+    showStickers,
+    setShowStickers,
+    handleStickerClick,
+    handleStickerDragEnd,
+    handleStickerTap,
+    handleStickerRemove,
+    handleStickerRotate
+  } = useStickerManager();
 
   const handleBackClick = () => {
     navigate('/home');
@@ -98,7 +81,7 @@ export const FrontCard = ({
           <ThemeSelector
             themes={[selectedThemeOption]}
             selectedTheme={selectedThemeOption}
-            onThemeChange={onThemeChange}
+            onThemeChange={setSelectedThemeOption}
           />
           
           <Button 
@@ -140,23 +123,23 @@ export const FrontCard = ({
               stickers={placedStickers}
               selectedSticker={selectedSticker}
               cardRef={cardRef}
-              onStickerTap={onStickerTap}
-              onStickerDragEnd={onStickerDragEnd}
-              onStickerRemove={onStickerRemove}
-              onStickerRotate={onStickerRotate}
+              onStickerTap={handleStickerTap}
+              onStickerDragEnd={handleStickerDragEnd}
+              onStickerRemove={handleStickerRemove}
+              onStickerRotate={handleStickerRotate}
             />
           </div>
         </div>
 
         <PatternSelector
           currentPattern={selectedThemeOption.pattern.type}
-          onPatternChange={onPatternChange}
+          onPatternChange={handlePatternChange}
         />
 
         <div className="flex justify-center pb-8 relative">
           <div className="relative">
             <button 
-              onClick={() => onShowStickers(!showStickers)}
+              onClick={() => setShowStickers(!showStickers)}
               className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors"
             >
               <span className="text-2xl">⭐</span>
@@ -168,7 +151,7 @@ export const FrontCard = ({
                   <button 
                     key={index}
                     className="w-10 h-10 flex items-center justify-center hover:bg-white/50 rounded-full transition-colors"
-                    onClick={() => onStickerClick(sticker.emoji)}
+                    onClick={() => handleStickerClick(sticker.emoji)}
                   >
                     <span className="text-2xl">{sticker.emoji}</span>
                   </button>
@@ -179,5 +162,13 @@ export const FrontCard = ({
         </div>
       </div>
     </div>
+  );
+};
+
+export const FrontCard = () => {
+  return (
+    <ThemeProvider>
+      <FrontCardContent />
+    </ThemeProvider>
   );
 };
