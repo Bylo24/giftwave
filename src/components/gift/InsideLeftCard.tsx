@@ -1,12 +1,10 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ArrowLeft, Upload } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchFrames, Frame } from "@/utils/giftCardTemplates";
 
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
@@ -16,30 +14,8 @@ interface InsideLeftCardProps {
 
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
-  const [selectedFrame, setSelectedFrame] = useState<string>('classic_gold');
   const [isUploading, setIsUploading] = useState(false);
-  const [frames, setFrames] = useState<Frame[]>([]);
-  const [isLoadingFrames, setIsLoadingFrames] = useState(true);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-
-  useEffect(() => {
-    const loadFrames = async () => {
-      try {
-        const framesData = await fetchFrames();
-        setFrames(framesData);
-        if (framesData.length > 0) {
-          setSelectedFrame(framesData[0].id);
-        }
-      } catch (error) {
-        console.error('Error loading frames:', error);
-        toast.error('Failed to load video frames');
-      } finally {
-        setIsLoadingFrames(false);
-      }
-    };
-
-    loadFrames();
-  }, []);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -112,24 +88,12 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
             <div className="relative z-10 h-full flex flex-col items-center justify-center">
               <div className="w-full h-[85%] rounded-lg flex items-center justify-center overflow-hidden relative">
                 {messageVideo ? (
-                  <>
-                    <video
-                      src={videoUrl}
-                      controls
-                      className="w-full h-full object-cover rounded-lg"
-                      playsInline
-                    />
-                    {frames.map((frame) => (
-                      frame.id === selectedFrame && (
-                        <img 
-                          key={frame.id}
-                          src={frame.image_url}
-                          alt={frame.name}
-                          className="absolute inset-0 w-full h-full pointer-events-none"
-                        />
-                      )
-                    ))}
-                  </>
+                  <video
+                    src={videoUrl}
+                    controls
+                    className="w-full h-full object-cover rounded-lg"
+                    playsInline
+                  />
                 ) : (
                   <div className="text-center">
                     <input
@@ -153,38 +117,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                       </Button>
                     </label>
                   </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div className="absolute bottom-0 left-0 right-0 pb-8">
-          <div className="px-4 max-w-md mx-auto">
-            <div className="overflow-x-auto">
-              <div className="flex gap-3 pb-4">
-                {isLoadingFrames ? (
-                  <div className="flex justify-center w-full py-4">
-                    <div className="animate-pulse bg-gray-200 h-20 w-20 rounded-lg"></div>
-                  </div>
-                ) : (
-                  frames.map((frame) => (
-                    <Card
-                      key={frame.id}
-                      className={`flex-shrink-0 w-20 h-20 cursor-pointer transition-all ${
-                        selectedFrame === frame.id 
-                          ? 'ring-2 ring-secondary scale-110' 
-                          : 'hover:scale-105'
-                      }`}
-                      onClick={() => setSelectedFrame(frame.id)}
-                    >
-                      <img
-                        src={frame.image_url}
-                        alt={frame.name}
-                        className="w-full h-full object-cover rounded-lg"
-                      />
-                    </Card>
-                  ))
                 )}
               </div>
             </div>
