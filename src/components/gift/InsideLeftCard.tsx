@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { ArrowLeft, Upload, Image, Plus } from "lucide-react";
 import { ThemeOption, PatternType, Sticker } from "@/types/gift";
