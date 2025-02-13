@@ -9,6 +9,7 @@ import { BlankCard } from "@/components/gift/cards/BlankCard";
 import { useStickerManager } from "@/hooks/useStickerManager";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { stickerOptions } from "@/constants/giftOptions";
+import { toast } from "sonner";
 
 const GiftContent = () => {
   const navigate = useNavigate();
@@ -25,14 +26,7 @@ const GiftContent = () => {
   const stickerManager = useStickerManager();
 
   const handleDuplicatePage = () => {
-    const timeoutId = setTimeout(() => {
-      navigate('/blank');
-    }, 0);
-
-    setCurrentStep('memory');
-    setCurrentPage('front');
-
-    return () => clearTimeout(timeoutId);
+    navigate('/preview');
   };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
