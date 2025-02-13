@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -124,17 +124,17 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                     />
                     <label 
                       htmlFor="video-upload"
-                      className="cursor-pointer inline-block"
+                      className="cursor-pointer inline-flex flex-col items-center gap-2"
                     >
                       <Button
-                        variant="ghost"
-                        className="bg-black/10 hover:bg-black/20 text-gray-700"
-                        disabled={isUploading}
+                        size="lg"
+                        className="bg-white hover:bg-white/90"
                       >
-                        {isUploading ? 'Uploading...' : 'Upload/Record a video message'}
+                        <Upload className="mr-2 h-5 w-5" />
+                        Upload Video
                       </Button>
+                      <p className="text-sm text-gray-500">Select a video from your device</p>
                     </label>
-                    <p className="text-sm text-gray-500 mt-2">Videos will be saved automatically</p>
                   </div>
                 )}
               </div>
