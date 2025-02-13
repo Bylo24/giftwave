@@ -2,7 +2,7 @@
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
-import { Search, Gift, Heart, Bell } from "lucide-react";
+import { Search, Gift, Heart, Bell, Video, CreditCard, Zap, Palette, ArrowRight, ChevronRight, Phone, Upload, DollarSign, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -25,9 +25,25 @@ const Home = () => {
     }
   };
 
+  const steps = [
+    { icon: Phone, text: "Choose recipient by phone number" },
+    { icon: Video, text: "Record a video message" },
+    { icon: DollarSign, text: "Select amount and pay" },
+    { icon: Gift, text: "They open an interactive gift" },
+    { icon: Zap, text: "Instant claiming" }
+  ];
+
+  const features = [
+    { icon: Video, title: "Video Messages", description: "Make your gift feel more personal", color: "blue" },
+    { icon: Gift, title: "Animated Gift Reveal", description: "Fun, interactive unwrapping", color: "green" },
+    { icon: CreditCard, title: "Secure Payments", description: "Card, wallet, or bank transfer", color: "purple" },
+    { icon: Zap, title: "Instant Claiming", description: "Claim gifts immediately", color: "yellow" },
+    { icon: Palette, title: "Personalized Cards", description: "Customize with stickers & themes", color: "pink" }
+  ];
+
   return (
     <div className="min-h-screen bg-white">
-      {/* Header Section */}
+      {/* Header */}
       <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2 shadow-sm">
         <div className="flex items-center justify-between gap-4 mb-4">
           <img 
@@ -59,55 +75,96 @@ const Home = () => {
       </div>
 
       {/* Main Content */}
-      <div className="px-4 py-6 space-y-6 pb-24">
-        {/* Quick Actions */}
-        <div className="grid grid-cols-2 gap-4">
-          <Card 
-            className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-blue-50 via-white to-white border-0"
+      <div className="px-4 py-6 space-y-8 pb-24">
+        {/* Hero Section */}
+        <div className="text-center space-y-4">
+          <h1 className="text-2xl font-semibold text-gray-900">
+            Send Money as a Gift, Instantly & Personally
+          </h1>
+          <p className="text-gray-600 text-sm">
+            Personalized video messages, interactive gift reveals, and secure payments.
+          </p>
+          <button
             onClick={() => navigate("/gift")}
+            className="w-full px-6 py-3 bg-black text-white rounded-full hover:bg-gray-800 transition-colors font-medium"
           >
-            <div className="flex flex-col items-center space-y-3">
-              <div className="bg-blue-100 p-3 rounded-xl">
-                <Gift className="h-6 w-6 text-blue-600" />
-              </div>
-              <div className="text-center">
-                <h2 className="font-medium text-sm">Send a Gift</h2>
-                <p className="text-xs text-gray-500 mt-1">Show you care</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card 
-            className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-green-50 via-white to-white border-0"
-            onClick={() => navigate("/my-gifts")}
-          >
-            <div className="flex flex-col items-center space-y-3">
-              <div className="bg-green-100 p-3 rounded-xl">
-                <Gift className="h-6 w-6 text-green-600" />
-              </div>
-              <div className="text-center">
-                <h2 className="font-medium text-sm">My Gifts</h2>
-                <p className="text-xs text-gray-500 mt-1">View history</p>
-              </div>
-            </div>
-          </Card>
+            Send a Gift Now
+          </button>
         </div>
 
-        {/* Promo Section */}
-        <Card 
-          className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-pink-50 via-white to-white border-0"
-          onClick={() => navigate("/promo")}
-        >
-          <div className="flex items-center gap-4">
-            <div className="bg-pink-100 p-2.5 rounded-xl">
-              <Heart className="h-5 w-5 text-pink-600" />
-            </div>
-            <div>
-              <h3 className="font-medium text-sm">Got a promo code?</h3>
-              <p className="text-xs text-gray-500 mt-0.5">Tap here to enter it</p>
+        {/* How It Works */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">How It Works</h2>
+          <div className="space-y-4">
+            {steps.map((step, index) => (
+              <div key={index} className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl">
+                <div className="bg-white p-3 rounded-full shadow-sm">
+                  <step.icon className="h-6 w-6 text-gray-700" />
+                </div>
+                <p className="text-sm text-gray-700 font-medium flex-1">{step.text}</p>
+                <ArrowRight className="h-5 w-5 text-gray-400" />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Features */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Key Features</h2>
+          <div className="space-y-4">
+            {features.map((feature, index) => (
+              <Card 
+                key={index}
+                className="p-4 flex items-center gap-4 hover:shadow-md transition-shadow cursor-pointer"
+              >
+                <div className={`bg-${feature.color}-100 p-3 rounded-xl`}>
+                  <feature.icon className={`h-6 w-6 text-${feature.color}-600`} />
+                </div>
+                <div>
+                  <h3 className="font-medium text-sm">{feature.title}</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">{feature.description}</p>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {/* Social Proof */}
+        <Card className="p-4 bg-gradient-to-br from-purple-50 to-white border-0">
+          <div className="text-center space-y-2">
+            <h3 className="font-semibold text-lg">Over 10,000 gifts sent!</h3>
+            <p className="text-sm text-gray-600">Join thousands of happy users</p>
+            <div className="flex justify-center gap-2 pt-2">
+              <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-medium">
+                ⭐️ 4.9/5 rating
+              </span>
+              <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                💝 Trusted by many
+              </span>
             </div>
           </div>
         </Card>
+
+        {/* Pricing */}
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold">Simple Pricing</h2>
+          <div className="space-y-3">
+            <Card className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">$25 Gift</p>
+                <p className="text-xs text-gray-500">10% fee</p>
+              </div>
+              <p className="text-sm font-medium text-gray-700">$2.50 fee</p>
+            </Card>
+            <Card className="p-4 flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium">$100 Gift</p>
+                <p className="text-xs text-gray-500">3% fee</p>
+              </div>
+              <p className="text-sm font-medium text-gray-700">$3.00 fee</p>
+            </Card>
+          </div>
+        </div>
 
         {/* Sign In Card */}
         {!user && (
@@ -128,7 +185,7 @@ const Home = () => {
 
         {/* FAQ Section */}
         <div className="bg-white rounded-xl">
-          <h3 className="font-medium text-base mb-4 px-1">Common Questions</h3>
+          <h3 className="font-medium text-lg mb-4">Common Questions</h3>
           <ScrollArea className="h-[280px]">
             <div className="space-y-5 pr-4">
               <div className="space-y-1.5">
@@ -164,6 +221,23 @@ const Home = () => {
             </div>
           </ScrollArea>
         </div>
+
+        {/* Contact Support */}
+        <Card 
+          className="p-4 cursor-pointer hover:shadow-md transition-shadow bg-gradient-to-br from-gray-50 via-white to-white border-0"
+          onClick={() => window.location.href = "mailto:support@giftwave.app"}
+        >
+          <div className="flex items-center gap-4">
+            <div className="bg-gray-100 p-2.5 rounded-xl">
+              <Mail className="h-5 w-5 text-gray-600" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-medium text-sm">Need help?</h3>
+              <p className="text-xs text-gray-500 mt-0.5">Contact our support team</p>
+            </div>
+            <ChevronRight className="h-5 w-5 text-gray-400" />
+          </div>
+        </Card>
       </div>
 
       {/* Bottom Navigation */}
