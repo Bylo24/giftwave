@@ -1,5 +1,5 @@
-
 import { useState, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Upload, Image, Plus } from "lucide-react";
 import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
@@ -26,6 +26,7 @@ const stickerOptions = [
 ];
 
 const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardProps) => {
+  const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const [caption, setCaption] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -33,6 +34,10 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [showStickers, setShowStickers] = useState(false);
   const [placedStickers, setPlacedStickers] = useState<Sticker[]>([]);
   const [selectedSticker, setSelectedSticker] = useState<string | null>(null);
+
+  const handleNext = () => {
+    navigate('/gift');
+  };
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -182,7 +187,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
           
           <button 
-            onClick={onNext}
+            onClick={handleNext}
             className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
             Next
