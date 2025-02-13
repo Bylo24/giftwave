@@ -4,7 +4,6 @@ import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { StickerLayer } from "./StickerLayer";
-import { VideoStage } from "./stages/VideoStage";
 
 interface Memory {
   imageUrl: string;
@@ -29,7 +28,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const cardRef = useRef<HTMLDivElement>(null);
   const [currentView, setCurrentView] = useState<'card' | 'video'>('card');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [caption, setCaption] = useState("");
   const [previewImage, setPreviewImage] = useState<string | null>(null);
@@ -184,7 +182,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
               onChange={async (e) => {
                 const file = e.target.files?.[0];
                 if (file) {
-                  setIsUploading(true);
                   try {
                     const fileExt = file.name.split('.').pop();
                     const fileName = `${crypto.randomUUID()}.${fileExt}`;
@@ -206,8 +203,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                   } catch (error) {
                     console.error('Upload error:', error);
                     toast.error('Failed to upload video. Please try again.');
-                  } finally {
-                    setIsUploading(false);
                   }
                 }
               }}
@@ -221,9 +216,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
               <div className="w-32 h-32 rounded-full bg-white/10 flex items-center justify-center">
                 <Upload className="h-12 w-12 text-white" />
               </div>
-              <p className="text-white text-lg font-medium">
-                {isUploading ? 'Uploading...' : 'Upload/Record a video message'}
-              </p>
+              <p className="text-white text-lg font-medium">Upload/Record a video message</p>
               <p className="text-gray-400 text-sm">Videos will be saved automatically</p>
             </label>
           </div>
