@@ -121,7 +121,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                       <Button
                         disabled={isUploading}
                         variant="outline"
-                        size="lg"
+                        size="default"
                         className="bg-white/90 backdrop-blur-sm text-gray-800 shadow-lg hover:bg-white/95"
                       >
                         <Upload className="mr-2 h-5 w-5" />
