@@ -23,7 +23,17 @@ const GiftContent = () => {
   const [amount, setAmount] = useState('');
 
   const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
-  const stickerManager = useStickerManager();
+  const {
+    placedStickers,
+    selectedSticker,
+    showStickers,
+    setShowStickers,
+    handleStickerClick,
+    handleStickerDragEnd,
+    handleStickerTap,
+    handleStickerRemove,
+    handleStickerRotate
+  } = useStickerManager();
 
   const handleDuplicatePage = () => {
     navigate('/preview');
@@ -70,12 +80,20 @@ const GiftContent = () => {
     return (
       <FrontCard
         selectedThemeOption={selectedThemeOption}
-        {...stickerManager}
+        placedStickers={placedStickers}
+        selectedSticker={selectedSticker}
+        showStickers={showStickers}
         stickerOptions={stickerOptions}
         onBack={goToPreviousStep}
         onNext={goToNextStep}
         onPatternChange={handlePatternChange}
         onThemeChange={setSelectedThemeOption}
+        onShowStickers={setShowStickers}
+        onStickerClick={handleStickerClick}
+        onStickerTap={handleStickerTap}
+        onStickerDragEnd={handleStickerDragEnd}
+        onStickerRemove={handleStickerRemove}
+        onStickerRotate={handleStickerRotate}
       />
     );
   }
@@ -85,11 +103,19 @@ const GiftContent = () => {
       <BlankCard
         selectedThemeOption={selectedThemeOption}
         messageVideo={messageVideo}
-        {...stickerManager}
+        placedStickers={placedStickers}
+        selectedSticker={selectedSticker}
+        showStickers={showStickers}
         stickerOptions={stickerOptions}
         onBack={goToPreviousStep}
         onNext={goToNextStep}
         onPatternChange={handlePatternChange}
+        onShowStickers={setShowStickers}
+        onStickerClick={handleStickerClick}
+        onStickerTap={handleStickerTap}
+        onStickerDragEnd={handleStickerDragEnd}
+        onStickerRemove={handleStickerRemove}
+        onStickerRotate={handleStickerRotate}
         onFileChange={handleFileChange}
         setMessageVideo={setMessageVideo}
       />
