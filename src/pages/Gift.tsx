@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
@@ -187,6 +186,16 @@ const Gift = () => {
     setSelectedSticker(null);
   };
 
+  const handleStickerRotate = (stickerId: string, newRotation: number) => {
+    setPlacedStickers(prev =>
+      prev.map(sticker =>
+        sticker.id === stickerId
+          ? { ...sticker, rotation: newRotation }
+          : sticker
+      )
+    );
+  };
+
   return (
     <div 
       className="min-h-screen relative transition-colors duration-300"
@@ -259,6 +268,7 @@ const Gift = () => {
               onStickerTap={handleStickerTap}
               onStickerDragEnd={handleDragEnd}
               onStickerRemove={handleRemoveSticker}
+              onStickerRotate={handleStickerRotate}
             />
           </div>
         </div>
