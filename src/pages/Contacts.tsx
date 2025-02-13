@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,6 +8,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { Avatar } from "@/components/ui/avatar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Contact {
   id: string;
@@ -24,6 +24,7 @@ type SortOption = 'favorites' | 'recent' | 'giftwave' | 'all';
 const Contacts = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
   const [searchQuery, setSearchQuery] = useState("");
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
@@ -136,8 +137,12 @@ const Contacts = () => {
   };
 
   useEffect(() => {
-    fetchContacts();
-  }, []);
+    if (isMobile) {
+      requestContactsPermission();
+    } else {
+      fetchContacts();
+    }
+  }, [isMobile]);
 
   const getFilteredContacts = () => {
     let filtered = contacts.filter(contact =>
@@ -183,15 +188,17 @@ const Contacts = () => {
       <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2 shadow-sm">
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-xl font-semibold">Contacts</h1>
-          <Button
-            onClick={requestContactsPermission}
-            variant="outline"
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <Users className="h-4 w-4" />
-            Import
-          </Button>
+          {!isMobile && (
+            <Button
+              onClick={requestContactsPermission}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <Users className="h-4 w-4" />
+              Import
+            </Button>
+          )}
         </div>
         
         <div className="space-y-3">
@@ -244,7 +251,18 @@ const Contacts = () => {
         {filteredContacts.length === 0 ? (
           <div className="text-center text-gray-500 mt-8">
             <Users className="h-12 w-12 mx-auto mb-2 opacity-50" />
-            <p>No contacts found</p>
+            <p>{permissionGranted ? "No contacts found" : "Grant access to your contacts to get started"}</p>
+            {!permissionGranted && (
+              <Button
+                onClick={requestContactsPermission}
+                variant="outline"
+                size="sm"
+                className="mt-4 flex items-center gap-2 mx-auto"
+              >
+                <Users className="h-4 w-4" />
+                Grant Access
+              </Button>
+            )}
           </div>
         ) : (
           filteredContacts.map((contact) => (
