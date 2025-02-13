@@ -1,5 +1,6 @@
 
 import { useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { ThemeOption, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
 import { PatternSelector } from "@/components/gift/PatternSelector";
@@ -31,7 +32,6 @@ export const FrontCard = ({
   selectedSticker,
   showStickers,
   stickerOptions,
-  onBack,
   onNext,
   onPatternChange,
   onThemeChange,
@@ -42,7 +42,12 @@ export const FrontCard = ({
   onStickerRemove,
   onStickerRotate
 }: FrontCardProps) => {
+  const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
+
+  const handleBackClick = () => {
+    navigate('/home');
+  };
 
   const getPatternStyle = (pattern: ThemeOption['pattern']) => {
     switch (pattern.type) {
@@ -85,7 +90,7 @@ export const FrontCard = ({
       <div className="relative z-10 min-h-screen flex flex-col">
         <div className="flex items-center justify-between p-4">
           <button 
-            onClick={onBack}
+            onClick={handleBackClick}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
