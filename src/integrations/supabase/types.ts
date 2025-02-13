@@ -156,6 +156,35 @@ export type Database = {
           },
         ]
       }
+      messages: {
+        Row: {
+          created_at: string
+          gift_id: string | null
+          id: string
+          video_url: string | null
+        }
+        Insert: {
+          created_at?: string
+          gift_id?: string | null
+          id?: string
+          video_url?: string | null
+        }
+        Update: {
+          created_at?: string
+          gift_id?: string | null
+          id?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_gift_id_fkey"
+            columns: ["gift_id"]
+            isOneToOne: false
+            referencedRelation: "gifts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -6,6 +6,7 @@ import { ThemeOption, PatternType, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
 import { PatternSelector } from "@/components/gift/PatternSelector";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
+import InsideLeftCard from "@/components/gift/InsideLeftCard";
 
 const themeOptions: ThemeOption[] = [
   {
@@ -75,6 +76,7 @@ const stickerOptions = [
 
 const Gift = () => {
   const navigate = useNavigate();
+  const [currentPage, setCurrentPage] = useState<'front' | 'inside-left'>('front');
   const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>('recipient');
   const [previousSteps, setPreviousSteps] = useState<Array<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>>([]);
   const [selectedTheme] = useState<ThemeType>('holiday');
@@ -89,7 +91,9 @@ const Gift = () => {
   const cardRef = useRef<HTMLDivElement>(null);
 
   const goToPreviousStep = () => {
-    if (previousSteps.length > 0) {
+    if (currentPage === 'inside-left') {
+      setCurrentPage('front');
+    } else if (previousSteps.length > 0) {
       const prevStep = previousSteps[previousSteps.length - 1];
       setCurrentStep(prevStep);
       setPreviousSteps(prev => prev.slice(0, -1));
@@ -98,9 +102,13 @@ const Gift = () => {
     }
   };
 
-  const goToNextStep = (nextStep: 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment') => {
-    setPreviousSteps(prev => [...prev, currentStep]);
-    setCurrentStep(nextStep);
+  const goToNextStep = () => {
+    if (currentPage === 'front') {
+      setCurrentPage('inside-left');
+    } else {
+      setPreviousSteps(prev => [...prev, currentStep]);
+      setCurrentStep('message');
+    }
   };
 
   const handlePatternChange = (type: PatternType) => {
@@ -196,11 +204,22 @@ const Gift = () => {
     );
   };
 
+  if (currentPage === 'inside-left') {
+    return (
+      <InsideLeftCard
+        selectedThemeOption={selectedThemeOption}
+        onBack={() => setCurrentPage('front')}
+        onNext={goToNextStep}
+      />
+    );
+  }
+
   return (
     <div 
       className="min-h-screen relative transition-colors duration-300"
       style={{ backgroundColor: selectedThemeOption.screenBgColor }}
     >
+      
       <div 
         className="absolute inset-0" 
         style={{
@@ -226,7 +245,7 @@ const Gift = () => {
           />
           
           <button 
-            onClick={() => goToNextStep('message')}
+            onClick={goToNextStep}
             className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
             Next
