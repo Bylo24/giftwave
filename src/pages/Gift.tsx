@@ -76,7 +76,7 @@ const stickerOptions = [
 
 const Gift = () => {
   const navigate = useNavigate();
-  const [currentPage, setCurrentPage] = useState<'front' | 'inside-left'>('front');
+  const [currentPage, setCurrentPage] = useState<'front' | 'blank' | 'inside-left'>('front');
   const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>('recipient');
   const [previousSteps, setPreviousSteps] = useState<Array<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>>([]);
   const [selectedTheme] = useState<ThemeType>('holiday');
@@ -92,6 +92,8 @@ const Gift = () => {
 
   const goToPreviousStep = () => {
     if (currentPage === 'inside-left') {
+      setCurrentPage('blank');
+    } else if (currentPage === 'blank') {
       setCurrentPage('front');
     } else if (previousSteps.length > 0) {
       const prevStep = previousSteps[previousSteps.length - 1];
@@ -104,6 +106,8 @@ const Gift = () => {
 
   const goToNextStep = () => {
     if (currentPage === 'front') {
+      setCurrentPage('blank');
+    } else if (currentPage === 'blank') {
       setCurrentPage('inside-left');
     } else {
       setPreviousSteps(prev => [...prev, currentStep]);
@@ -208,9 +212,106 @@ const Gift = () => {
     return (
       <InsideLeftCard
         selectedThemeOption={selectedThemeOption}
-        onBack={() => setCurrentPage('front')}
+        onBack={() => setCurrentPage('blank')}
         onNext={goToNextStep}
       />
+    );
+  }
+
+  if (currentPage === 'blank') {
+    return (
+      <div 
+        className="min-h-screen relative transition-colors duration-300"
+        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+      >
+        <div className="absolute inset-0" 
+          style={{
+            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 10%, transparent 11%)',
+            backgroundSize: '30px 30px',
+            backgroundPosition: '0 0, 15px 15px'
+          }}
+        />
+        
+        <div className="relative z-10 min-h-screen flex flex-col">
+          <div className="flex items-center justify-between p-4">
+            <button 
+              onClick={goToPreviousStep}
+              className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
+            >
+              <ArrowLeft className="h-5 w-5 text-gray-600" />
+            </button>
+            
+            <ThemeSelector
+              themes={themeOptions}
+              selectedTheme={selectedThemeOption}
+              onThemeChange={setSelectedThemeOption}
+            />
+            
+            <button 
+              onClick={goToNextStep}
+              className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
+            >
+              Next
+            </button>
+          </div>
+
+          <div className="flex-1 flex items-center justify-center px-4">
+            <div 
+              ref={cardRef}
+              className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative overflow-hidden`}
+            >
+              <div 
+                className="absolute inset-0 z-0" 
+                style={getPatternStyle(selectedThemeOption.pattern)}
+              />
+              
+              <div className="relative z-10 h-full flex flex-col items-center justify-center">
+                {/* This card is intentionally left blank */}
+              </div>
+
+              <StickerLayer
+                stickers={placedStickers}
+                selectedSticker={selectedSticker}
+                cardRef={cardRef}
+                onStickerTap={handleStickerTap}
+                onStickerDragEnd={handleDragEnd}
+                onStickerRemove={handleRemoveSticker}
+                onStickerRotate={handleStickerRotate}
+              />
+            </div>
+          </div>
+
+          <PatternSelector
+            currentPattern={selectedThemeOption.pattern.type}
+            onPatternChange={handlePatternChange}
+          />
+
+          <div className="flex justify-center pb-8 relative">
+            <div className="relative">
+              <button 
+                onClick={() => setShowStickers(!showStickers)}
+                className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors"
+              >
+                <span className="text-2xl">⭐</span>
+              </button>
+              
+              {showStickers && (
+                <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl grid grid-cols-5 gap-2 min-w-[200px]">
+                  {stickerOptions.map((sticker, index) => (
+                    <button 
+                      key={index}
+                      className="w-10 h-10 flex items-center justify-center hover:bg-white/50 rounded-full transition-colors"
+                      onClick={() => handleStickerClick(sticker.emoji)}
+                    >
+                      <span className="text-2xl">{sticker.emoji}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
     );
   }
 
