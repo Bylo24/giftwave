@@ -4,6 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import { ThemeOption } from "@/types/gift";
 import { MessageStep } from "@/components/gift/MessageStep";
 import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface InsideLeftCardProps {
   selectedThemeOption: ThemeOption;
@@ -23,6 +24,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const [isRecordingMessage, setIsRecordingMessage] = useState(false);
   const [selectedFrame, setSelectedFrame] = useState<string>('frame1');
+  const [isRecordingModalOpen, setIsRecordingModalOpen] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
   return (
@@ -55,17 +57,6 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           </button>
         </div>
 
-        <div className="px-4 mb-2">
-          <MessageStep
-            messageVideo={messageVideo}
-            setMessageVideo={setMessageVideo}
-            isRecordingMessage={isRecordingMessage}
-            startMessageRecording={() => setIsRecordingMessage(true)}
-            stopMessageRecording={() => setIsRecordingMessage(false)}
-            onNext={onNext}
-          />
-        </div>
-
         <div className="flex-1 flex items-center justify-center px-4 pb-20">
           <div 
             ref={cardRef}
@@ -73,7 +64,7 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
           >
             <div className="relative z-10 h-full flex flex-col items-center justify-center">
               <div className="w-full h-[85%] rounded-lg flex items-center justify-center overflow-hidden relative">
-                {messageVideo && (
+                {messageVideo ? (
                   <>
                     <video
                       src={URL.createObjectURL(messageVideo)}
@@ -87,11 +78,16 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
                       className="absolute inset-0 w-full h-full pointer-events-none"
                     />
                   </>
-                )}
-                {!messageVideo && (
-                  <div className="text-gray-500 text-center">
-                    <p>Record or upload a video message</p>
-                    <p className="text-sm">Videos will be saved automatically</p>
+                ) : (
+                  <div className="text-center">
+                    <Button
+                      variant="ghost"
+                      onClick={() => setIsRecordingModalOpen(true)}
+                      className="bg-black/10 hover:bg-black/20 text-gray-700"
+                    >
+                      Record or upload a video message
+                    </Button>
+                    <p className="text-sm text-gray-500 mt-2">Videos will be saved automatically</p>
                   </div>
                 )}
               </div>
@@ -124,6 +120,17 @@ const InsideLeftCard = ({ selectedThemeOption, onBack, onNext }: InsideLeftCardP
             </div>
           </div>
         </div>
+
+        <MessageStep
+          isOpen={isRecordingModalOpen}
+          onClose={() => setIsRecordingModalOpen(false)}
+          messageVideo={messageVideo}
+          setMessageVideo={setMessageVideo}
+          isRecordingMessage={isRecordingMessage}
+          startMessageRecording={() => setIsRecordingMessage(true)}
+          stopMessageRecording={() => setIsRecordingMessage(false)}
+          onNext={onNext}
+        />
       </div>
     </div>
   );
