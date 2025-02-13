@@ -158,13 +158,19 @@ const Gift = () => {
   const handleDragEnd = (event: any, info: any, stickerId: string) => {
     if (!cardRef.current) return;
 
-    const x = info.point.x;
-    const y = info.point.y;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = info.point.x - rect.left;
+    const y = info.point.y - rect.top;
+
+    const maxX = rect.width - 40;  // 40px for sticker size
+    const maxY = rect.height - 40;
+    const constrainedX = Math.min(Math.max(0, x), maxX);
+    const constrainedY = Math.min(Math.max(0, y), maxY);
 
     setPlacedStickers(prev =>
       prev.map(sticker =>
         sticker.id === stickerId
-          ? { ...sticker, x, y }
+          ? { ...sticker, x: constrainedX, y: constrainedY }
           : sticker
       )
     );
