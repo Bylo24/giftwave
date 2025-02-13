@@ -1,3 +1,4 @@
+
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Video } from "lucide-react";
@@ -293,25 +294,45 @@ const Gift = () => {
               />
               
               <div className="relative z-10 h-full flex flex-col items-center justify-center">
-                <input 
-                  type="file" 
-                  accept="video/*"
-                  capture="user"
-                  className="hidden" 
-                  id="video-upload"
-                  onChange={handleFileChange}
-                />
-                <label 
-                  htmlFor="video-upload"
-                  className="cursor-pointer flex flex-col items-center space-y-4"
-                >
-                  <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors">
-                    <Video className="h-8 w-8 text-gray-600" />
+                {messageVideo ? (
+                  <div className="w-full h-full relative rounded-lg overflow-hidden">
+                    <video
+                      className="w-full h-full object-cover rounded-lg"
+                      src={URL.createObjectURL(messageVideo)}
+                      controls
+                      playsInline
+                    />
+                    <button 
+                      onClick={() => setMessageVideo(null)}
+                      className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg hover:bg-white/95 transition-colors"
+                    >
+                      <span className="sr-only">Remove video</span>
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-600" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                      </svg>
+                    </button>
                   </div>
-                  <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                    {messageVideo ? 'Change video message' : 'Add video message'}
-                  </span>
-                </label>
+                ) : (
+                  <input 
+                    type="file" 
+                    accept="video/*"
+                    capture="user"
+                    className="hidden" 
+                    id="video-upload"
+                    onChange={handleFileChange}
+                  />
+                  <label 
+                    htmlFor="video-upload"
+                    className="cursor-pointer flex flex-col items-center space-y-4"
+                  >
+                    <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors">
+                      <Video className="h-8 w-8 text-gray-600" />
+                    </div>
+                    <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                      Add video message
+                    </span>
+                  </label>
+                )}
               </div>
 
               <StickerLayer
