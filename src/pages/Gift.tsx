@@ -1,4 +1,3 @@
-
 import { useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Video } from "lucide-react";
@@ -8,6 +7,7 @@ import { StickerLayer } from "@/components/gift/StickerLayer";
 import { PatternSelector } from "@/components/gift/PatternSelector";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
 import InsideLeftCard from "@/components/gift/InsideLeftCard";
+import { AmountStep } from "@/components/gift/AmountStep";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -114,7 +114,7 @@ const Gift = () => {
       setCurrentPage('inside-left');
     } else {
       setPreviousSteps(prev => [...prev, currentStep]);
-      setCurrentStep('message');
+      setCurrentStep('amount');
     }
   };
 
@@ -378,6 +378,22 @@ const Gift = () => {
               )}
             </div>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (currentStep === 'amount') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-4"
+        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+      >
+        <div className="w-full max-w-md">
+          <AmountStep
+            amount={amount}
+            setAmount={setAmount}
+            onNext={goToNextStep}
+          />
         </div>
       </div>
     );
