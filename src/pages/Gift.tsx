@@ -1,26 +1,26 @@
 
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { BottomNav } from "@/components/ui/bottom-nav";
 import { ArrowLeft } from "lucide-react";
-import { RecipientStep } from "@/components/gift/RecipientStep";
-import { MessageStep } from "@/components/gift/MessageStep";
-import { AmountStep } from "@/components/gift/AmountStep";
-import { PreviewStep } from "@/components/gift/PreviewStep";
-import { MemoryStep } from "@/components/gift/MemoryStep";
-import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
-import { GiftCard } from "@/components/gift/GiftCard";
-import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
-
-type Step = 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment';
-type CardView = 'card' | 'message' | 'envelope';
 
 interface ThemeOption {
   text: string;
   emoji: string;
   bgColor: string;
   textColors: string[];
+}
+
+interface Memory {
+  id: string;
+  imageUrl?: string;
+  caption: string;
+  date: Date;
+}
+
+interface GiftMemory {
+  caption: string;
+  date: Date;
 }
 
 const themeOptions: ThemeOption[] = [
@@ -52,8 +52,8 @@ const themeOptions: ThemeOption[] = [
 
 const Gift = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState<Step>('recipient');
-  const [previousSteps, setPreviousSteps] = useState<Step[]>([]);
+  const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>('recipient');
+  const [previousSteps, setPreviousSteps] = useState<Array<'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment'>>([]);
   const [selectedTheme] = useState<ThemeType>('holiday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
@@ -64,7 +64,6 @@ const Gift = () => {
     date: new Date()
   });
   const [memories, setMemories] = useState<Memory[]>([]);
-  const [currentView, setCurrentView] = useState<CardView>('card');
   const [selectedThemeOption, setSelectedThemeOption] = useState<ThemeOption>(themeOptions[0]);
 
   const goToPreviousStep = () => {
@@ -77,7 +76,7 @@ const Gift = () => {
     }
   };
 
-  const goToNextStep = (nextStep: Step) => {
+  const goToNextStep = (nextStep: 'recipient' | 'message' | 'amount' | 'memory' | 'preview' | 'payment') => {
     setPreviousSteps(prev => [...prev, currentStep]);
     setCurrentStep(nextStep);
   };
@@ -132,79 +131,17 @@ const Gift = () => {
                 {selectedThemeOption.text.split('').map((letter, index) => (
                   <span 
                     key={index} 
-                    className={`text-8xl font-serif ${selectedThemeOption.textColors[index % selectedThemeOption.textColors.length]}`}
+                    className={`text-3xl sm:text-5xl md:text-8xl font-serif ${selectedThemeOption.textColors[index % selectedThemeOption.textColors.length]}`}
                   >
                     {letter}
                   </span>
                 ))}
               </div>
               
-              <div className="text-6xl animate-bounce">
+              <div className="text-4xl sm:text-5xl md:text-6xl animate-bounce">
                 {selectedThemeOption.emoji}
               </div>
             </div>
-          </div>
-        </div>
-
-        <div className="p-4 space-y-4">
-          <div className="bg-white rounded-full p-1 flex justify-between max-w-md mx-auto">
-            <button 
-              onClick={() => setCurrentView('card')}
-              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium ${
-                currentView === 'card' ? 'bg-gray-900 text-white' : 'text-gray-600'
-              }`}
-            >
-              Card
-            </button>
-            <button 
-              onClick={() => setCurrentView('message')}
-              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium ${
-                currentView === 'message' ? 'bg-gray-900 text-white' : 'text-gray-600'
-              }`}
-            >
-              Message
-            </button>
-            <button 
-              onClick={() => setCurrentView('envelope')}
-              className={`flex-1 py-2 px-4 rounded-full text-sm font-medium ${
-                currentView === 'envelope' ? 'bg-gray-900 text-white' : 'text-gray-600'
-              }`}
-            >
-              Envelope
-            </button>
-          </div>
-
-          <div className="flex justify-between items-center max-w-md mx-auto px-4">
-            <button className="flex flex-col items-center space-y-1">
-              <div className="w-12 h-12 flex items-center justify-center">
-                <img src="/lovable-uploads/209f908f-8bcc-4832-823d-f6dc2c0a1e50.png" alt="Templates" className="w-8 h-8" />
-              </div>
-              <span className="text-xs text-gray-500">Templates</span>
-            </button>
-            <button className="flex flex-col items-center space-y-1">
-              <div className="w-12 h-12 flex items-center justify-center">
-                <span className="text-3xl">T</span>
-              </div>
-              <span className="text-xs text-gray-500">Text</span>
-            </button>
-            <button className="flex flex-col items-center space-y-1">
-              <div className="w-12 h-12 flex items-center justify-center">
-                <span className="text-3xl">⭐</span>
-              </div>
-              <span className="text-xs text-gray-500">Stickers</span>
-            </button>
-            <button className="flex flex-col items-center space-y-1">
-              <div className="w-12 h-12 flex items-center justify-center">
-                <span className="text-3xl">📷</span>
-              </div>
-              <span className="text-xs text-gray-500">Video</span>
-            </button>
-            <button className="flex flex-col items-center space-y-1">
-              <div className="w-12 h-12 flex items-center justify-center">
-                <span className="text-3xl">📎</span>
-              </div>
-              <span className="text-xs text-gray-500">Props</span>
-            </button>
           </div>
         </div>
 
