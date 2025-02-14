@@ -1,4 +1,3 @@
-
 import { useEffect, useRef, useState } from 'react';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
 import animationData from '@/animations/gift-preview.json';
@@ -6,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 
 interface GiftPreviewAnimationProps {
   messageVideo: File | null;
+  messageVideoType?: 'file' | 'url';
   amount: string;
   memories: Array<{
     id: string;
@@ -18,6 +18,7 @@ interface GiftPreviewAnimationProps {
 
 export const GiftPreviewAnimation = ({ 
   messageVideo, 
+  messageVideoType = 'file',
   amount, 
   memories,
   onComplete 
@@ -36,7 +37,6 @@ export const GiftPreviewAnimation = ({
     if (lottieRef.current) {
       lottieRef.current.setSpeed(0.8);
       
-      // Set up animation frame tracking
       const animation = lottieRef.current;
       const updateProgress = () => {
         if (animation.animationItem) {
@@ -57,7 +57,6 @@ export const GiftPreviewAnimation = ({
 
   return (
     <div className="relative w-full max-w-md mx-auto aspect-square">
-      {/* Base Lottie Animation */}
       <Lottie
         lottieRef={lottieRef}
         animationData={animationData}
@@ -65,9 +64,7 @@ export const GiftPreviewAnimation = ({
         className="w-full h-full"
       />
 
-      {/* Dynamic Content Overlays */}
       <AnimatePresence>
-        {/* Video Message */}
         {animationProgress >= segments.video.start && messageVideo && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -83,7 +80,7 @@ export const GiftPreviewAnimation = ({
             }}
           >
             <video
-              src={URL.createObjectURL(messageVideo)}
+              src={messageVideoType === 'file' ? URL.createObjectURL(messageVideo as File) : messageVideo as string}
               className="w-full h-full object-cover rounded-lg"
               autoPlay
               muted
@@ -91,7 +88,6 @@ export const GiftPreviewAnimation = ({
           </motion.div>
         )}
 
-        {/* Memories */}
         {animationProgress >= segments.memories.start && memories.map((memory, index) => (
           <motion.div
             key={memory.id}
@@ -118,7 +114,6 @@ export const GiftPreviewAnimation = ({
           </motion.div>
         ))}
 
-        {/* Amount */}
         {animationProgress >= segments.amount.start && (
           <motion.div
             initial={{ opacity: 0, scale: 0.5 }}

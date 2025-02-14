@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -79,6 +80,7 @@ const CollectGift = () => {
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
           messageVideo={gift.message_video_url}
+          messageVideoType="url"
           amount={gift.amount.toString()}
           memories={gift.memories || []}
           onComplete={handleAnimationComplete}
