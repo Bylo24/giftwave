@@ -38,7 +38,7 @@ const TestAnimation = () => {
             <div 
               onClick={handleCardClick}
               className="w-[300px] h-[400px] transform-style-3d transition-transform duration-1000 cursor-pointer"
-              style={{ transform: `rotateY(${currentFlip * 180}deg)` }}
+              style={{ transform: `rotateY(${currentFlip * -180}deg)` }}
             >
               {/* Front of Card */}
               <div className="absolute w-full h-full backface-hidden bg-[#f8b400] flex justify-center items-center text-2xl font-bold text-white">
