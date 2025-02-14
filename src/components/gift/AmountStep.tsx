@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
+import { useToast } from "@/hooks/use-toast";
 
 interface AmountStepProps {
   amount: string;
@@ -14,6 +15,39 @@ interface AmountStepProps {
 
 export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
   const presetAmounts = [5, 10, 20, 50, 100, 200];
+  const { toast } = useToast();
+
+  const handleAmountChange = (value: string) => {
+    const numValue = parseFloat(value);
+    if (value === "") {
+      setAmount("");
+    } else if (numValue <= 0) {
+      toast({
+        title: "Invalid amount",
+        description: "Please enter an amount greater than $0",
+        variant: "destructive",
+      });
+      setAmount("");
+    } else {
+      setAmount(value);
+    }
+  };
+
+  const handleCustomAmountClick = () => {
+    const customAmount = prompt("Enter custom amount:");
+    if (customAmount) {
+      const numAmount = parseFloat(customAmount);
+      if (!isNaN(numAmount) && numAmount > 0) {
+        setAmount(numAmount.toString());
+      } else {
+        toast({
+          title: "Invalid amount",
+          description: "Please enter a valid amount greater than $0",
+          variant: "destructive",
+        });
+      }
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -41,7 +75,9 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
             <Input
               type="number"
               value={amount}
-              onChange={(e) => setAmount(e.target.value)}
+              onChange={(e) => handleAmountChange(e.target.value)}
+              min="0.01"
+              step="0.01"
               className="pl-12 h-14 text-lg font-medium border-2 focus:ring-2 focus:ring-blue-500/20 transition-shadow"
               placeholder="Enter amount"
             />
@@ -64,6 +100,16 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
               </Button>
             ))}
           </div>
+
+          <div className="mt-3">
+            <Button
+              variant="outline"
+              onClick={handleCustomAmountClick}
+              className="w-full h-12 border-2 font-medium hover:border-blue-200 hover:bg-blue-50/50"
+            >
+              Custom Amount
+            </Button>
+          </div>
         </Card>
       </motion.div>
 
@@ -74,7 +120,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       >
         <Button 
           onClick={onNext}
-          disabled={!amount}
+          disabled={!amount || parseFloat(amount) <= 0}
           className="w-full h-14 text-lg font-medium bg-blue-600 hover:bg-blue-700 transition-colors"
         >
           Continue
