@@ -78,7 +78,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
               onChange={(e) => handleAmountChange(e.target.value)}
               min="0.01"
               step="0.01"
-              className="pl-12 h-14 text-lg font-medium border-2 focus:ring-2 focus:ring-blue-500/20 transition-shadow"
+              className="pl-12 h-14 text-lg font-medium border-2 focus:ring-2 focus:ring-blue-500/20 transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               placeholder="Enter amount"
             />
           </div>
