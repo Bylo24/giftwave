@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
+import { useNavigate } from "react-router-dom";
 
 interface AmountStepProps {
   amount: string;
@@ -16,6 +17,7 @@ interface AmountStepProps {
 export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
   const presetAmounts = [5, 10, 20, 50, 100, 200];
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value);
@@ -47,6 +49,10 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
         });
       }
     }
+  };
+
+  const handleContinue = () => {
+    navigate('/testanimation');
   };
 
   return (
@@ -119,7 +125,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
         transition={{ delay: 0.2 }}
       >
         <Button 
-          onClick={onNext}
+          onClick={handleContinue}
           disabled={!amount || parseFloat(amount) <= 0}
           className="w-full h-14 text-lg font-medium bg-blue-600 hover:bg-blue-700 transition-colors"
         >
