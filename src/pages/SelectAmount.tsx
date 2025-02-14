@@ -15,37 +15,26 @@ const SelectAmountContent = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="min-h-screen bg-gray-50/50">
       {/* Header Navigation */}
-      <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 z-10">
+      <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
         <Button
           variant="ghost"
           size="icon"
-          className="bg-white rounded-full w-10 h-10"
+          className="rounded-full w-10 h-10 hover:bg-gray-100"
           onClick={() => navigate(-1)}
         >
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </Button>
-
-        <Button
-          variant="ghost"
-          className="bg-white rounded-full px-6 py-2 text-gray-800"
-          onClick={() => navigate('/preview-gift')}
-        >
-          <span className="font-medium">Continue</span>
-          <span className="ml-2">→</span>
-        </Button>
       </div>
 
       {/* Centered Content */}
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="w-full max-w-md">
-          <AmountStep 
-            amount={amount}
-            setAmount={setAmount}
-            onNext={handleNext}
-          />
-        </div>
+      <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto">
+        <AmountStep 
+          amount={amount}
+          setAmount={setAmount}
+          onNext={handleNext}
+        />
       </div>
     </div>
   );
