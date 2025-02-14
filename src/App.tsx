@@ -33,6 +33,7 @@ import PreviewGift from "./pages/PreviewGift";
 import { FrontCard } from "./pages/FrontCard";
 import InsideLeftCard from "./pages/InsideLeftCard";
 import InsideRightCard from "./pages/InsideRightCard";
+import TestAnimation from "./pages/TestAnimation";
 
 function App() {
   const queryClient = new QueryClient();
@@ -54,6 +55,7 @@ function App() {
                 <Route path="/verify-code" element={<CodeVerification />} />
                 <Route path="/setup" element={<AccountSetup />} />
                 <Route path="/update-phone" element={<UpdatePhone />} />
+                <Route path="/testanimation" element={<TestAnimation />} />
                 
                 {/* Protected Routes */}
                 <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
