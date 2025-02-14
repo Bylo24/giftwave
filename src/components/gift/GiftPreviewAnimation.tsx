@@ -1,7 +1,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
-import animationData from '@/animations/gift-preview.json'; // You'll need to add this JSON file
+import animationData from '@/animations/gift-preview.json';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface GiftPreviewAnimationProps {
@@ -34,16 +34,26 @@ export const GiftPreviewAnimation = ({
 
   useEffect(() => {
     if (lottieRef.current) {
-      lottieRef.current.setSpeed(0.8); // Adjust speed as needed
+      lottieRef.current.setSpeed(0.8);
+      
+      // Set up animation frame tracking
+      const animation = lottieRef.current;
+      const updateProgress = () => {
+        if (animation.animationItem) {
+          const progress = animation.animationItem.currentFrame / animation.animationItem.totalFrames;
+          setAnimationProgress(progress);
+          
+          if (progress >= 1) {
+            onComplete();
+          } else {
+            requestAnimationFrame(updateProgress);
+          }
+        }
+      };
+      
+      requestAnimationFrame(updateProgress);
     }
-  }, []);
-
-  const handleAnimationUpdate = (progress: number) => {
-    setAnimationProgress(progress);
-    if (progress >= 1) {
-      onComplete();
-    }
-  };
+  }, [onComplete]);
 
   return (
     <div className="relative w-full max-w-md mx-auto aspect-square">
@@ -52,9 +62,6 @@ export const GiftPreviewAnimation = ({
         lottieRef={lottieRef}
         animationData={animationData}
         loop={false}
-        onAnimationUpdate={(container) => {
-          handleAnimationUpdate(container.currentFrame / container.totalFrames);
-        }}
         className="w-full h-full"
       />
 
@@ -68,7 +75,6 @@ export const GiftPreviewAnimation = ({
             exit={{ opacity: 0 }}
             className="absolute"
             style={{
-              // These values should match your Lottie animation's "dynamic_video" layer position
               top: '30%',
               left: '50%',
               transform: 'translate(-50%, -50%)',
@@ -95,7 +101,6 @@ export const GiftPreviewAnimation = ({
             transition={{ delay: index * 0.1 }}
             className="absolute"
             style={{
-              // Position each memory around the gift based on index
               top: `${30 + Math.sin(index * (Math.PI * 2 / memories.length)) * 20}%`,
               left: `${50 + Math.cos(index * (Math.PI * 2 / memories.length)) * 20}%`,
               transform: 'translate(-50%, -50%)',
