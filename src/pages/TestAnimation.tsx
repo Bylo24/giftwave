@@ -6,7 +6,7 @@ const TestAnimation = () => {
   return (
     <PageContainer>
       <PageHeader title="Animation Test" />
-      <div className="p-4">
+      <div className="p-4" data-testid="animation-container">
       </div>
     </PageContainer>
   );
