@@ -87,7 +87,7 @@ export const BlankCard = ({
       <div className="relative z-10 min-h-screen flex flex-col">
         <div className="flex items-center justify-between p-4">
           <button 
-            onClick={onBack}
+            onClick={() => window.location.href = '/frontcard'}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
