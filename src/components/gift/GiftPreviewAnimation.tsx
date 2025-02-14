@@ -1,10 +1,11 @@
+
 import { useEffect, useRef, useState } from 'react';
 import Lottie, { LottieRefCurrentProps } from 'lottie-react';
 import animationData from '@/animations/gift-preview.json';
 import { motion, AnimatePresence } from 'framer-motion';
 
 interface GiftPreviewAnimationProps {
-  messageVideo: File | null;
+  messageVideo: File | string | null;
   messageVideoType?: 'file' | 'url';
   amount: string;
   memories: Array<{
