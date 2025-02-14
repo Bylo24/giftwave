@@ -15,6 +15,10 @@ const TestAnimation = () => {
     }
   };
 
+  const handleCardClick = () => {
+    setCurrentFlip(prev => prev === 0 ? 1 : 0);
+  };
+
   return (
     <PageContainer>
       <PageHeader title="Animation Test" />
@@ -32,7 +36,8 @@ const TestAnimation = () => {
           {/* Card Container */}
           <div className="perspective-[1000px]">
             <div 
-              className="w-[300px] h-[400px] transform-style-3d transition-transform duration-1000"
+              onClick={handleCardClick}
+              className="w-[300px] h-[400px] transform-style-3d transition-transform duration-1000 cursor-pointer"
               style={{ transform: `rotateY(${currentFlip * 180}deg)` }}
             >
               {/* Front of Card */}
