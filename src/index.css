@@ -59,3 +59,19 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
+
+/* Custom utilities for 3D card effect */
+@layer utilities {
+  .perspective-\[1000px\] {
+    perspective: 1000px;
+  }
+  .transform-style-3d {
+    transform-style: preserve-3d;
+  }
+  .backface-hidden {
+    backface-visibility: hidden;
+  }
+  .rotate-y-180 {
+    transform: rotateY(180deg);
+  }
+}
