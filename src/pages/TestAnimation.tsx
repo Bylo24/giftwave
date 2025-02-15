@@ -4,17 +4,54 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useLocation } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 
 const TestAnimation = () => {
   const [currentFlip, setCurrentFlip] = useState(0);
   const location = useLocation();
+  const queryClient = useQueryClient();
   const designId = new URLSearchParams(location.search).get('id');
+
+  // Create a new gift design
+  const createGiftDesign = useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase
+        .from('gift_designs')
+        .insert([{
+          selected_amount: 50,
+          memories: [
+            {
+              id: crypto.randomUUID(),
+              imageUrl: '/placeholder.svg',
+              caption: 'Sample Memory',
+              date: new Date().toISOString()
+            }
+          ],
+          message_video_url: null,
+          status: 'draft'
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error creating gift design:", error);
+        toast.error("Failed to create gift preview");
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['gift-design'] });
+      toast.success("Created new gift design");
+    },
+  });
 
   // Fetch the specific gift design or latest one
   const { data: giftDesign, isLoading } = useQuery({
@@ -82,8 +119,14 @@ const TestAnimation = () => {
         <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
           <GiftNotFound />
           <p className="text-center text-gray-600 mt-4">
-            No gift design found. Start by creating a new gift from the home page.
+            No gift design found. Click below to create a new test gift.
           </p>
+          <Button 
+            onClick={() => createGiftDesign.mutate()}
+            className="mt-4"
+          >
+            Create Test Gift
+          </Button>
         </div>
       </PageContainer>
     );
