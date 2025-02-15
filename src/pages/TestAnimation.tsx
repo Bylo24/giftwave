@@ -1,7 +1,7 @@
 
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
 import { useQuery } from "@tanstack/react-query";
@@ -9,21 +9,29 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
+import { useLocation } from "react-router-dom";
 
 const TestAnimation = () => {
   const [currentFlip, setCurrentFlip] = useState(0);
+  const location = useLocation();
+  const designId = new URLSearchParams(location.search).get('id');
 
-  // Fetch the latest gift design
+  // Fetch the specific gift design or latest one
   const { data: giftDesign, isLoading } = useQuery({
-    queryKey: ['gift-design'],
+    queryKey: ['gift-design', designId],
     queryFn: async () => {
-      console.log("Fetching latest gift design");
-      const { data, error } = await supabase
+      console.log("Fetching gift design, id:", designId);
+      let query = supabase
         .from('gift_designs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .limit(1)
-        .maybeSingle();
+        .select('*');
+
+      if (designId) {
+        query = query.eq('id', designId);
+      } else {
+        query = query.order('created_at', { ascending: false }).limit(1);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (error) {
         console.error("Error fetching gift design:", error);
@@ -31,6 +39,12 @@ const TestAnimation = () => {
         throw error;
       }
 
+      if (!data) {
+        console.log("No gift design found");
+        return null;
+      }
+
+      console.log("Found gift design:", data);
       return data;
     },
   });
@@ -62,7 +76,17 @@ const TestAnimation = () => {
   }
 
   if (!giftDesign) {
-    return <GiftNotFound />;
+    return (
+      <PageContainer>
+        <PageHeader title="Gift Preview" />
+        <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
+          <GiftNotFound />
+          <p className="text-center text-gray-600 mt-4">
+            No gift design found. Start by creating a new gift from the home page.
+          </p>
+        </div>
+      </PageContainer>
+    );
   }
 
   return (
@@ -90,6 +114,7 @@ const TestAnimation = () => {
               <div className="absolute w-full h-full backface-hidden">
                 <GiftPreviewAnimation
                   messageVideo={giftDesign.message_video_url || null}
+                  messageVideoType="url"
                   amount={giftDesign.selected_amount?.toString() || "0"}
                   memories={formattedMemories}
                   onComplete={() => {}}
