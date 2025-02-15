@@ -1,10 +1,11 @@
+
 import { useState } from 'react';
 import { GiftPreviewAnimation } from './GiftPreviewAnimation';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 interface GiftRevealAnimationProps {
-  messageVideo: File | null;
+  messageVideo: File | string | null;
   amount: string;
   memories: Array<{
     id: string;

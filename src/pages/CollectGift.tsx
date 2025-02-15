@@ -79,8 +79,7 @@ const CollectGift = () => {
     return (
       <div className="min-h-screen bg-background">
         <GiftRevealAnimation
-          messageVideo={null}
-          messageVideoType="url"
+          messageVideo={gift.message_video_url}
           amount={gift.amount.toString()}
           memories={gift.memories || []}
           onComplete={handleAnimationComplete}
