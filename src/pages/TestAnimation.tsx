@@ -7,6 +7,8 @@ import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
+import { GiftNotFound } from "@/components/gift/GiftNotFound";
 
 const TestAnimation = () => {
   const [currentFlip, setCurrentFlip] = useState(0);
@@ -21,7 +23,7 @@ const TestAnimation = () => {
         .select('*')
         .order('created_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error("Error fetching gift design:", error);
@@ -55,6 +57,14 @@ const TestAnimation = () => {
       }))
     : [];
 
+  if (isLoading) {
+    return <GiftLoadingState />;
+  }
+
+  if (!giftDesign) {
+    return <GiftNotFound />;
+  }
+
   return (
     <PageContainer>
       <PageHeader title="Your Gift Preview" />
@@ -79,8 +89,8 @@ const TestAnimation = () => {
               {/* Front Side - Gift Animation */}
               <div className="absolute w-full h-full backface-hidden">
                 <GiftPreviewAnimation
-                  messageVideo={giftDesign?.message_video_url || null}
-                  amount={giftDesign?.selected_amount?.toString() || "0"}
+                  messageVideo={giftDesign.message_video_url || null}
+                  amount={giftDesign.selected_amount?.toString() || "0"}
                   memories={formattedMemories}
                   onComplete={() => {}}
                 />
@@ -89,7 +99,7 @@ const TestAnimation = () => {
               {/* Back Side - Amount Display */}
               <div className="absolute w-full h-full backface-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex flex-col justify-center items-center text-xl font-bold text-white rotate-y-180 rounded-lg shadow-xl">
                 <span className="text-4xl mb-2">Amount</span>
-                <span className="text-6xl">${giftDesign?.selected_amount || 0}</span>
+                <span className="text-6xl">${giftDesign.selected_amount || 0}</span>
               </div>
             </div>
           </div>
