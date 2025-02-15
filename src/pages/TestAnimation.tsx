@@ -1,7 +1,6 @@
-
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
@@ -11,19 +10,26 @@ import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
 
 const TestAnimation = () => {
   const [currentFlip, setCurrentFlip] = useState(0);
   const location = useLocation();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
   const designId = new URLSearchParams(location.search).get('id');
 
   // Create a new gift design
   const createGiftDesign = useMutation({
     mutationFn: async () => {
+      if (!user) {
+        throw new Error("You must be logged in to create a gift design");
+      }
+
       const { data, error } = await supabase
         .from('gift_designs')
         .insert([{
+          user_id: user.id,
           selected_amount: 50,
           memories: [
             {
@@ -64,6 +70,12 @@ const TestAnimation = () => {
 
       if (designId) {
         query = query.eq('id', designId);
+      } else if (user) {
+        // If no specific design ID, get the latest one for the current user
+        query = query
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
       } else {
         query = query.order('created_at', { ascending: false }).limit(1);
       }
@@ -84,6 +96,7 @@ const TestAnimation = () => {
       console.log("Found gift design:", data);
       return data;
     },
+    enabled: true, // Query will run even if user is not logged in
   });
 
   const flipCard = (direction: 'left' | 'right') => {
@@ -119,14 +132,19 @@ const TestAnimation = () => {
         <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
           <GiftNotFound />
           <p className="text-center text-gray-600 mt-4">
-            No gift design found. Click below to create a new test gift.
+            {user ? 
+              "No gift design found. Click below to create a new test gift." :
+              "Please log in to create and view gift designs."
+            }
           </p>
-          <Button 
-            onClick={() => createGiftDesign.mutate()}
-            className="mt-4"
-          >
-            Create Test Gift
-          </Button>
+          {user && (
+            <Button 
+              onClick={() => createGiftDesign.mutate()}
+              className="mt-4"
+            >
+              Create Test Gift
+            </Button>
+          )}
         </div>
       </PageContainer>
     );
