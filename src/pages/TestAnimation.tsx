@@ -4,9 +4,34 @@ import { PageHeader } from "@/components/layout/PageHeader";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const TestAnimation = () => {
   const [currentFlip, setCurrentFlip] = useState(0);
+
+  // Fetch the latest gift design
+  const { data: giftDesign, isLoading } = useQuery({
+    queryKey: ['gift-design'],
+    queryFn: async () => {
+      console.log("Fetching latest gift design");
+      const { data, error } = await supabase
+        .from('gift_designs')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (error) {
+        console.error("Error fetching gift design:", error);
+        toast.error("Failed to load gift preview");
+        throw error;
+      }
+
+      return data;
+    },
+  });
 
   const flipCard = (direction: 'left' | 'right') => {
     if (direction === 'left' && currentFlip > 0) {
@@ -20,23 +45,15 @@ const TestAnimation = () => {
     setCurrentFlip(prev => prev === 0 ? 1 : 0);
   };
 
-  // Mock data - this should be replaced with actual data from your app's state management
-  const mockMessageVideo = "/placeholder.svg"; // This should come from InsideLeftCard
-  const mockAmount = "50"; // This should come from AmountStep
-  const mockMemories = [
-    {
-      id: "1",
-      imageUrl: "/placeholder.svg",
-      caption: "First Memory",
-      date: new Date()
-    },
-    {
-      id: "2",
-      imageUrl: "/placeholder.svg",
-      caption: "Second Memory",
-      date: new Date()
-    }
-  ];
+  // Format memories from the stored JSON
+  const formattedMemories = giftDesign?.memories 
+    ? (giftDesign.memories as any[]).map(memory => ({
+        id: memory.id || crypto.randomUUID(),
+        imageUrl: memory.imageUrl,
+        caption: memory.caption,
+        date: new Date(memory.date)
+      }))
+    : [];
 
   return (
     <PageContainer>
@@ -62,10 +79,9 @@ const TestAnimation = () => {
               {/* Front Side - Gift Animation */}
               <div className="absolute w-full h-full backface-hidden">
                 <GiftPreviewAnimation
-                  messageVideo={mockMessageVideo}
-                  messageVideoType="url"
-                  amount={mockAmount}
-                  memories={mockMemories}
+                  messageVideo={giftDesign?.message_video_url || null}
+                  amount={giftDesign?.selected_amount?.toString() || "0"}
+                  memories={formattedMemories}
                   onComplete={() => {}}
                 />
               </div>
@@ -73,7 +89,7 @@ const TestAnimation = () => {
               {/* Back Side - Amount Display */}
               <div className="absolute w-full h-full backface-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex flex-col justify-center items-center text-xl font-bold text-white rotate-y-180 rounded-lg shadow-xl">
                 <span className="text-4xl mb-2">Amount</span>
-                <span className="text-6xl">${mockAmount}</span>
+                <span className="text-6xl">${giftDesign?.selected_amount || 0}</span>
               </div>
             </div>
           </div>

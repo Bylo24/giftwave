@@ -148,6 +148,45 @@ export type Database = {
         }
         Relationships: []
       }
+      gift_designs: {
+        Row: {
+          created_at: string
+          front_card_pattern: string | null
+          front_card_stickers: Json | null
+          id: string
+          memories: Json | null
+          message_video_url: string | null
+          selected_amount: number | null
+          status: string | null
+          theme: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          front_card_pattern?: string | null
+          front_card_stickers?: Json | null
+          id?: string
+          memories?: Json | null
+          message_video_url?: string | null
+          selected_amount?: number | null
+          status?: string | null
+          theme?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          front_card_pattern?: string | null
+          front_card_stickers?: Json | null
+          id?: string
+          memories?: Json | null
+          message_video_url?: string | null
+          selected_amount?: number | null
+          status?: string | null
+          theme?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       gift_memories: {
         Row: {
           caption: string
