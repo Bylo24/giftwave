@@ -1,3 +1,4 @@
+
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useState } from "react";
@@ -34,12 +35,18 @@ const TestAnimation = () => {
           memories: [
             {
               id: crypto.randomUUID(),
-              imageUrl: '/placeholder.svg',
+              imageUrl: 'https://images.unsplash.com/photo-1501854140801-50d01698950b',
               caption: 'Sample Memory',
+              date: new Date().toISOString()
+            },
+            {
+              id: crypto.randomUUID(),
+              imageUrl: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
+              caption: 'Another Memory',
               date: new Date().toISOString()
             }
           ],
-          message_video_url: null,
+          message_video_url: 'https://example.com/sample-video.mp4', // You should replace this with an actual video URL
           status: 'draft'
         }])
         .select()
@@ -96,7 +103,7 @@ const TestAnimation = () => {
       console.log("Found gift design:", data);
       return data;
     },
-    enabled: true, // Query will run even if user is not logged in
+    enabled: true,
   });
 
   const flipCard = (direction: 'left' | 'right') => {
@@ -115,9 +122,9 @@ const TestAnimation = () => {
   const formattedMemories = giftDesign?.memories 
     ? (giftDesign.memories as any[]).map(memory => ({
         id: memory.id || crypto.randomUUID(),
-        imageUrl: memory.imageUrl,
-        caption: memory.caption,
-        date: new Date(memory.date)
+        imageUrl: memory.imageUrl || 'https://images.unsplash.com/photo-1501854140801-50d01698950b',
+        caption: memory.caption || 'Beautiful Memory',
+        date: new Date(memory.date || new Date())
       }))
     : [];
 
@@ -153,7 +160,7 @@ const TestAnimation = () => {
   return (
     <PageContainer>
       <PageHeader title="Your Gift Preview" />
-      <div className="flex justify-center items-center min-h-[600px] bg-gray-100 p-4" data-testid="animation-container">
+      <div className="flex justify-center items-center min-h-[600px] bg-gradient-to-br from-purple-50 to-pink-50 p-4" data-testid="animation-container">
         <div className="relative flex items-center">
           {/* Left Arrow */}
           <button 
