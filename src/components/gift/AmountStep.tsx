@@ -29,15 +29,15 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
 
       const { data, error } = await supabase
         .from('gifts')
-        .insert([{
+        .insert({
           sender_id: user.id,
           recipient_phone: recipientPhone,
-          amount,
-          theme,
+          amount: amount,
+          theme: JSON.stringify(theme),
           message_video_url: messageVideoUrl,
-          memories,
+          memories: JSON.stringify(memories),
           status: 'draft'
-        }])
+        })
         .select()
         .single();
 

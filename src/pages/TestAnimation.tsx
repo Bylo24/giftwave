@@ -13,6 +13,23 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
+interface Gift {
+  id: string;
+  amount: string;
+  message_video_url: string;
+  memories: Array<{
+    id: string;
+    imageUrl?: string;
+    caption: string;
+    date: Date;
+  }>;
+  theme: string;
+  recipient_phone: string;
+  sender_id: string;
+  created_at: string;
+  updated_at: string;
+}
+
 const TestAnimation = () => {
   const [currentFlip, setCurrentFlip] = useState(0);
   const location = useLocation();
@@ -37,7 +54,7 @@ const TestAnimation = () => {
         throw error;
       }
 
-      return data;
+      return data as Gift;
     },
     enabled: Boolean(giftId && user),
   });
