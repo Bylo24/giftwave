@@ -9,13 +9,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const TestAnimation = () => {
   const [currentFlip, setCurrentFlip] = useState(0);
   const location = useLocation();
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const designId = new URLSearchParams(location.search).get('id');
@@ -27,27 +28,18 @@ const TestAnimation = () => {
         throw new Error("You must be logged in to create a gift design");
       }
 
+      // Start with front card
       const { data, error } = await supabase
         .from('gift_designs')
         .insert([{
           user_id: user.id,
-          selected_amount: 50,
-          memories: [
-            {
-              id: crypto.randomUUID(),
-              imageUrl: 'https://images.unsplash.com/photo-1501854140801-50d01698950b',
-              caption: 'Sample Memory',
-              date: new Date().toISOString()
-            },
-            {
-              id: crypto.randomUUID(),
-              imageUrl: 'https://images.unsplash.com/photo-1649972904349-6e44c42644a7',
-              caption: 'Another Memory',
-              date: new Date().toISOString()
-            }
-          ],
-          message_video_url: 'https://example.com/sample-video.mp4', // You should replace this with an actual video URL
-          status: 'draft'
+          selected_amount: 0, // Will be set in amount selection step
+          memories: [], // Will be added in inside right card
+          message_video_url: null, // Will be added in inside left card
+          status: 'draft',
+          front_card_pattern: null,
+          front_card_stickers: [],
+          theme: null
         }])
         .select()
         .single();
@@ -58,11 +50,13 @@ const TestAnimation = () => {
         throw error;
       }
 
+      // Redirect to front card design
+      navigate(`/frontcard?id=${data.id}`);
       return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gift-design'] });
-      toast.success("Created new gift design");
+      toast.success("Started new gift design");
     },
   });
 
@@ -83,8 +77,6 @@ const TestAnimation = () => {
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(1);
-      } else {
-        query = query.order('created_at', { ascending: false }).limit(1);
       }
 
       const { data, error } = await query.maybeSingle();
@@ -103,7 +95,7 @@ const TestAnimation = () => {
       console.log("Found gift design:", data);
       return data;
     },
-    enabled: true,
+    enabled: Boolean(user),
   });
 
   const flipCard = (direction: 'left' | 'right') => {
@@ -121,10 +113,10 @@ const TestAnimation = () => {
   // Format memories from the stored JSON
   const formattedMemories = giftDesign?.memories 
     ? (giftDesign.memories as any[]).map(memory => ({
-        id: memory.id || crypto.randomUUID(),
-        imageUrl: memory.imageUrl || 'https://images.unsplash.com/photo-1501854140801-50d01698950b',
-        caption: memory.caption || 'Beautiful Memory',
-        date: new Date(memory.date || new Date())
+        id: memory.id,
+        imageUrl: memory.imageUrl,
+        caption: memory.caption,
+        date: new Date(memory.date)
       }))
     : [];
 
@@ -140,7 +132,7 @@ const TestAnimation = () => {
           <GiftNotFound />
           <p className="text-center text-gray-600 mt-4">
             {user ? 
-              "No gift design found. Click below to create a new test gift." :
+              "No gift design found. Click below to start creating a new gift." :
               "Please log in to create and view gift designs."
             }
           </p>
@@ -149,12 +141,33 @@ const TestAnimation = () => {
               onClick={() => createGiftDesign.mutate()}
               className="mt-4"
             >
-              Create Test Gift
+              Create New Gift
             </Button>
           )}
         </div>
       </PageContainer>
     );
+  }
+
+  // If the gift design is incomplete, redirect to the appropriate step
+  if (!giftDesign.theme || !giftDesign.front_card_pattern) {
+    navigate(`/frontcard?id=${giftDesign.id}`);
+    return null;
+  }
+
+  if (!giftDesign.message_video_url) {
+    navigate(`/insideleftcard?id=${giftDesign.id}`);
+    return null;
+  }
+
+  if (!giftDesign.memories || giftDesign.memories.length === 0) {
+    navigate(`/insiderightcard?id=${giftDesign.id}`);
+    return null;
+  }
+
+  if (!giftDesign.selected_amount) {
+    navigate(`/select-amount?id=${giftDesign.id}`);
+    return null;
   }
 
   return (
@@ -181,7 +194,7 @@ const TestAnimation = () => {
               {/* Front Side - Gift Animation */}
               <div className="absolute w-full h-full backface-hidden">
                 <GiftPreviewAnimation
-                  messageVideo={giftDesign.message_video_url || null}
+                  messageVideo={giftDesign.message_video_url}
                   messageVideoType="url"
                   amount={giftDesign.selected_amount?.toString() || "0"}
                   memories={formattedMemories}
