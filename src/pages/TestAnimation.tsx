@@ -160,7 +160,8 @@ const TestAnimation = () => {
     return null;
   }
 
-  if (!giftDesign.memories || giftDesign.memories.length === 0) {
+  // Check if memories exists and is an array before checking length
+  if (!giftDesign.memories || !Array.isArray(giftDesign.memories) || giftDesign.memories.length === 0) {
     navigate(`/insiderightcard?id=${giftDesign.id}`);
     return null;
   }
