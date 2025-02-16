@@ -56,6 +56,14 @@ export const GiftPreviewAnimation = ({
     }
   }, [onComplete]);
 
+  // Get video source based on type
+  const getVideoSource = () => {
+    if (!messageVideo) return '';
+    return messageVideoType === 'file' 
+      ? URL.createObjectURL(messageVideo as File) 
+      : messageVideo as string;
+  };
+
   return (
     <div className="relative w-full max-w-md mx-auto aspect-square">
       <Lottie
@@ -81,7 +89,7 @@ export const GiftPreviewAnimation = ({
             }}
           >
             <video
-              src={messageVideoType === 'file' ? URL.createObjectURL(messageVideo as File) : messageVideo as string}
+              src={getVideoSource()}
               className="w-full h-full object-cover rounded-lg"
               autoPlay
               muted
