@@ -1,7 +1,8 @@
+
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PageHeader } from "@/components/layout/PageHeader";
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Gift, Video, Image, DollarSign } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, Gift, Video, Image } from "lucide-react";
 import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -104,12 +105,13 @@ const TestAnimation = () => {
     setCurrentFlip(prev => prev === 0 ? 1 : 0);
   };
 
+  // Format memories to ensure they have the correct structure
   const formattedMemories = giftDesign?.memories 
     ? (giftDesign.memories as any[]).map(memory => ({
-        id: memory.id,
+        id: memory.id || crypto.randomUUID(),
         imageUrl: memory.imageUrl,
         caption: memory.caption,
-        date: new Date(memory.date)
+        date: new Date(memory.date || Date.now())
       }))
     : [];
 
@@ -146,6 +148,7 @@ const TestAnimation = () => {
     frontCard: !giftDesign.theme || !giftDesign.front_card_pattern,
     message: !giftDesign.message_video_url,
     memories: !giftDesign.memories || !Array.isArray(giftDesign.memories) || giftDesign.memories.length === 0,
+    amount: !giftDesign.selected_amount
   };
 
   return (
