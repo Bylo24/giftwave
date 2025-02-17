@@ -28,14 +28,13 @@ const TestAnimation = () => {
         throw new Error("You must be logged in to create a gift design");
       }
 
-      // Start with front card
       const { data, error } = await supabase
         .from('gift_designs')
         .insert([{
           user_id: user.id,
-          selected_amount: 0, // Will be set in amount selection step
-          memories: [], // Will be added in inside right card
-          message_video_url: null, // Will be added in inside left card
+          selected_amount: 0,
+          memories: [],
+          message_video_url: null,
           status: 'draft',
           front_card_pattern: null,
           front_card_stickers: [],
@@ -50,7 +49,6 @@ const TestAnimation = () => {
         throw error;
       }
 
-      // Redirect to front card design
       navigate(`/frontcard?id=${data.id}`);
       return data;
     },
@@ -72,7 +70,6 @@ const TestAnimation = () => {
       if (designId) {
         query = query.eq('id', designId);
       } else if (user) {
-        // If no specific design ID, get the latest one for the current user
         query = query
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
@@ -147,28 +144,6 @@ const TestAnimation = () => {
         </div>
       </PageContainer>
     );
-  }
-
-  // If the gift design is incomplete, redirect to the appropriate step
-  if (!giftDesign.theme || !giftDesign.front_card_pattern) {
-    navigate(`/frontcard?id=${giftDesign.id}`);
-    return null;
-  }
-
-  if (!giftDesign.message_video_url) {
-    navigate(`/insideleftcard?id=${giftDesign.id}`);
-    return null;
-  }
-
-  // Check if memories exists and is an array before checking length
-  if (!giftDesign.memories || !Array.isArray(giftDesign.memories) || giftDesign.memories.length === 0) {
-    navigate(`/insiderightcard?id=${giftDesign.id}`);
-    return null;
-  }
-
-  if (!giftDesign.selected_amount) {
-    navigate(`/select-amount?id=${giftDesign.id}`);
-    return null;
   }
 
   return (
