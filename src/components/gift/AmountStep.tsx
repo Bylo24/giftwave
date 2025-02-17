@@ -7,6 +7,9 @@ import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AmountStepProps {
   amount: string;
@@ -18,6 +21,8 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
   const presetAmounts = [5, 10, 20, 50, 100, 200];
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value);
@@ -51,8 +56,60 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     }
   };
 
-  const handleContinue = () => {
-    navigate('/testanimation');
+  // Create a new gift design
+  const createGiftDesign = useMutation({
+    mutationFn: async () => {
+      if (!user) {
+        throw new Error("You must be logged in to create a gift design");
+      }
+
+      const { data, error } = await supabase
+        .from('gift_designs')
+        .insert([{
+          user_id: user.id,
+          selected_amount: parseFloat(amount),
+          status: 'draft'
+        }])
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error creating gift design:", error);
+        toast({
+          title: "Error",
+          description: "Failed to create gift preview",
+          variant: "destructive",
+        });
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ['gift-design'] });
+      navigate(`/testanimation?id=${data.id}`);
+      toast({
+        title: "Success",
+        description: "Gift design created successfully",
+      });
+    },
+  });
+
+  const handleContinue = async () => {
+    if (!amount) {
+      toast({
+        title: "Invalid amount",
+        description: "Please select or enter an amount",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await createGiftDesign.mutateAsync();
+    } catch (error) {
+      console.error("Failed to create gift design:", error);
+    }
   };
 
   return (
@@ -126,10 +183,10 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       >
         <Button 
           onClick={handleContinue}
-          disabled={!amount || parseFloat(amount) <= 0}
+          disabled={!amount || parseFloat(amount) <= 0 || createGiftDesign.isPending}
           className="w-full h-14 text-lg font-medium bg-blue-600 hover:bg-blue-700 transition-colors"
         >
-          Continue
+          {createGiftDesign.isPending ? "Creating..." : "Continue"}
         </Button>
       </motion.div>
     </div>
