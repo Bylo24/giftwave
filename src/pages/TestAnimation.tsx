@@ -1,8 +1,7 @@
-
 import { PageContainer } from "@/components/layout/PageContainer";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { useState } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Gift, Video, Image, DollarSign } from "lucide-react";
 import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,7 +20,6 @@ const TestAnimation = () => {
   const { user } = useAuth();
   const designId = new URLSearchParams(location.search).get('id');
 
-  // Create a new gift design
   const createGiftDesign = useMutation({
     mutationFn: async () => {
       if (!user) {
@@ -58,7 +56,6 @@ const TestAnimation = () => {
     },
   });
 
-  // Fetch the specific gift design or latest one
   const { data: giftDesign, isLoading } = useQuery({
     queryKey: ['gift-design', designId],
     queryFn: async () => {
@@ -107,7 +104,6 @@ const TestAnimation = () => {
     setCurrentFlip(prev => prev === 0 ? 1 : 0);
   };
 
-  // Format memories from the stored JSON
   const formattedMemories = giftDesign?.memories 
     ? (giftDesign.memories as any[]).map(memory => ({
         id: memory.id,
@@ -146,12 +142,48 @@ const TestAnimation = () => {
     );
   }
 
+  const incompleteSteps = {
+    frontCard: !giftDesign.theme || !giftDesign.front_card_pattern,
+    message: !giftDesign.message_video_url,
+    memories: !giftDesign.memories || !Array.isArray(giftDesign.memories) || giftDesign.memories.length === 0,
+  };
+
   return (
     <PageContainer>
       <PageHeader title="Your Gift Preview" />
+      
+      <div className="flex justify-center gap-4 mb-6">
+        <Button
+          variant={incompleteSteps.frontCard ? "destructive" : "outline"}
+          onClick={() => navigate(`/frontcard?id=${giftDesign.id}`)}
+          className="flex items-center gap-2"
+        >
+          <Gift className="h-4 w-4" />
+          Front Card
+          {incompleteSteps.frontCard && " (Required)"}
+        </Button>
+        <Button
+          variant={incompleteSteps.message ? "destructive" : "outline"}
+          onClick={() => navigate(`/insideleftcard?id=${giftDesign.id}`)}
+          className="flex items-center gap-2"
+        >
+          <Video className="h-4 w-4" />
+          Message
+          {incompleteSteps.message && " (Required)"}
+        </Button>
+        <Button
+          variant={incompleteSteps.memories ? "destructive" : "outline"}
+          onClick={() => navigate(`/insiderightcard?id=${giftDesign.id}`)}
+          className="flex items-center gap-2"
+        >
+          <Image className="h-4 w-4" />
+          Memories
+          {incompleteSteps.memories && " (Required)"}
+        </Button>
+      </div>
+
       <div className="flex justify-center items-center min-h-[600px] bg-gradient-to-br from-purple-50 to-pink-50 p-4" data-testid="animation-container">
         <div className="relative flex items-center">
-          {/* Left Arrow */}
           <button 
             onClick={() => flipCard('left')} 
             className="absolute -left-16 text-3xl text-gray-700 hover:text-gray-900 transition-colors cursor-pointer z-10"
@@ -160,14 +192,12 @@ const TestAnimation = () => {
             <ChevronLeft size={30} />
           </button>
 
-          {/* Card Container */}
           <div className="perspective-[1000px]">
             <div 
               onClick={handleCardClick}
               className="w-[300px] h-[400px] transform-style-3d transition-transform duration-1000 cursor-pointer"
               style={{ transform: `rotateY(${currentFlip * -180}deg)` }}
             >
-              {/* Front Side - Gift Animation */}
               <div className="absolute w-full h-full backface-hidden">
                 <GiftPreviewAnimation
                   messageVideo={giftDesign.message_video_url}
@@ -178,7 +208,6 @@ const TestAnimation = () => {
                 />
               </div>
               
-              {/* Back Side - Amount Display */}
               <div className="absolute w-full h-full backface-hidden bg-gradient-to-br from-blue-500 to-purple-600 flex flex-col justify-center items-center text-xl font-bold text-white rotate-y-180 rounded-lg shadow-xl">
                 <span className="text-4xl mb-2">Amount</span>
                 <span className="text-6xl">${giftDesign.selected_amount || 0}</span>
@@ -186,7 +215,6 @@ const TestAnimation = () => {
             </div>
           </div>
 
-          {/* Right Arrow */}
           <button 
             onClick={() => flipCard('right')} 
             className="absolute -right-16 text-3xl text-gray-700 hover:text-gray-900 transition-colors cursor-pointer z-10"
@@ -196,6 +224,12 @@ const TestAnimation = () => {
           </button>
         </div>
       </div>
+
+      {(incompleteSteps.frontCard || incompleteSteps.message || incompleteSteps.memories) && (
+        <div className="mt-6 text-center text-gray-600">
+          <p>Please complete all required sections above to finalize your gift.</p>
+        </div>
+      )}
     </PageContainer>
   );
 };
