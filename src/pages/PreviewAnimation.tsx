@@ -1,14 +1,12 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
-import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
-import { Button } from "@/components/ui/button";
-import { Loader2, ChevronLeft, ChevronRight, Video, Image, Star, DollarSign } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { useAuth } from "@/contexts/AuthContext";
-import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { PatternType } from "@/types/gift";
 import Confetti from 'react-confetti';
+import { PreviewNavigationButtons } from "@/components/gift/preview/PreviewNavigationButtons";
+import { PreviewCard } from "@/components/gift/preview/PreviewCard";
+import { PreviewContainer } from "@/components/gift/preview/PreviewContainer";
 
 const sampleThemeOption = {
   text: "Happy Birthday!",
@@ -22,21 +20,9 @@ const sampleThemeOption = {
   }
 };
 
-const memoryPlaceholders = [
-  {
-    imageUrl: "/placeholder.svg",
-    caption: "Memory 1"
-  },
-  {
-    imageUrl: "/placeholder.svg",
-    caption: "Memory 2"
-  }
-];
-
 const PreviewAnimation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [gift, setGift] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
@@ -67,10 +53,6 @@ const PreviewAnimation = () => {
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
     setShowConfetti(true);
     setTimeout(() => setIsFlipping(false), 500);
-  };
-
-  const handleComplete = () => {
-    navigate("/collect-gift");
   };
 
   const getPatternStyle = (pattern: { type: PatternType; color: string }) => {
@@ -110,7 +92,7 @@ const PreviewAnimation = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <p className="text-red-500 mb-4">{error}</p>
-        <Button onClick={() => navigate("/home")}>Return Home</Button>
+        <button onClick={() => navigate("/home")}>Return Home</button>
       </div>
     );
   }
@@ -128,126 +110,33 @@ const PreviewAnimation = () => {
         />
       )}
       <div className="w-full max-w-md relative">
-        <div className="flex justify-between mb-16 sm:mb-20 px-6">
-          <button
-            onClick={previousPage}
-            disabled={isFlipping}
-            className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Previous page"
-          >
-            <ChevronLeft className="w-6 h-6 text-gray-600" />
-          </button>
-
-          <button
-            onClick={nextPage}
-            disabled={isFlipping}
-            className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            aria-label="Next page"
-          >
-            <ChevronRight className="w-6 h-6 text-gray-600" />
-          </button>
-        </div>
-
-        <div 
+        <PreviewNavigationButtons
+          onPrevious={previousPage}
+          onNext={nextPage}
+          isFlipping={isFlipping}
+        />
+        
+        <PreviewContainer
+          currentPage={currentPage}
           onClick={nextPage}
-          className="cursor-pointer mx-6"
-          style={{ perspective: "1000px" }}
         >
-          <div 
-            className="w-full aspect-[3/4] relative transition-transform duration-500"
-            style={{ 
-              transform: `rotateY(${currentPage * -90}deg)`,
-              transformStyle: "preserve-3d"
-            }}
-          >
-            {[0, 1, 2, 3].map((pageIndex) => (
-              <div
-                key={pageIndex}
-                className="w-full h-full absolute bg-white rounded-xl shadow-xl"
-                style={{
-                  transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
-                  backfaceVisibility: "hidden"
-                }}
-              >
-                {pageIndex === 0 ? (
-                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
-                    <div 
-                      className="absolute inset-0" 
-                      style={getPatternStyle(sampleThemeOption.pattern)}
-                    />
-                    <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8 p-4">
-                      <div className="text-center">
-                        {sampleThemeOption.text.split('').map((letter, index) => (
-                          <span 
-                            key={index} 
-                            className={`text-2xl sm:text-3xl md:text-4xl font-serif ${sampleThemeOption.textColors[index % sampleThemeOption.textColors.length]}`}
-                          >
-                            {letter}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="text-3xl sm:text-4xl md:text-5xl animate-bounce">
-                        {sampleThemeOption.emoji}
-                      </div>
-                    </div>
-                  </div>
-                ) : pageIndex === 1 ? (
-                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
-                    <div 
-                      className="absolute inset-0" 
-                      style={getPatternStyle(sampleThemeOption.pattern)}
-                    />
-                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
-                      <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
-                        <Video className="h-8 w-8 text-gray-600" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                        Video message
-                      </span>
-                    </div>
-                  </div>
-                ) : pageIndex === 2 ? (
-                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
-                    <div 
-                      className="absolute inset-0" 
-                      style={getPatternStyle(sampleThemeOption.pattern)}
-                    />
-                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
-                      <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
-                        <Image className="h-8 w-8 text-gray-600" />
-                      </div>
-                      <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                        Photo memories
-                      </span>
-                      <div className="flex flex-col items-center justify-center mt-4">
-                        <Star className="h-6 w-6 text-gray-400 mb-2" />
-                        <p className="text-sm text-gray-500">Add your first memory</p>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
-                    <div 
-                      className="absolute inset-0" 
-                      style={getPatternStyle(sampleThemeOption.pattern)}
-                    />
-                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
-                      <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
-                        <DollarSign className="h-8 w-8 text-gray-600" />
-                      </div>
-                      <div className="flex flex-col items-center">
-                        <span className="text-4xl font-bold text-gray-700 mb-2">$50</span>
-                        <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                          Gift amount
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+          {[0, 1, 2, 3].map((pageIndex) => (
+            <div
+              key={pageIndex}
+              className="w-full h-full absolute bg-white rounded-xl shadow-xl"
+              style={{
+                transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
+                backfaceVisibility: "hidden"
+              }}
+            >
+              <PreviewCard
+                pageIndex={pageIndex}
+                themeOption={sampleThemeOption}
+                getPatternStyle={getPatternStyle}
+              />
+            </div>
+          ))}
+        </PreviewContainer>
       </div>
     </div>
   );
