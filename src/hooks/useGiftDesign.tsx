@@ -16,7 +16,7 @@ interface GiftDesign {
   status: string;
   theme: string | null;
   user_id: string | null;
-  token: string;
+  token: string | null;
 }
 
 export const useGiftDesign = (token: string | null) => {
@@ -52,7 +52,9 @@ export const useGiftDesign = (token: string | null) => {
       }
 
       const giftDesign = data as GiftDesign;
-      navigate(`/frontcard?token=${giftDesign.token}`);
+      if (giftDesign.token) {
+        navigate(`/frontcard?token=${giftDesign.token}`);
+      }
       return giftDesign;
     },
     onSuccess: () => {
