@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -7,6 +8,7 @@ import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { PatternType } from "@/types/gift";
 
 const sampleThemeOption = {
   text: "Happy Birthday!",
@@ -15,7 +17,7 @@ const sampleThemeOption = {
   screenBgColor: "#f3e8ff",
   textColors: ["text-purple-600"],
   pattern: {
-    type: "dots" as const,
+    type: "dots" as PatternType,
     color: "rgba(147, 51, 234, 0.1)"
   }
 };
@@ -108,7 +110,7 @@ const PreviewAnimation = () => {
     navigate("/collect-gift");
   };
 
-  const getPatternStyle = (pattern: typeof sampleThemeOption.pattern) => {
+  const getPatternStyle = (pattern: { type: PatternType; color: string }) => {
     switch (pattern.type) {
       case 'dots':
         return {
