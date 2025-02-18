@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -13,7 +13,10 @@ const PreviewAnimation = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [gift, setGift] = useState<any>(null);
+  const [currentPage, setCurrentPage] = useState(0);
   const navigate = useNavigate();
+
+  const totalPages = 3; // Number of blank card sides
 
   useEffect(() => {
     const loadGift = async () => {
@@ -75,6 +78,14 @@ const PreviewAnimation = () => {
     loadGift();
   }, []);
 
+  const nextPage = () => {
+    setCurrentPage((prev) => (prev + 1) % totalPages);
+  };
+
+  const previousPage = () => {
+    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+  };
+
   const handleComplete = () => {
     navigate("/collect-gift");
   };
@@ -98,16 +109,35 @@ const PreviewAnimation = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg">
-        {gift && (
-          <GiftRevealAnimation
-            messageVideo={gift.message_video_url || ""}
-            amount={gift.amount?.toString() || "0"}
-            memories={gift.memories}
-            memory={gift.memory}
-            onComplete={handleComplete}
-          />
-        )}
+      <div className="w-full max-w-lg relative">
+        <button
+          onClick={previousPage}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10"
+          aria-label="Previous page"
+        >
+          <ChevronLeft className="w-6 h-6 text-gray-600" />
+        </button>
+
+        <div 
+          onClick={nextPage}
+          className="cursor-pointer"
+        >
+          <div className="w-full aspect-[3/4] bg-white rounded-xl shadow-xl p-8">
+            <div className="w-full h-full flex items-center justify-center">
+              <h2 className="text-2xl font-bold text-gray-400">
+                Page {currentPage + 1}
+              </h2>
+            </div>
+          </div>
+        </div>
+
+        <button
+          onClick={nextPage}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10"
+          aria-label="Next page"
+        >
+          <ChevronRight className="w-6 h-6 text-gray-600" />
+        </button>
       </div>
     </div>
   );
