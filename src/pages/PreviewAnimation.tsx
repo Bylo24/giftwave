@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronLeft, ChevronRight, Video, Image, Star, PlusCircle } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Video, Image, Star, DollarSign } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -270,14 +271,14 @@ const PreviewAnimation = () => {
                     />
                     <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
                       <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
-                        <PlusCircle className="h-8 w-8 text-gray-600" />
+                        <DollarSign className="h-8 w-8 text-gray-600" />
                       </div>
-                      <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-                        Add more content
-                      </span>
-                      <p className="text-sm text-gray-500 text-center mt-4">
-                        Click to customize your gift
-                      </p>
+                      <div className="flex flex-col items-center">
+                        <span className="text-4xl font-bold text-gray-700 mb-2">$50</span>
+                        <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                          Gift amount
+                        </span>
+                      </div>
                     </div>
                   </div>
                 )}
