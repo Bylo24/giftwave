@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { GiftPreviewAnimation } from './GiftPreviewAnimation';
+import { GiftPreviewCard } from './GiftPreviewCard';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
@@ -29,14 +29,8 @@ export const GiftRevealAnimation = ({
     setIsRevealing(true);
   };
 
-  const handleAnimationComplete = () => {
-    setTimeout(() => {
-      onComplete();
-    }, 1000); // Add a small delay before transitioning
-  };
-
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-purple-50 to-pink-50">
+    <div className="min-h-[500px] flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {!isRevealing ? (
           <motion.div
@@ -58,12 +52,17 @@ export const GiftRevealAnimation = ({
             </Button>
           </motion.div>
         ) : (
-          <GiftPreviewAnimation
-            messageVideo={messageVideo}
-            amount={amount}
-            memories={memories}
-            onComplete={handleAnimationComplete}
-          />
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          >
+            <GiftPreviewCard
+              messageVideo={messageVideo}
+              amount={amount}
+              memories={memories}
+            />
+          </motion.div>
         )}
       </div>
     </div>

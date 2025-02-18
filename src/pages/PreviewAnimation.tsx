@@ -1,91 +1,102 @@
 
-import { PageContainer } from "@/components/layout/PageContainer";
-import { PageHeader } from "@/components/layout/PageHeader";
-import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
-import { GiftNotFound } from "@/components/gift/GiftNotFound";
-import { useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { useAuth } from "@/contexts/AuthContext";
-import { useGiftDesign } from "@/hooks/useGiftDesign";
-import { GiftPreviewNavigation } from "@/components/gift/GiftPreviewNavigation";
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
+import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
+import { Button } from "@/components/ui/button";
+import { Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const PreviewAnimation = () => {
-  const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [gift, setGift] = useState<any>(null);
+  const navigate = useNavigate();
   const { user } = useAuth();
-  const token = new URLSearchParams(location.search).get('token');
-  const { giftDesign, isLoading, createGiftDesign } = useGiftDesign(token);
 
-  // Format memories to ensure they have the correct structure
-  const formattedMemories = giftDesign?.memories 
-    ? (giftDesign.memories as any[]).map(memory => ({
-        id: memory.id || crypto.randomUUID(),
-        imageUrl: memory.imageUrl,
-        caption: memory.caption,
-        date: new Date(memory.date || Date.now())
-      }))
-    : [];
+  useEffect(() => {
+    const loadGift = async () => {
+      try {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('phone_number')
+          .eq('id', user?.id)
+          .single();
+
+        if (!profile?.phone_number) {
+          setError("No phone number found");
+          return;
+        }
+
+        const { data: giftData, error: giftError } = await supabase
+          .from('gifts')
+          .select(`
+            *,
+            sender:profiles(full_name)
+          `)
+          .eq('recipient_phone', profile.phone_number)
+          .eq('status', 'pending')
+          .single();
+
+        if (giftError) {
+          console.error("Error loading gift:", giftError);
+          setError("Failed to load gift");
+          return;
+        }
+
+        if (!giftData) {
+          setError("Gift not found");
+          return;
+        }
+
+        setGift(giftData);
+      } catch (err) {
+        console.error("Error in loadGift:", err);
+        setError("An unexpected error occurred");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadGift();
+  }, [user?.id]);
+
+  const handleComplete = () => {
+    navigate("/collect-gift");
+  };
 
   if (isLoading) {
-    return <GiftLoadingState />;
-  }
-
-  if (!giftDesign) {
     return (
-      <PageContainer>
-        <PageHeader title="Gift Preview" />
-        <div className="flex flex-col items-center justify-center min-h-[400px] p-4">
-          <GiftNotFound />
-          <p className="text-center text-gray-600 mt-4">
-            {user ? 
-              "No gift design found. Click below to start creating a new gift." :
-              "Please log in to create and view gift designs."
-            }
-          </p>
-          {user && (
-            <Button 
-              onClick={() => createGiftDesign.mutate()}
-              className="mt-4"
-            >
-              Create New Gift
-            </Button>
-          )}
-        </div>
-      </PageContainer>
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
+      </div>
     );
   }
 
-  const incompleteSteps = {
-    frontCard: !giftDesign.theme || !giftDesign.front_card_pattern,
-    message: !giftDesign.message_video_url,
-    memories: !giftDesign.memories || !Array.isArray(giftDesign.memories) || giftDesign.memories.length === 0,
-    amount: !giftDesign.selected_amount
-  };
+  if (error) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <p className="text-red-500 mb-4">{error}</p>
+        <Button onClick={() => navigate("/home")}>Return Home</Button>
+      </div>
+    );
+  }
 
   return (
-    <PageContainer>
-      <PageHeader title="Your Gift Preview" />
-      
-      <GiftPreviewNavigation 
-        giftId={giftDesign.id} 
-        token={giftDesign.token}
-        incompleteSteps={incompleteSteps} 
-      />
-
-      <div className="flex justify-center items-center min-h-[600px] bg-gradient-to-br from-purple-50 to-pink-50 p-4" data-testid="animation-container">
-        <GiftPreviewCard
-          messageVideo={giftDesign.message_video_url}
-          amount={giftDesign.selected_amount?.toString() || "0"}
-          memories={formattedMemories}
-        />
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+      <div className="w-full max-w-lg">
+        {gift && (
+          <GiftRevealAnimation
+            messageVideo={gift.message_video_url}
+            amount={gift.amount?.toString() || "0"}
+            memories={gift.memories || []}
+            memory={gift.memory}
+            onComplete={handleComplete}
+          />
+        )}
       </div>
-
-      {(incompleteSteps.frontCard || incompleteSteps.message || incompleteSteps.memories) && (
-        <div className="mt-6 text-center text-gray-600">
-          <p>Please complete all required sections above to finalize your gift.</p>
-        </div>
-      )}
-    </PageContainer>
+    </div>
   );
 };
 
