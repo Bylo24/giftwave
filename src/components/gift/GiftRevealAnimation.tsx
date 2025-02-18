@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
 interface GiftRevealAnimationProps {
-  messageVideo: File | string | null;
+  messageVideo: string;
   amount: string;
   memories: Array<{
     id: string;

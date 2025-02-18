@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { toast } from "sonner";
 
 const PreviewAnimation = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -18,18 +19,28 @@ const PreviewAnimation = () => {
   useEffect(() => {
     const loadGift = async () => {
       try {
-        const { data: profile } = await supabase
+        if (!user?.id) {
+          setError("Please sign in to view this gift");
+          return;
+        }
+
+        const { data: profile, error: profileError } = await supabase
           .from('profiles')
           .select('phone_number')
-          .eq('id', user?.id)
-          .single();
+          .eq('id', user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error("Error fetching profile:", profileError);
+          setError("Failed to load profile");
+          return;
+        }
 
         if (!profile?.phone_number) {
           setError("No phone number found");
           return;
         }
 
-        // Query gifts with proper status filter
         const { data: giftData, error: giftError } = await supabase
           .from('gifts')
           .select(`
@@ -39,7 +50,7 @@ const PreviewAnimation = () => {
           `)
           .eq('recipient_phone', profile.phone_number)
           .eq('status', 'pending')
-          .single();
+          .maybeSingle();
 
         if (giftError) {
           console.error("Error loading gift:", giftError);
@@ -48,11 +59,10 @@ const PreviewAnimation = () => {
         }
 
         if (!giftData) {
-          setError("Gift not found");
+          setError("No pending gifts found");
           return;
         }
 
-        // Format memories from gift_memories
         const formattedMemories = giftData.gift_memories?.map((memory: any) => ({
           id: memory.id,
           imageUrl: memory.image_url,
@@ -101,7 +111,7 @@ const PreviewAnimation = () => {
       <div className="w-full max-w-lg">
         {gift && (
           <GiftRevealAnimation
-            messageVideo={gift.message_video_url}
+            messageVideo={gift.message_video_url || ""}
             amount={gift.amount?.toString() || "0"}
             memories={gift.memories}
             memory={gift.memory}
