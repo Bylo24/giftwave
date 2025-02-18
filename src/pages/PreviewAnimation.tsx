@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -21,6 +20,17 @@ const sampleThemeOption = {
     color: "rgba(147, 51, 234, 0.1)"
   }
 };
+
+const memoryPlaceholders = [
+  {
+    imageUrl: "/placeholder.svg",
+    caption: "Memory 1"
+  },
+  {
+    imageUrl: "/placeholder.svg",
+    caption: "Memory 2"
+  }
+];
 
 const PreviewAnimation = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -216,6 +226,26 @@ const PreviewAnimation = () => {
                       <div className="text-3xl sm:text-4xl md:text-5xl animate-bounce">
                         {sampleThemeOption.emoji}
                       </div>
+                    </div>
+                  </div>
+                ) : pageIndex === 1 ? (
+                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
+                    <div 
+                      className="absolute inset-0" 
+                      style={getPatternStyle(sampleThemeOption.pattern)}
+                    />
+                    <div className="relative z-10 h-full flex flex-col justify-between py-8">
+                      {memoryPlaceholders.map((memory, idx) => (
+                        <div key={idx} className="flex-1 flex items-center justify-center">
+                          <div className="flex flex-col space-y-2 w-full">
+                            <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg w-32 h-32 mx-auto">
+                              <img src={memory.imageUrl} alt={memory.caption} className="w-full h-full object-cover" />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
+                            </div>
+                            <p className="text-sm text-center font-medium text-gray-800">{memory.caption}</p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 ) : (
