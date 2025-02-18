@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Video } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -234,18 +234,13 @@ const PreviewAnimation = () => {
                       className="absolute inset-0" 
                       style={getPatternStyle(sampleThemeOption.pattern)}
                     />
-                    <div className="relative z-10 h-full flex flex-col justify-between py-8">
-                      {memoryPlaceholders.map((memory, idx) => (
-                        <div key={idx} className="flex-1 flex items-center justify-center">
-                          <div className="flex flex-col space-y-2 w-full">
-                            <div className="relative rounded-lg overflow-hidden aspect-square shadow-lg w-32 h-32 mx-auto">
-                              <img src={memory.imageUrl} alt={memory.caption} className="w-full h-full object-cover" />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                            </div>
-                            <p className="text-sm text-center font-medium text-gray-800">{memory.caption}</p>
-                          </div>
-                        </div>
-                      ))}
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+                      <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
+                        <Video className="h-8 w-8 text-gray-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                        Video message
+                      </span>
                     </div>
                   </div>
                 ) : (
