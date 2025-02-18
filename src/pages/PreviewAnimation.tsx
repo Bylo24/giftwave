@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -25,6 +26,7 @@ const PreviewAnimation = () => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [confettiOpacity, setConfettiOpacity] = useState(1);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -35,10 +37,21 @@ const PreviewAnimation = () => {
 
   useEffect(() => {
     if (showConfetti) {
-      const timer = setTimeout(() => {
+      // Start fading out after 1 second
+      const fadeStartTimer = setTimeout(() => {
+        setConfettiOpacity(0);
+      }, 1000);
+
+      // Remove confetti after fade completes
+      const removeTimer = setTimeout(() => {
         setShowConfetti(false);
-      }, 2000);
-      return () => clearTimeout(timer);
+        setConfettiOpacity(1); // Reset opacity for next animation
+      }, 1500);
+
+      return () => {
+        clearTimeout(fadeStartTimer);
+        clearTimeout(removeTimer);
+      };
     }
   }, [showConfetti]);
 
@@ -99,14 +112,26 @@ const PreviewAnimation = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center px-8 py-12 sm:p-6">
       {showConfetti && (
-        <Confetti
-          width={window.innerWidth}
-          height={window.innerHeight}
-          recycle={false}
-          numberOfPieces={100}
-          gravity={0.3}
-          colors={['#FF69B4', '#9370DB', '#4B0082', '#FF1493', '#8A2BE2']}
-        />
+        <div style={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          width: '100%', 
+          height: '100%',
+          opacity: confettiOpacity,
+          transition: 'opacity 0.5s ease-out',
+          pointerEvents: 'none'
+        }}>
+          <Confetti
+            width={window.innerWidth}
+            height={window.innerHeight}
+            recycle={false}
+            numberOfPieces={150}
+            gravity={0.5}
+            initialVelocityY={15}
+            colors={['#FF69B4', '#9370DB', '#4B0082', '#FF1493', '#8A2BE2']}
+          />
+        </div>
       )}
       <div className="w-full max-w-md relative">
         <PreviewNavigationButtons
