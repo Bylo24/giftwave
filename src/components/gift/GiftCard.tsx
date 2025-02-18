@@ -28,10 +28,8 @@ interface GiftCardProps {
   amount: string;
 }
 
-type CardPage = 'front' | 'left' | 'right' | 'back';
-
 export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProps) => {
-  const [currentPage, setCurrentPage] = useState<CardPage>('front');
+  const [currentPage, setCurrentPage] = useState<'front' | 'left' | 'right' | 'back'>('front');
   const [isRevealed, setIsRevealed] = useState(false);
   const [templates, setTemplates] = useState<GiftCardTemplate[]>([]);
   const [selectedTemplate, setSelectedTemplate] = useState<GiftCardTemplate | null>(null);
@@ -71,24 +69,24 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
     setPlacedStickers([...placedStickers, position]);
   };
 
-  const getPageIndex = (page: CardPage) => {
-    const pages: CardPage[] = ['front', 'left', 'right', 'back'];
+  const getPageIndex = (page: 'front' | 'left' | 'right' | 'back') => {
+    const pages = ['front', 'left', 'right', 'back'];
     return pages.indexOf(page);
   };
 
   const handleNextPage = () => {
-    const pages: CardPage[] = ['front', 'left', 'right', 'back'];
+    const pages = ['front', 'left', 'right', 'back'];
     const currentIndex = pages.indexOf(currentPage);
     if (currentIndex < pages.length - 1) {
-      setCurrentPage(pages[currentIndex + 1]);
+      setCurrentPage(pages[currentIndex + 1] as 'front' | 'left' | 'right' | 'back');
     }
   };
 
   const handlePreviousPage = () => {
-    const pages: CardPage[] = ['front', 'left', 'right', 'back'];
+    const pages = ['front', 'left', 'right', 'back'];
     const currentIndex = pages.indexOf(currentPage);
     if (currentIndex > 0) {
-      setCurrentPage(pages[currentIndex - 1]);
+      setCurrentPage(pages[currentIndex - 1] as 'front' | 'left' | 'right' | 'back');
     }
   };
 
@@ -180,7 +178,6 @@ export const GiftCard = ({ theme, messageVideo, memories, amount }: GiftCardProp
                   </DialogHeader>
                   <ScrollArea className="h-[300px] w-full pr-4">
                     <div className="grid grid-cols-4 gap-4">
-                      {/* Add your sticker options here */}
                       {['🎈', '🎁', '🎊', '🎉', '💝', '💖', '✨', '⭐'].map((emoji, index) => (
                         <motion.div
                           key={index}
