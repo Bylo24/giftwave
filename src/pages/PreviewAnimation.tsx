@@ -129,6 +129,12 @@ const PreviewAnimation = () => {
             numberOfPieces={150}
             gravity={0.5}
             initialVelocityY={15}
+            confettiSource={{
+              x: window.innerWidth / 2,
+              y: window.innerHeight,
+              w: window.innerWidth,
+              h: 0
+            }}
             colors={['#FF69B4', '#9370DB', '#4B0082', '#FF1493', '#8A2BE2']}
           />
         </div>
