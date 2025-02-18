@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -14,9 +13,10 @@ const PreviewAnimation = () => {
   const [error, setError] = useState<string | null>(null);
   const [gift, setGift] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isFlipping, setIsFlipping] = useState(false);
   const navigate = useNavigate();
 
-  const totalPages = 3; // Number of blank card sides
+  const totalPages = 3;
 
   useEffect(() => {
     const loadGift = async () => {
@@ -79,11 +79,17 @@ const PreviewAnimation = () => {
   }, []);
 
   const nextPage = () => {
+    if (isFlipping) return;
+    setIsFlipping(true);
     setCurrentPage((prev) => (prev + 1) % totalPages);
+    setTimeout(() => setIsFlipping(false), 500);
   };
 
   const previousPage = () => {
+    if (isFlipping) return;
+    setIsFlipping(true);
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+    setTimeout(() => setIsFlipping(false), 500);
   };
 
   const handleComplete = () => {
@@ -112,7 +118,8 @@ const PreviewAnimation = () => {
       <div className="w-full max-w-lg relative">
         <button
           onClick={previousPage}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10"
+          disabled={isFlipping}
+          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Previous page"
         >
           <ChevronLeft className="w-6 h-6 text-gray-600" />
@@ -120,20 +127,40 @@ const PreviewAnimation = () => {
 
         <div 
           onClick={nextPage}
-          className="cursor-pointer"
+          className="cursor-pointer perspective-[1000px]"
+          style={{ perspective: "1000px" }}
         >
-          <div className="w-full aspect-[3/4] bg-white rounded-xl shadow-xl p-8">
-            <div className="w-full h-full flex items-center justify-center">
-              <h2 className="text-2xl font-bold text-gray-400">
-                Page {currentPage + 1}
-              </h2>
-            </div>
+          <div 
+            className="w-full aspect-[3/4] relative transition-transform duration-500 transform-style-preserve-3d"
+            style={{ 
+              transform: `rotateY(${currentPage * -120}deg)`,
+              transformStyle: "preserve-3d"
+            }}
+          >
+            {[0, 1, 2].map((pageIndex) => (
+              <div
+                key={pageIndex}
+                className="w-full h-full absolute backface-hidden bg-white rounded-xl shadow-xl p-8"
+                style={{
+                  transform: `rotateY(${pageIndex * 120}deg) translateZ(500px)`,
+                  backfaceVisibility: "hidden",
+                  position: "absolute",
+                }}
+              >
+                <div className="w-full h-full flex items-center justify-center">
+                  <h2 className="text-2xl font-bold text-gray-400">
+                    Page {pageIndex + 1}
+                  </h2>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
         <button
           onClick={nextPage}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10"
+          disabled={isFlipping}
+          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
           aria-label="Next page"
         >
           <ChevronRight className="w-6 h-6 text-gray-600" />
