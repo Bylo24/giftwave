@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -8,6 +7,18 @@ import { Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+
+const sampleThemeOption = {
+  text: "Happy Birthday!",
+  emoji: "🎉",
+  bgColor: "bg-purple-100",
+  screenBgColor: "#f3e8ff",
+  textColors: ["text-purple-600"],
+  pattern: {
+    type: "dots" as const,
+    color: "rgba(147, 51, 234, 0.1)"
+  }
+};
 
 const PreviewAnimation = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -97,6 +108,31 @@ const PreviewAnimation = () => {
     navigate("/collect-gift");
   };
 
+  const getPatternStyle = (pattern: typeof sampleThemeOption.pattern) => {
+    switch (pattern.type) {
+      case 'dots':
+        return {
+          backgroundImage: `radial-gradient(circle, ${pattern.color} 10%, transparent 11%)`,
+          backgroundSize: '20px 20px'
+        };
+      case 'grid':
+        return {
+          backgroundImage: `linear-gradient(to right, ${pattern.color} 1px, transparent 1px),
+                           linear-gradient(to bottom, ${pattern.color} 1px, transparent 1px)`,
+          backgroundSize: '20px 20px'
+        };
+      case 'waves':
+        return {
+          backgroundImage: `repeating-linear-gradient(45deg, ${pattern.color} 0px, ${pattern.color} 2px,
+                           transparent 2px, transparent 8px)`,
+          backgroundSize: '20px 20px'
+        };
+      case 'none':
+      default:
+        return {};
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -158,11 +194,35 @@ const PreviewAnimation = () => {
                   backfaceVisibility: "hidden"
                 }}
               >
-                <div className="w-full h-full flex items-center justify-center">
-                  <h2 className="text-2xl font-bold text-gray-400">
-                    Page {pageIndex + 1}
-                  </h2>
-                </div>
+                {pageIndex === 0 ? (
+                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-lg relative overflow-hidden`}>
+                    <div 
+                      className="absolute inset-0" 
+                      style={getPatternStyle(sampleThemeOption.pattern)}
+                    />
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8">
+                      <div className="text-center">
+                        {sampleThemeOption.text.split('').map((letter, index) => (
+                          <span 
+                            key={index} 
+                            className={`text-3xl sm:text-5xl md:text-8xl font-serif ${sampleThemeOption.textColors[index % sampleThemeOption.textColors.length]}`}
+                          >
+                            {letter}
+                          </span>
+                        ))}
+                      </div>
+                      <div className="text-4xl sm:text-5xl md:text-6xl animate-bounce">
+                        {sampleThemeOption.emoji}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center">
+                    <h2 className="text-2xl font-bold text-gray-400">
+                      Page {pageIndex + 1}
+                    </h2>
+                  </div>
+                )}
               </div>
             ))}
           </div>
