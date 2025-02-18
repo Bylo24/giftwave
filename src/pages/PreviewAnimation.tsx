@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -142,7 +143,7 @@ const PreviewAnimation = () => {
                 key={pageIndex}
                 className="w-full h-full absolute backface-hidden bg-white rounded-xl shadow-xl p-8"
                 style={{
-                  transform: `rotateY(${pageIndex * 120}deg) translateZ(500px)`,
+                  transform: `rotateY(${pageIndex * 120}deg) translateZ(200px)`,
                   backfaceVisibility: "hidden",
                   position: "absolute",
                 }}
