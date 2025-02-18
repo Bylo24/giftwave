@@ -14,18 +14,14 @@ const PreviewAnimation = () => {
   const [error, setError] = useState<string | null>(null);
   const [gift, setGift] = useState<any>(null);
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const token = searchParams.get('token');
 
   useEffect(() => {
     const loadGift = async () => {
       try {
-        if (!token) {
-          setError("Invalid gift token");
-          return;
-        }
-
-        console.log("Loading gift with token:", token);
+        // For testing, we'll use the hardcoded gift ID
+        const giftId = '12345678-1234-1234-1234-123456789abc';
+        
+        console.log("Loading gift with ID:", giftId);
 
         const { data: giftData, error: giftError } = await supabase
           .from('gifts')
@@ -34,7 +30,7 @@ const PreviewAnimation = () => {
             sender:profiles(full_name),
             gift_memories(*)
           `)
-          .eq('token', token)
+          .eq('id', giftId)
           .maybeSingle();
 
         if (giftError) {
@@ -46,7 +42,7 @@ const PreviewAnimation = () => {
         console.log("Gift data received:", giftData);
 
         if (!giftData) {
-          console.log("No gift found with token:", token);
+          console.log("No gift found");
           setError("Gift not found");
           return;
         }
@@ -73,7 +69,7 @@ const PreviewAnimation = () => {
     };
 
     loadGift();
-  }, [token]);
+  }, []);
 
   const handleComplete = () => {
     navigate("/collect-gift");
