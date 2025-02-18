@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
 import InsideLeftCard from "@/components/gift/InsideLeftCard";
@@ -94,7 +94,7 @@ const GiftContent = () => {
   };
 
   // Clean up object URLs when component unmounts
-  React.useEffect(() => {
+  useEffect(() => {
     return () => {
       if (messageVideoUrl) {
         URL.revokeObjectURL(messageVideoUrl);
