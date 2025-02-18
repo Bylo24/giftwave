@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { Button } from "@/components/ui/button";
@@ -14,30 +14,14 @@ const PreviewAnimation = () => {
   const [error, setError] = useState<string | null>(null);
   const [gift, setGift] = useState<any>(null);
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
 
   useEffect(() => {
     const loadGift = async () => {
       try {
-        if (!user?.id) {
-          setError("Please sign in to view this gift");
-          return;
-        }
-
-        const { data: profile, error: profileError } = await supabase
-          .from('profiles')
-          .select('phone_number')
-          .eq('id', user.id)
-          .maybeSingle();
-
-        if (profileError) {
-          console.error("Error fetching profile:", profileError);
-          setError("Failed to load profile");
-          return;
-        }
-
-        if (!profile?.phone_number) {
-          setError("No phone number found");
+        if (!token) {
+          setError("Invalid gift token");
           return;
         }
 
@@ -48,8 +32,7 @@ const PreviewAnimation = () => {
             sender:profiles(full_name),
             gift_memories(*)
           `)
-          .eq('recipient_phone', profile.phone_number)
-          .eq('status', 'pending')
+          .eq('token', token)
           .maybeSingle();
 
         if (giftError) {
@@ -59,7 +42,7 @@ const PreviewAnimation = () => {
         }
 
         if (!giftData) {
-          setError("No pending gifts found");
+          setError("Gift not found");
           return;
         }
 
@@ -83,7 +66,7 @@ const PreviewAnimation = () => {
     };
 
     loadGift();
-  }, [user?.id]);
+  }, [token]);
 
   const handleComplete = () => {
     navigate("/collect-gift");
