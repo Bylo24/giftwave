@@ -117,7 +117,7 @@ const PreviewAnimation = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
       <div className="w-full max-w-2xl relative">
-        <div className="flex justify-between mb-12">
+        <div className="flex justify-between mb-20">
           <button
             onClick={previousPage}
             disabled={isFlipping}
