@@ -1,12 +1,11 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
 import { PatternType } from "@/types/gift";
 import Confetti from 'react-confetti';
 import { PreviewNavigationButtons } from "@/components/gift/preview/PreviewNavigationButtons";
 import { PreviewCard } from "@/components/gift/preview/PreviewCard";
 import { PreviewContainer } from "@/components/gift/preview/PreviewContainer";
+import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 
 const sampleThemeOption = {
   text: "Happy Birthday!",
@@ -27,6 +26,10 @@ const PreviewAnimation = () => {
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    setIsLoading(false);
+  }, []);
 
   const totalPages = 4;
 
@@ -81,11 +84,7 @@ const PreviewAnimation = () => {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-gray-500" />
-      </div>
-    );
+    return <GiftLoadingState />;
   }
 
   if (error) {
