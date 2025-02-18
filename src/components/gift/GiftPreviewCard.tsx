@@ -1,7 +1,6 @@
 
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { GiftPreviewAnimation } from "@/components/gift/GiftPreviewAnimation";
 import { Card } from "@/components/ui/card";
 
 interface Memory {
@@ -27,7 +26,7 @@ export const GiftPreviewCard = ({ messageVideo, amount, memories }: GiftPreviewC
     setIsFlipping(true);
     if (direction === 'left' && currentFlip > 0) {
       setCurrentFlip(prev => prev - 1);
-    } else if (direction === 'right' && currentFlip < 2) {
+    } else if (direction === 'right' && currentFlip < 3) {
       setCurrentFlip(prev => prev + 1);
     }
     setTimeout(() => setIsFlipping(false), 1000);
@@ -47,17 +46,23 @@ export const GiftPreviewCard = ({ messageVideo, amount, memories }: GiftPreviewC
       <div className="perspective-[1000px] w-[300px] h-[400px]">
         <div 
           className="relative w-full h-full transition-transform duration-1000 transform-style-3d cursor-pointer"
-          style={{ transform: `rotateY(${currentFlip * -180}deg)` }}
+          style={{ transform: `rotateY(${currentFlip * -90}deg)` }}
         >
           {/* Front of card */}
-          <Card className="absolute w-full h-full backface-hidden bg-white p-6 flex flex-col items-center justify-center text-center rounded-xl shadow-xl">
-            <div className="text-3xl font-bold text-gray-800 mb-4">Happy Birthday!</div>
+          <Card className="absolute w-full h-full backface-hidden bg-gradient-to-br from-purple-100 to-pink-100 p-6 flex flex-col items-center justify-center text-center rounded-xl shadow-xl">
+            <div className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+              Happy Birthday!
+            </div>
             <div className="text-6xl mb-4">🎉</div>
-            <p className="text-gray-600">Tap to reveal your gift</p>
+            <p className="text-gray-600">You received a gift!</p>
+            <p className="text-sm text-gray-500 mt-2">Tap the arrow to reveal</p>
           </Card>
 
-          {/* Inside left (message) */}
-          <Card className="absolute w-full h-full backface-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-6 flex flex-col justify-center items-center text-white rotate-y-180 rounded-xl shadow-xl">
+          {/* Video message */}
+          <Card 
+            className="absolute w-full h-full backface-hidden bg-gradient-to-br from-blue-500 to-purple-600 p-6 flex flex-col justify-center items-center text-white rounded-xl shadow-xl"
+            style={{ transform: 'rotateY(90deg) translateX(100%)', transformOrigin: 'left center' }}
+          >
             <div className="text-2xl font-bold mb-4">Video Message</div>
             {messageVideo ? (
               <video 
@@ -72,8 +77,11 @@ export const GiftPreviewCard = ({ messageVideo, amount, memories }: GiftPreviewC
             )}
           </Card>
 
-          {/* Inside right (memories) */}
-          <Card className="absolute w-full h-full backface-hidden bg-gradient-to-br from-pink-500 to-rose-600 p-6 flex flex-col justify-center items-center text-white rotate-y-360 rounded-xl shadow-xl">
+          {/* Memories */}
+          <Card 
+            className="absolute w-full h-full backface-hidden bg-gradient-to-br from-pink-500 to-rose-600 p-6 flex flex-col justify-center items-center text-white rounded-xl shadow-xl"
+            style={{ transform: 'rotateY(180deg) translateX(100%)', transformOrigin: 'left center' }}
+          >
             <div className="text-2xl font-bold mb-4">Memories</div>
             {memories.length > 0 ? (
               <div className="grid grid-cols-2 gap-2 w-full">
@@ -102,13 +110,23 @@ export const GiftPreviewCard = ({ messageVideo, amount, memories }: GiftPreviewC
               </div>
             )}
           </Card>
+
+          {/* Amount */}
+          <Card 
+            className="absolute w-full h-full backface-hidden bg-gradient-to-br from-green-500 to-emerald-600 p-6 flex flex-col justify-center items-center text-white rounded-xl shadow-xl"
+            style={{ transform: 'rotateY(270deg) translateX(100%)', transformOrigin: 'left center' }}
+          >
+            <div className="text-2xl font-bold mb-4">Your Gift</div>
+            <div className="text-6xl font-bold mb-4">${amount}</div>
+            <p className="text-white/90">Tap to claim your gift</p>
+          </Card>
         </div>
       </div>
 
       <button 
         onClick={() => flipCard('right')} 
         className="absolute -right-16 text-3xl text-gray-700 hover:text-gray-900 transition-colors cursor-pointer z-10 disabled:opacity-50"
-        disabled={currentFlip === 2 || isFlipping}
+        disabled={currentFlip === 3 || isFlipping}
         aria-label="Next side"
       >
         <ChevronRight size={30} />
