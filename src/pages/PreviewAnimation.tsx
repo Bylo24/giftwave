@@ -192,7 +192,7 @@ const PreviewAnimation = () => {
                 key={pageIndex}
                 className="w-full h-full absolute bg-white rounded-xl shadow-xl"
                 style={{
-                  transform: `rotateY(${pageIndex * 120}deg) translateZ(300px)`,
+                  transform: `rotateY(${pageIndex * 120}deg) translateZ(200px)`,
                   backfaceVisibility: "hidden"
                 }}
               >
@@ -207,13 +207,13 @@ const PreviewAnimation = () => {
                         {sampleThemeOption.text.split('').map((letter, index) => (
                           <span 
                             key={index} 
-                            className={`text-3xl sm:text-4xl md:text-6xl font-serif ${sampleThemeOption.textColors[index % sampleThemeOption.textColors.length]}`}
+                            className={`text-2xl sm:text-3xl md:text-4xl font-serif ${sampleThemeOption.textColors[index % sampleThemeOption.textColors.length]}`}
                           >
                             {letter}
                           </span>
                         ))}
                       </div>
-                      <div className="text-4xl sm:text-5xl md:text-6xl animate-bounce">
+                      <div className="text-3xl sm:text-4xl md:text-5xl animate-bounce">
                         {sampleThemeOption.emoji}
                       </div>
                     </div>
