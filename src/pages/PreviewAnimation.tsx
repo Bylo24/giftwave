@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -9,6 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
 import { PatternType } from "@/types/gift";
+import Confetti from 'react-confetti';
 
 const sampleThemeOption = {
   text: "Happy Birthday!",
@@ -39,74 +39,25 @@ const PreviewAnimation = () => {
   const [gift, setGift] = useState<any>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
   const navigate = useNavigate();
 
   const totalPages = 4;
 
   useEffect(() => {
-    const loadGift = async () => {
-      try {
-        const giftId = '12345678-1234-1234-1234-123456789abc';
-        
-        console.log("Starting gift load...");
-        console.log("Using gift ID:", giftId);
-
-        const { data: giftData, error: giftError } = await supabase
-          .from('gifts')
-          .select(`
-            *,
-            sender:profiles(full_name),
-            gift_memories(*)
-          `)
-          .eq('id', giftId)
-          .maybeSingle();
-
-        if (giftError) {
-          console.error("Supabase error:", giftError);
-          setError("Failed to load gift");
-          return;
-        }
-
-        console.log("Raw gift data:", giftData);
-
-        if (!giftData) {
-          console.log("No gift data returned from query");
-          setError("Gift not found");
-          return;
-        }
-
-        const formattedMemories = giftData.gift_memories?.map((memory: any) => ({
-          id: memory.id,
-          imageUrl: memory.image_url,
-          caption: memory.caption,
-          date: new Date(memory.date)
-        })) || [];
-
-        console.log("Formatted memories:", formattedMemories);
-
-        const formattedGift = {
-          ...giftData,
-          memories: formattedMemories
-        };
-
-        console.log("Final formatted gift:", formattedGift);
-        
-        setGift(formattedGift);
-      } catch (err) {
-        console.error("Error in loadGift:", err);
-        setError("An unexpected error occurred");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadGift();
-  }, []);
+    if (showConfetti) {
+      const timer = setTimeout(() => {
+        setShowConfetti(false);
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [showConfetti]);
 
   const nextPage = () => {
     if (isFlipping) return;
     setIsFlipping(true);
     setCurrentPage((prev) => (prev + 1) % totalPages);
+    setShowConfetti(true);
     setTimeout(() => setIsFlipping(false), 500);
   };
 
@@ -114,6 +65,7 @@ const PreviewAnimation = () => {
     if (isFlipping) return;
     setIsFlipping(true);
     setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+    setShowConfetti(true);
     setTimeout(() => setIsFlipping(false), 500);
   };
 
@@ -165,6 +117,16 @@ const PreviewAnimation = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center px-8 py-12 sm:p-6">
+      {showConfetti && (
+        <Confetti
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={100}
+          gravity={0.3}
+          colors={['#FF69B4', '#9370DB', '#4B0082', '#FF1493', '#8A2BE2']}
+        />
+      )}
       <div className="w-full max-w-md relative">
         <div className="flex justify-between mb-16 sm:mb-20 px-6">
           <button
