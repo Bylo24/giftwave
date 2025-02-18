@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -115,15 +116,26 @@ const PreviewAnimation = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-lg relative">
-        <button
-          onClick={previousPage}
-          disabled={isFlipping}
-          className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Previous page"
-        >
-          <ChevronLeft className="w-6 h-6 text-gray-600" />
-        </button>
+      <div className="w-full max-w-2xl relative">
+        <div className="flex justify-between mb-6">
+          <button
+            onClick={previousPage}
+            disabled={isFlipping}
+            className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Previous page"
+          >
+            <ChevronLeft className="w-6 h-6 text-gray-600" />
+          </button>
+
+          <button
+            onClick={nextPage}
+            disabled={isFlipping}
+            className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            aria-label="Next page"
+          >
+            <ChevronRight className="w-6 h-6 text-gray-600" />
+          </button>
+        </div>
 
         <div 
           onClick={nextPage}
@@ -142,7 +154,7 @@ const PreviewAnimation = () => {
                 key={pageIndex}
                 className="w-full h-full absolute bg-white rounded-xl shadow-xl p-8"
                 style={{
-                  transform: `rotateY(${pageIndex * 120}deg) translateZ(200px)`,
+                  transform: `rotateY(${pageIndex * 120}deg) translateZ(300px)`,
                   backfaceVisibility: "hidden"
                 }}
               >
@@ -155,15 +167,6 @@ const PreviewAnimation = () => {
             ))}
           </div>
         </div>
-
-        <button
-          onClick={nextPage}
-          disabled={isFlipping}
-          className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-16 p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors z-10 disabled:opacity-50 disabled:cursor-not-allowed"
-          aria-label="Next page"
-        >
-          <ChevronRight className="w-6 h-6 text-gray-600" />
-        </button>
       </div>
     </div>
   );
