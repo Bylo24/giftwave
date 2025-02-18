@@ -5,6 +5,20 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
+interface GiftDesign {
+  id: string;
+  created_at: string;
+  front_card_pattern: string | null;
+  front_card_stickers: any[] | null;
+  memories: any[] | null;
+  message_video_url: string | null;
+  selected_amount: number | null;
+  status: string;
+  theme: string | null;
+  user_id: string | null;
+  token: string;
+}
+
 export const useGiftDesign = (token: string | null) => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -37,8 +51,9 @@ export const useGiftDesign = (token: string | null) => {
         throw error;
       }
 
-      navigate(`/frontcard?token=${data.token}`);
-      return data;
+      const giftDesign = data as GiftDesign;
+      navigate(`/frontcard?token=${giftDesign.token}`);
+      return giftDesign;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['gift-design'] });
@@ -77,7 +92,7 @@ export const useGiftDesign = (token: string | null) => {
       }
 
       console.log("Found gift design:", data);
-      return data;
+      return data as GiftDesign;
     },
     enabled: Boolean(token || user),
   });

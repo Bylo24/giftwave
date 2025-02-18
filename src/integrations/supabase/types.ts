@@ -159,6 +159,7 @@ export type Database = {
           selected_amount: number | null
           status: string | null
           theme: string | null
+          token: string | null
           user_id: string | null
         }
         Insert: {
@@ -171,6 +172,7 @@ export type Database = {
           selected_amount?: number | null
           status?: string | null
           theme?: string | null
+          token?: string | null
           user_id?: string | null
         }
         Update: {
@@ -183,6 +185,7 @@ export type Database = {
           selected_amount?: number | null
           status?: string | null
           theme?: string | null
+          token?: string | null
           user_id?: string | null
         }
         Relationships: []
