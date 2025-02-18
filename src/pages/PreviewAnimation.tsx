@@ -1,9 +1,10 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronLeft, ChevronRight, Video } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Video, Image, Star } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -244,10 +245,23 @@ const PreviewAnimation = () => {
                     </div>
                   </div>
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center">
-                    <h2 className="text-2xl font-bold text-gray-400">
-                      Page {pageIndex + 1}
-                    </h2>
+                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
+                    <div 
+                      className="absolute inset-0" 
+                      style={getPatternStyle(sampleThemeOption.pattern)}
+                    />
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+                      <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
+                        <Image className="h-8 w-8 text-gray-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                        Photo memories
+                      </span>
+                      <div className="flex flex-col items-center justify-center mt-4">
+                        <Star className="h-6 w-6 text-gray-400 mb-2" />
+                        <p className="text-sm text-gray-500">Add your first memory</p>
+                      </div>
+                    </div>
                   </div>
                 )}
               </div>
