@@ -1,6 +1,6 @@
 
 import { useEffect, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { Button } from "@/components/ui/button";
@@ -18,10 +18,10 @@ const PreviewAnimation = () => {
   useEffect(() => {
     const loadGift = async () => {
       try {
-        // For testing, we'll use the hardcoded gift ID
         const giftId = '12345678-1234-1234-1234-123456789abc';
         
-        console.log("Loading gift with ID:", giftId);
+        console.log("Starting gift load...");
+        console.log("Using gift ID:", giftId);
 
         const { data: giftData, error: giftError } = await supabase
           .from('gifts')
@@ -34,15 +34,15 @@ const PreviewAnimation = () => {
           .maybeSingle();
 
         if (giftError) {
-          console.error("Error loading gift:", giftError);
+          console.error("Supabase error:", giftError);
           setError("Failed to load gift");
           return;
         }
 
-        console.log("Gift data received:", giftData);
+        console.log("Raw gift data:", giftData);
 
         if (!giftData) {
-          console.log("No gift found");
+          console.log("No gift data returned from query");
           setError("Gift not found");
           return;
         }
@@ -56,10 +56,14 @@ const PreviewAnimation = () => {
 
         console.log("Formatted memories:", formattedMemories);
 
-        setGift({
+        const formattedGift = {
           ...giftData,
           memories: formattedMemories
-        });
+        };
+
+        console.log("Final formatted gift:", formattedGift);
+        
+        setGift(formattedGift);
       } catch (err) {
         console.error("Error in loadGift:", err);
         setError("An unexpected error occurred");
