@@ -153,9 +153,9 @@ const PreviewAnimation = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center px-6 py-8 sm:p-4">
       <div className="w-full max-w-md relative">
-        <div className="flex justify-between mb-20">
+        <div className="flex justify-between mb-16 sm:mb-20 px-4">
           <button
             onClick={previousPage}
             disabled={isFlipping}
@@ -177,7 +177,7 @@ const PreviewAnimation = () => {
 
         <div 
           onClick={nextPage}
-          className="cursor-pointer"
+          className="cursor-pointer mx-4"
           style={{ perspective: "1000px" }}
         >
           <div 
