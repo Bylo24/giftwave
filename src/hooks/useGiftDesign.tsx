@@ -5,7 +5,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-export const useGiftDesign = (designId: string | null) => {
+export const useGiftDesign = (token: string | null) => {
   const { user } = useAuth();
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -37,7 +37,7 @@ export const useGiftDesign = (designId: string | null) => {
         throw error;
       }
 
-      navigate(`/frontcard?id=${data.id}`);
+      navigate(`/frontcard?token=${data.token}`);
       return data;
     },
     onSuccess: () => {
@@ -47,15 +47,15 @@ export const useGiftDesign = (designId: string | null) => {
   });
 
   const { data: giftDesign, isLoading } = useQuery({
-    queryKey: ['gift-design', designId],
+    queryKey: ['gift-design', token],
     queryFn: async () => {
-      console.log("Fetching gift design, id:", designId);
+      console.log("Fetching gift design, token:", token);
       let query = supabase
         .from('gift_designs')
         .select('*');
 
-      if (designId) {
-        query = query.eq('id', designId);
+      if (token) {
+        query = query.eq('token', token);
       } else if (user) {
         query = query
           .eq('user_id', user.id)
@@ -79,7 +79,7 @@ export const useGiftDesign = (designId: string | null) => {
       console.log("Found gift design:", data);
       return data;
     },
-    enabled: Boolean(user),
+    enabled: Boolean(token || user),
   });
 
   return {

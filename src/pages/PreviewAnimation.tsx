@@ -10,11 +10,11 @@ import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { GiftPreviewNavigation } from "@/components/gift/GiftPreviewNavigation";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 
-const TestAnimation = () => {
+const PreviewAnimation = () => {
   const location = useLocation();
   const { user } = useAuth();
-  const designId = new URLSearchParams(location.search).get('id');
-  const { giftDesign, isLoading, createGiftDesign } = useGiftDesign(designId);
+  const token = new URLSearchParams(location.search).get('token');
+  const { giftDesign, isLoading, createGiftDesign } = useGiftDesign(token);
 
   // Format memories to ensure they have the correct structure
   const formattedMemories = giftDesign?.memories 
@@ -68,6 +68,7 @@ const TestAnimation = () => {
       
       <GiftPreviewNavigation 
         giftId={giftDesign.id} 
+        token={giftDesign.token}
         incompleteSteps={incompleteSteps} 
       />
 
@@ -88,4 +89,4 @@ const TestAnimation = () => {
   );
 };
 
-export default TestAnimation;
+export default PreviewAnimation;
