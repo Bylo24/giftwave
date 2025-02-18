@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
@@ -128,11 +127,11 @@ const PreviewAnimation = () => {
 
         <div 
           onClick={nextPage}
-          className="cursor-pointer perspective-[1000px]"
+          className="cursor-pointer"
           style={{ perspective: "1000px" }}
         >
           <div 
-            className="w-full aspect-[3/4] relative transition-transform duration-500 transform-style-preserve-3d"
+            className="w-full aspect-[3/4] relative transition-transform duration-500"
             style={{ 
               transform: `rotateY(${currentPage * -120}deg)`,
               transformStyle: "preserve-3d"
@@ -141,11 +140,10 @@ const PreviewAnimation = () => {
             {[0, 1, 2].map((pageIndex) => (
               <div
                 key={pageIndex}
-                className="w-full h-full absolute backface-hidden bg-white rounded-xl shadow-xl p-8"
+                className="w-full h-full absolute bg-white rounded-xl shadow-xl p-8"
                 style={{
                   transform: `rotateY(${pageIndex * 120}deg) translateZ(200px)`,
-                  backfaceVisibility: "hidden",
-                  position: "absolute",
+                  backfaceVisibility: "hidden"
                 }}
               >
                 <div className="w-full h-full flex items-center justify-center">
