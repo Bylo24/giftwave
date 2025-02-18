@@ -154,7 +154,7 @@ const PreviewAnimation = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center p-4">
-      <div className="w-full max-w-2xl relative">
+      <div className="w-full max-w-md relative">
         <div className="flex justify-between mb-20">
           <button
             onClick={previousPage}
@@ -190,24 +190,24 @@ const PreviewAnimation = () => {
             {[0, 1, 2].map((pageIndex) => (
               <div
                 key={pageIndex}
-                className="w-full h-full absolute bg-white rounded-xl shadow-xl p-8"
+                className="w-full h-full absolute bg-white rounded-xl shadow-xl"
                 style={{
                   transform: `rotateY(${pageIndex * 120}deg) translateZ(300px)`,
                   backfaceVisibility: "hidden"
                 }}
               >
                 {pageIndex === 0 ? (
-                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-lg relative overflow-hidden`}>
+                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
                     <div 
                       className="absolute inset-0" 
                       style={getPatternStyle(sampleThemeOption.pattern)}
                     />
-                    <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8">
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8 p-4">
                       <div className="text-center">
                         {sampleThemeOption.text.split('').map((letter, index) => (
                           <span 
                             key={index} 
-                            className={`text-3xl sm:text-5xl md:text-8xl font-serif ${sampleThemeOption.textColors[index % sampleThemeOption.textColors.length]}`}
+                            className={`text-3xl sm:text-4xl md:text-6xl font-serif ${sampleThemeOption.textColors[index % sampleThemeOption.textColors.length]}`}
                           >
                             {letter}
                           </span>
