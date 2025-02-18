@@ -22,6 +22,7 @@ const GiftContent = () => {
   const [selectedTheme] = useState<ThemeType>('holiday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
+  const [messageVideoUrl, setMessageVideoUrl] = useState<string>('');
   const [amount, setAmount] = useState('');
   const [memories, setMemories] = useState<Array<{ id: string; imageUrl?: string; caption: string; date: Date }>>([]);
 
@@ -56,6 +57,9 @@ const GiftContent = () => {
     }
 
     setMessageVideo(file);
+    // Create a temporary URL for the video file
+    const videoUrl = URL.createObjectURL(file);
+    setMessageVideoUrl(videoUrl);
   };
 
   const goToPreviousStep = () => {
@@ -89,10 +93,19 @@ const GiftContent = () => {
     }
   };
 
+  // Clean up object URLs when component unmounts
+  React.useEffect(() => {
+    return () => {
+      if (messageVideoUrl) {
+        URL.revokeObjectURL(messageVideoUrl);
+      }
+    };
+  }, [messageVideoUrl]);
+
   if (currentStep === 'reveal') {
     return (
       <GiftRevealAnimation
-        messageVideo={messageVideo}
+        messageVideo={messageVideoUrl}
         amount={amount}
         memories={memories}
         memory={null}
