@@ -1,10 +1,9 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { GiftPreviewCard } from "@/components/gift/GiftPreviewCard";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { Button } from "@/components/ui/button";
-import { Loader2, ChevronLeft, ChevronRight, Video, Image, Star } from "lucide-react";
+import { Loader2, ChevronLeft, ChevronRight, Video, Image, Star, PlusCircle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
@@ -41,7 +40,7 @@ const PreviewAnimation = () => {
   const [isFlipping, setIsFlipping] = useState(false);
   const navigate = useNavigate();
 
-  const totalPages = 3;
+  const totalPages = 4;
 
   useEffect(() => {
     const loadGift = async () => {
@@ -194,16 +193,16 @@ const PreviewAnimation = () => {
           <div 
             className="w-full aspect-[3/4] relative transition-transform duration-500"
             style={{ 
-              transform: `rotateY(${currentPage * -120}deg)`,
+              transform: `rotateY(${currentPage * -90}deg)`,
               transformStyle: "preserve-3d"
             }}
           >
-            {[0, 1, 2].map((pageIndex) => (
+            {[0, 1, 2, 3].map((pageIndex) => (
               <div
                 key={pageIndex}
                 className="w-full h-full absolute bg-white rounded-xl shadow-xl"
                 style={{
-                  transform: `rotateY(${pageIndex * 120}deg) translateZ(200px)`,
+                  transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
                   backfaceVisibility: "hidden"
                 }}
               >
@@ -244,7 +243,7 @@ const PreviewAnimation = () => {
                       </span>
                     </div>
                   </div>
-                ) : (
+                ) : pageIndex === 2 ? (
                   <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
                     <div 
                       className="absolute inset-0" 
@@ -261,6 +260,24 @@ const PreviewAnimation = () => {
                         <Star className="h-6 w-6 text-gray-400 mb-2" />
                         <p className="text-sm text-gray-500">Add your first memory</p>
                       </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={`${sampleThemeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
+                    <div 
+                      className="absolute inset-0" 
+                      style={getPatternStyle(sampleThemeOption.pattern)}
+                    />
+                    <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
+                      <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
+                        <PlusCircle className="h-8 w-8 text-gray-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                        Add more content
+                      </span>
+                      <p className="text-sm text-gray-500 text-center mt-4">
+                        Click to customize your gift
+                      </p>
                     </div>
                   </div>
                 )}
