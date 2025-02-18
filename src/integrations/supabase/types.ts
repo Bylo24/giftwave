@@ -233,6 +233,7 @@ export type Database = {
           message_video_url: string | null
           recipient_phone: string | null
           sender_id: string | null
+          status: string
           theme: string
           updated_at: string
         }
@@ -243,6 +244,7 @@ export type Database = {
           message_video_url?: string | null
           recipient_phone?: string | null
           sender_id?: string | null
+          status?: string
           theme: string
           updated_at?: string
         }
@@ -253,6 +255,7 @@ export type Database = {
           message_video_url?: string | null
           recipient_phone?: string | null
           sender_id?: string | null
+          status?: string
           theme?: string
           updated_at?: string
         }

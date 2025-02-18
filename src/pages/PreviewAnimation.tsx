@@ -29,11 +29,13 @@ const PreviewAnimation = () => {
           return;
         }
 
+        // Query gifts with proper status filter
         const { data: giftData, error: giftError } = await supabase
           .from('gifts')
           .select(`
             *,
-            sender:profiles(full_name)
+            sender:profiles(full_name),
+            gift_memories(*)
           `)
           .eq('recipient_phone', profile.phone_number)
           .eq('status', 'pending')
@@ -50,7 +52,18 @@ const PreviewAnimation = () => {
           return;
         }
 
-        setGift(giftData);
+        // Format memories from gift_memories
+        const formattedMemories = giftData.gift_memories?.map((memory: any) => ({
+          id: memory.id,
+          imageUrl: memory.image_url,
+          caption: memory.caption,
+          date: new Date(memory.date)
+        })) || [];
+
+        setGift({
+          ...giftData,
+          memories: formattedMemories
+        });
       } catch (err) {
         console.error("Error in loadGift:", err);
         setError("An unexpected error occurred");
@@ -90,7 +103,7 @@ const PreviewAnimation = () => {
           <GiftRevealAnimation
             messageVideo={gift.message_video_url}
             amount={gift.amount?.toString() || "0"}
-            memories={gift.memories || []}
+            memories={gift.memories}
             memory={gift.memory}
             onComplete={handleComplete}
           />
