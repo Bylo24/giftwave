@@ -25,6 +25,8 @@ const PreviewAnimation = () => {
           return;
         }
 
+        console.log("Loading gift with token:", token);
+
         const { data: giftData, error: giftError } = await supabase
           .from('gifts')
           .select(`
@@ -41,7 +43,10 @@ const PreviewAnimation = () => {
           return;
         }
 
+        console.log("Gift data received:", giftData);
+
         if (!giftData) {
+          console.log("No gift found with token:", token);
           setError("Gift not found");
           return;
         }
@@ -52,6 +57,8 @@ const PreviewAnimation = () => {
           caption: memory.caption,
           date: new Date(memory.date)
         })) || [];
+
+        console.log("Formatted memories:", formattedMemories);
 
         setGift({
           ...giftData,
