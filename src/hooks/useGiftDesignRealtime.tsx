@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Database } from '@/integrations/supabase/types';
 import { RealtimePostgresChangesPayload } from '@supabase/supabase-js';
-import { GiftDesign } from './useGiftDesign';
+import { GiftDesign, GiftStatus } from './useGiftDesign';
 
 type GiftDesignRow = Database['public']['Tables']['gift_designs']['Row'];
 
