@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -10,9 +9,8 @@ const GiftV2Content = () => {
   const navigate = useNavigate();
   const [amount, setAmount] = useState("");
 
-  const handleNext = () => {
-    // We'll handle the next step later
-    console.log("Selected amount:", amount);
+  const handleNext = async () => {
+    return Promise.resolve();
   };
 
   return (

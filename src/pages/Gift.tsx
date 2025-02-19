@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
@@ -74,6 +73,10 @@ const GiftContent = () => {
     } else {
       navigate('/');
     }
+  };
+
+  const handleNext = async () => {
+    return Promise.resolve();
   };
 
   const goToNextStep = () => {
