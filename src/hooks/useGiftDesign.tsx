@@ -5,7 +5,7 @@ import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 
-type GiftDesignRow = Database['public']['Tables']['gift_designs']['Row'];
+type Json = Database['public']['Tables']['gift_designs']['Row'];
 
 export type GiftStatus = 'draft' | 'editing' | 'preview' | 'finalized' | 'sent';
 
@@ -52,20 +52,29 @@ export const useGiftDesign = (token: string | null) => {
 
       if (!data) throw new Error('No gift design found');
 
+      // Parse JSON fields and handle nullables
+      const frontCardStickers = data.front_card_stickers ? 
+        (typeof data.front_card_stickers === 'string' ? 
+          JSON.parse(data.front_card_stickers) : data.front_card_stickers) : null;
+
+      const memories = data.memories ? 
+        (typeof data.memories === 'string' ? 
+          JSON.parse(data.memories) : data.memories) : [];
+
       // Explicitly construct the GiftDesign object with all required properties
       const giftDesign: GiftDesign = {
         id: data.id,
         front_card_pattern: data.front_card_pattern,
-        front_card_stickers: Array.isArray(data.front_card_stickers) ? data.front_card_stickers : null,
+        front_card_stickers: Array.isArray(frontCardStickers) ? frontCardStickers : null,
         selected_amount: data.selected_amount,
-        memories: Array.isArray(data.memories) ? data.memories : [],
+        memories: Array.isArray(memories) ? memories : [],
         message_video_url: data.message_video_url,
         theme: data.theme,
         token: data.token,
         status: (data.status || 'draft') as GiftStatus,
-        editing_session_id: data.editing_session_id || null,
-        editing_user_id: data.editing_user_id || null,
-        last_edited_at: data.last_edited_at || data.created_at,
+        editing_session_id: (data as any).editing_session_id || null,
+        editing_user_id: (data as any).editing_user_id || null,
+        last_edited_at: (data as any).last_edited_at || data.created_at,
         user_id: data.user_id,
         created_at: data.created_at
       };
@@ -191,15 +200,24 @@ export const useGiftDesign = (token: string | null) => {
           table: 'gift_designs',
           filter: `token=eq.${token}`
         },
-        (payload) => {
+        (payload: { new: Json | null }) => {
           console.log('Realtime update received:', payload);
           if (!payload.new) return;
           
-          const newData = payload.new as GiftDesignRow;
+          const newData = payload.new;
+          
+          // Parse JSON fields and handle nullables for realtime updates
+          const frontCardStickers = newData.front_card_stickers ? 
+            (typeof newData.front_card_stickers === 'string' ? 
+              JSON.parse(newData.front_card_stickers) : newData.front_card_stickers) : null;
+
+          const memories = newData.memories ? 
+            (typeof newData.memories === 'string' ? 
+              JSON.parse(newData.memories) : newData.memories) : [];
           
           // Don't apply updates if they're from a different editing session
-          if (newData.editing_session_id && 
-              newData.editing_session_id !== sessionId && 
+          if ((newData as any).editing_session_id && 
+              (newData as any).editing_session_id !== sessionId && 
               newData.status === 'editing') {
             return;
           }
@@ -208,16 +226,16 @@ export const useGiftDesign = (token: string | null) => {
           const updatedGiftDesign: GiftDesign = {
             id: newData.id,
             front_card_pattern: newData.front_card_pattern,
-            front_card_stickers: Array.isArray(newData.front_card_stickers) ? newData.front_card_stickers : null,
+            front_card_stickers: Array.isArray(frontCardStickers) ? frontCardStickers : null,
             selected_amount: newData.selected_amount,
-            memories: Array.isArray(newData.memories) ? newData.memories : [],
+            memories: Array.isArray(memories) ? memories : [],
             message_video_url: newData.message_video_url,
             theme: newData.theme,
             token: newData.token,
             status: (newData.status || 'draft') as GiftStatus,
-            editing_session_id: newData.editing_session_id || null,
-            editing_user_id: newData.editing_user_id || null,
-            last_edited_at: newData.last_edited_at || newData.created_at,
+            editing_session_id: (newData as any).editing_session_id || null,
+            editing_user_id: (newData as any).editing_user_id || null,
+            last_edited_at: (newData as any).last_edited_at || newData.created_at,
             user_id: newData.user_id,
             created_at: newData.created_at
           };
