@@ -77,8 +77,10 @@ const GiftContent = () => {
   };
 
   const handleNext = async (): Promise<void> => {
-    // Since we're now explicitly returning a Promise<void>, TypeScript will be happy
-    return Promise.resolve();
+    // First handle the async operations
+    await Promise.resolve();
+    // Then call goToNextStep to maintain the original flow
+    goToNextStep();
   };
 
   const goToNextStep = () => {
