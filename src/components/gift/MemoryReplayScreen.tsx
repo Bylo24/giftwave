@@ -1,8 +1,9 @@
+
 import { useState } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
-import { Image, Camera, MessageCircle, Calendar, Plus } from "lucide-react";
+import { Image, Camera, MessageCircle, Calendar, Plus, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 
 interface Memory {
@@ -18,6 +19,10 @@ interface MemoryReplayScreenProps {
   onNext: () => void;
 }
 
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
+const MAX_MEMORIES = 6;
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 const CAPTION_SUGGESTIONS = [
   "my favourite moment with you",
   "something I wish to forget",
@@ -30,24 +35,52 @@ export const MemoryReplayScreen = ({ memories, onAddMemory, onNext }: MemoryRepl
   const [newCaption, setNewCaption] = useState("");
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (file.type.startsWith("image/")) {
-        setSelectedImage(file);
-        const url = URL.createObjectURL(file);
-        setPreviewUrl(url);
-        toast.success("Image uploaded successfully!");
-      } else {
-        toast.error("Please upload an image file");
-      }
+    if (!file) return;
+
+    // Validate file type
+    if (!ALLOWED_TYPES.includes(file.type)) {
+      toast.error('Please upload a JPG, PNG or WebP image');
+      return;
+    }
+
+    // Validate file size
+    if (file.size > MAX_FILE_SIZE) {
+      toast.error('Image must be smaller than 5MB');
+      return;
+    }
+
+    // Validate total memories
+    if (memories.length >= MAX_MEMORIES) {
+      toast.error(`Maximum ${MAX_MEMORIES} memories allowed`);
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const url = URL.createObjectURL(file);
+      setSelectedImage(file);
+      setPreviewUrl(url);
+      toast.success("Image uploaded successfully!");
+    } catch (error) {
+      toast.error("Failed to process image");
+      console.error("Image processing error:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleAddMemory = () => {
     if (!selectedImage && !newCaption) {
       toast.error("Please add an image or caption");
+      return;
+    }
+
+    if (memories.length >= MAX_MEMORIES) {
+      toast.error(`Maximum ${MAX_MEMORIES} memories allowed`);
       return;
     }
 
@@ -75,21 +108,35 @@ export const MemoryReplayScreen = ({ memories, onAddMemory, onNext }: MemoryRepl
           </h2>
         </div>
 
+        {memories.length >= MAX_MEMORIES && (
+          <div className="flex items-center gap-2 p-3 bg-amber-50 rounded-lg text-amber-600">
+            <AlertCircle className="h-5 w-5" />
+            <p className="text-sm">Maximum number of memories reached</p>
+          </div>
+        )}
+
         {/* Upload Section */}
-        <Card className="p-4 cursor-pointer hover:shadow-lg transition-shadow border-2 border-blue-500/20">
-          <label className="flex flex-col items-center gap-3 cursor-pointer">
+        <Card 
+          className={`p-4 cursor-pointer hover:shadow-lg transition-shadow border-2 
+            ${isUploading ? 'border-blue-300 bg-blue-50' : 'border-blue-500/20'}
+            ${memories.length >= MAX_MEMORIES ? 'opacity-50 cursor-not-allowed' : ''}`}
+        >
+          <label className={`flex flex-col items-center gap-3 ${memories.length >= MAX_MEMORIES ? 'cursor-not-allowed' : 'cursor-pointer'}`}>
             <div className="p-3 bg-blue-500/10 rounded-full">
               <Camera className="h-6 w-6 text-blue-500" />
             </div>
             <div className="text-center">
               <p className="font-medium">Upload Photo</p>
-              <p className="text-sm text-gray-500">Share a special moment</p>
+              <p className="text-sm text-gray-500">
+                {isUploading ? 'Uploading...' : 'Share a special moment (max 5MB)'}
+              </p>
             </div>
             <input
               type="file"
-              accept="image/*"
+              accept={ALLOWED_TYPES.join(',')}
               className="hidden"
               onChange={handleImageUpload}
+              disabled={memories.length >= MAX_MEMORIES || isUploading}
             />
           </label>
         </Card>
@@ -102,6 +149,11 @@ export const MemoryReplayScreen = ({ memories, onAddMemory, onNext }: MemoryRepl
               alt="Preview"
               className="w-full h-full object-cover"
             />
+            {isUploading && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <div className="loading-spinner" />
+              </div>
+            )}
           </div>
         )}
 
@@ -116,13 +168,18 @@ export const MemoryReplayScreen = ({ memories, onAddMemory, onNext }: MemoryRepl
             value={newCaption}
             onChange={(e) => setNewCaption(e.target.value)}
             className="min-h-[100px] border-2 border-blue-500/20 focus:border-blue-500/40"
+            maxLength={200}
           />
+          <p className="text-xs text-gray-500 text-right">
+            {newCaption.length}/200 characters
+          </p>
         </div>
 
         <div className="flex gap-3">
           <Button
             onClick={handleAddMemory}
             className="flex-1 bg-blue-500 hover:bg-blue-600 transition-colors"
+            disabled={isUploading || (!selectedImage && !newCaption) || memories.length >= MAX_MEMORIES}
           >
             <Plus className="h-4 w-4 mr-2" />
             Add Memory
@@ -139,7 +196,7 @@ export const MemoryReplayScreen = ({ memories, onAddMemory, onNext }: MemoryRepl
 
       {/* Memories List */}
       <div className="space-y-4">
-        {memories.map((memory) => (
+        {memories.map((memory, index) => (
           <Card
             key={memory.id}
             className="p-4 hover:shadow-lg transition-shadow animate-fade-in bg-white"
@@ -148,8 +205,9 @@ export const MemoryReplayScreen = ({ memories, onAddMemory, onNext }: MemoryRepl
               <div className="relative aspect-video rounded-lg overflow-hidden mb-3">
                 <img
                   src={memory.imageUrl}
-                  alt="Memory"
+                  alt={`Memory ${index + 1}`}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
             )}
