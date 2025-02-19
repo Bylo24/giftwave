@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -21,6 +20,7 @@ export interface GiftDesign {
   editing_user_id: string | null;
   last_edited_at: string;
   user_id: string | null;
+  created_at: string;
 }
 
 export const useGiftDesign = (token: string | null) => {
@@ -47,7 +47,14 @@ export const useGiftDesign = (token: string | null) => {
         throw error;
       }
 
-      return data as GiftDesign;
+      // Cast the response to match our GiftDesign type
+      return {
+        ...data,
+        status: (data.status || 'draft') as GiftStatus,
+        editing_session_id: data.editing_session_id || null,
+        editing_user_id: data.editing_user_id || null,
+        last_edited_at: data.last_edited_at || data.created_at
+      } as GiftDesign;
     },
     enabled: !!token
   });
@@ -170,7 +177,7 @@ export const useGiftDesign = (token: string | null) => {
         },
         (payload) => {
           console.log('Realtime update received:', payload);
-          const newData = payload.new as GiftDesign;
+          const newData = payload.new;
           
           // Don't apply updates if they're from a different editing session
           if (newData.editing_session_id && 
@@ -179,7 +186,14 @@ export const useGiftDesign = (token: string | null) => {
             return;
           }
           
-          setRealtimeGiftDesign(newData);
+          // Cast the payload to match our GiftDesign type
+          setRealtimeGiftDesign({
+            ...newData,
+            status: (newData.status || 'draft') as GiftStatus,
+            editing_session_id: newData.editing_session_id || null,
+            editing_user_id: newData.editing_user_id || null,
+            last_edited_at: newData.last_edited_at || newData.created_at
+          } as GiftDesign);
         }
       )
       .subscribe();
