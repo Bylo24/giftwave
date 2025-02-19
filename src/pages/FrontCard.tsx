@@ -13,11 +13,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { Json } from "@/integrations/supabase/types";
 
 interface GiftDesign {
   theme: string | null;
   front_card_pattern: PatternType | null;
-  front_card_stickers: Sticker[] | null;
+  front_card_stickers: Json | null;
   id: string;
   created_at: string;
   editing_session_id: string | null;
@@ -30,6 +31,25 @@ interface GiftDesign {
   token: string | null;
   user_id: string | null;
 }
+
+// Helper type guard to check if a value is a valid sticker object
+const isValidStickerObject = (value: any): value is { 
+  id: string; 
+  emoji: string; 
+  x: number; 
+  y: number; 
+  rotation: number; 
+} => {
+  return (
+    value !== null &&
+    typeof value === 'object' &&
+    typeof value.id === 'string' &&
+    typeof value.emoji === 'string' &&
+    typeof value.x === 'number' &&
+    typeof value.y === 'number' &&
+    typeof value.rotation === 'number'
+  );
+};
 
 const FrontCardContent = () => {
   const navigate = useNavigate();
@@ -127,13 +147,13 @@ const FrontCardContent = () => {
 
       if (giftDesign.front_card_stickers && Array.isArray(giftDesign.front_card_stickers)) {
         const validStickers = giftDesign.front_card_stickers
-          .filter(isValidSticker)
+          .filter(isValidStickerObject)
           .map(sticker => ({
-            id: sticker.id as string,
-            emoji: sticker.emoji as string,
-            x: sticker.x as number,
-            y: sticker.y as number,
-            rotation: sticker.rotation as number
+            id: sticker.id,
+            emoji: sticker.emoji,
+            x: sticker.x,
+            y: sticker.y,
+            rotation: sticker.rotation
           }));
         setPlacedStickers(validStickers);
       }
