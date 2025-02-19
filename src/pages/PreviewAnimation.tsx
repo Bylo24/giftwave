@@ -43,7 +43,7 @@ const PreviewAnimation = () => {
 
   // Initialize edit session if needed
   useEffect(() => {
-    if (giftDesign && !isPreviewMode && !isFinalized) {
+    if (giftDesign && !isPreviewMode && !isFinalized && giftDesign.status === 'draft') {
       startEditing();
     }
   }, [giftDesign, isPreviewMode, isFinalized, startEditing]);
