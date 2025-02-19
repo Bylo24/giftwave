@@ -151,9 +151,12 @@ export type Database = {
       gift_designs: {
         Row: {
           created_at: string
+          editing_session_id: string | null
+          editing_user_id: string | null
           front_card_pattern: string | null
           front_card_stickers: Json | null
           id: string
+          last_edited_at: string | null
           memories: Json | null
           message_video_url: string | null
           selected_amount: number | null
@@ -164,9 +167,12 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          editing_session_id?: string | null
+          editing_user_id?: string | null
           front_card_pattern?: string | null
           front_card_stickers?: Json | null
           id?: string
+          last_edited_at?: string | null
           memories?: Json | null
           message_video_url?: string | null
           selected_amount?: number | null
@@ -177,9 +183,12 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          editing_session_id?: string | null
+          editing_user_id?: string | null
           front_card_pattern?: string | null
           front_card_stickers?: Json | null
           id?: string
+          last_edited_at?: string | null
           memories?: Json | null
           message_video_url?: string | null
           selected_amount?: number | null

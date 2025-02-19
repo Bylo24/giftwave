@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -71,7 +72,7 @@ export const useGiftDesign = (token: string | null) => {
         memories: Array.isArray(memories) ? memories : [],
         message_video_url: data.message_video_url,
         theme: data.theme,
-        token: data.token,
+        token: data.token || '',
         status: (data.status || 'draft') as GiftStatus,
         editing_session_id: (data as any).editing_session_id || null,
         editing_user_id: (data as any).editing_user_id || null,
