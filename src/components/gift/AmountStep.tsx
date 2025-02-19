@@ -94,34 +94,44 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
         return null;
       }
 
-      // Fetch existing design
+      // First, verify this token exists and belongs to the current user
       const { data: existingDesign, error: fetchError } = await supabase
         .from('gift_designs')
         .select('*')
         .eq('token', draftToken)
+        .eq('user_id', user.id)
         .single();
 
-      if (fetchError) {
+      if (fetchError || !existingDesign) {
         console.error("Error fetching existing design:", fetchError);
-        throw fetchError;
+        toast({
+          title: "Error",
+          description: "Could not find your gift design. Please start over.",
+          variant: "destructive",
+        });
+        navigate('/frontcard');
+        return null;
       }
 
-      // Validate the gift design
+      // Validate all required steps are completed
       const validation = await validateGiftDesign(existingDesign);
       if (!validation.isValid) {
+        const firstMissingStep = validation.missingSteps[0];
+        const redirectMap = {
+          "front card design": '/frontcard',
+          "video message": '/insideleftcard',
+          "photo memories": '/insiderightcard'
+        };
+        
         toast({
           title: "Missing information",
           description: `Please complete these steps first: ${validation.missingSteps.join(", ")}`,
           variant: "destructive",
         });
         
-        // Navigate to the appropriate step
-        if (validation.missingSteps.includes("front card design")) {
-          navigate('/frontcard');
-        } else if (validation.missingSteps.includes("video message")) {
-          navigate('/insideleftcard');
-        } else if (validation.missingSteps.includes("photo memories")) {
-          navigate('/insiderightcard');
+        // Navigate to the first missing step
+        if (firstMissingStep in redirectMap) {
+          navigate(redirectMap[firstMissingStep as keyof typeof redirectMap]);
         }
         return null;
       }
@@ -135,6 +145,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
           last_edited_at: new Date().toISOString()
         })
         .eq('token', draftToken)
+        .eq('user_id', user.id) // Extra safety check
         .select()
         .single();
 
@@ -146,8 +157,9 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       return data;
     },
     onSuccess: (data) => {
-      if (data) {
+      if (data?.token) {
         queryClient.invalidateQueries({ queryKey: ['gift-design'] });
+        // Navigate to preview animation with the specific token
         navigate(`/previewanimation?token=${data.token}`);
         toast({
           title: "Success",
