@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -58,26 +58,6 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     }
   };
 
-  const validateGiftDesign = async (design: any) => {
-    const validationChecks = {
-      frontCard: !!(design.front_card_pattern || design.theme),
-      insideLeft: !!design.message_video_url,
-      insideRight: !!(design.memories && design.memories.length > 0),
-      amount: !!(design.selected_amount && design.selected_amount > 0)
-    };
-
-    const missingSteps = [];
-    if (!validationChecks.frontCard) missingSteps.push("front card design");
-    if (!validationChecks.insideLeft) missingSteps.push("video message");
-    if (!validationChecks.insideRight) missingSteps.push("photo memories");
-    if (!validationChecks.amount) missingSteps.push("gift amount");
-
-    return {
-      isValid: Object.values(validationChecks).every(check => check),
-      missingSteps
-    };
-  };
-
   const updateGiftDesign = useMutation({
     mutationFn: async () => {
       if (!user) {
@@ -95,48 +75,23 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       }
 
       // First, verify this token exists and belongs to the current user
-      const { data: existingDesign, error: fetchError } = await supabase
+      const { data: giftDesign, error: fetchError } = await supabase
         .from('gift_designs')
         .select('*')
         .eq('token', draftToken)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
-      if (fetchError || !existingDesign) {
-        console.error("Error fetching existing design:", fetchError);
-        toast({
-          title: "Error",
-          description: "Could not find your gift design. Please start over.",
-          variant: "destructive",
-        });
-        navigate('/frontcard');
-        return null;
+      if (fetchError) {
+        console.error("Error fetching gift design:", fetchError);
+        throw new Error("Could not find your gift design");
       }
 
-      // Validate all required steps are completed
-      const validation = await validateGiftDesign(existingDesign);
-      if (!validation.isValid) {
-        const firstMissingStep = validation.missingSteps[0];
-        const redirectMap = {
-          "front card design": '/frontcard',
-          "video message": '/insideleftcard',
-          "photo memories": '/insiderightcard'
-        };
-        
-        toast({
-          title: "Missing information",
-          description: `Please complete these steps first: ${validation.missingSteps.join(", ")}`,
-          variant: "destructive",
-        });
-        
-        // Navigate to the first missing step
-        if (firstMissingStep in redirectMap) {
-          navigate(redirectMap[firstMissingStep as keyof typeof redirectMap]);
-        }
-        return null;
+      if (!giftDesign) {
+        throw new Error("Gift design not found");
       }
 
-      // Update the gift design with amount and change status to preview
+      // Update the gift design with amount
       const { data, error } = await supabase
         .from('gift_designs')
         .update({
@@ -145,7 +100,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
           last_edited_at: new Date().toISOString()
         })
         .eq('token', draftToken)
-        .eq('user_id', user.id) // Extra safety check
+        .eq('user_id', user.id)
         .select()
         .single();
 
@@ -159,7 +114,6 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     onSuccess: (data) => {
       if (data?.token) {
         queryClient.invalidateQueries({ queryKey: ['gift-design'] });
-        // Navigate to preview animation with the specific token
         navigate(`/previewanimation?token=${data.token}`);
         toast({
           title: "Success",
@@ -178,7 +132,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
   });
 
   const handleContinue = async () => {
-    if (!amount) {
+    if (!amount || parseFloat(amount) <= 0) {
       toast({
         title: "Invalid amount",
         description: "Please select or enter an amount",
