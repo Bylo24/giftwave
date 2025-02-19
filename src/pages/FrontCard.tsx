@@ -1,5 +1,5 @@
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeOption, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
@@ -10,6 +10,8 @@ import { Button } from "@/components/ui/button";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { useStickerManager } from "@/hooks/useStickerManager";
 import { stickerOptions } from "@/constants/giftOptions";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const FrontCardContent = () => {
   const navigate = useNavigate();
@@ -26,6 +28,35 @@ const FrontCardContent = () => {
     handleStickerRemove,
     handleStickerRotate
   } = useStickerManager();
+
+  // Save changes whenever relevant state changes
+  useEffect(() => {
+    const saveChanges = async () => {
+      const token = localStorage.getItem('gift_draft_token');
+      if (!token) {
+        console.error('No gift token found');
+        return;
+      }
+
+      try {
+        const { error } = await supabase
+          .from('gift_designs')
+          .update({
+            front_card_pattern: selectedThemeOption.pattern.type,
+            front_card_stickers: placedStickers,
+            theme: selectedThemeOption.text
+          })
+          .eq('token', token);
+
+        if (error) throw error;
+      } catch (err) {
+        console.error('Error saving card changes:', err);
+        toast.error('Failed to save changes');
+      }
+    };
+
+    saveChanges();
+  }, [selectedThemeOption, placedStickers]);
 
   const handleBackClick = () => {
     navigate('/home');
