@@ -45,7 +45,7 @@ const InsideLeftCardContent = () => {
     },
     enabled: !!token,
     staleTime: Infinity, // Keep the data fresh indefinitely
-    cacheTime: 1000 * 60 * 30, // Cache for 30 minutes
+    gcTime: 1000 * 60 * 30 // Cache for 30 minutes before garbage collection
   });
 
   // Set video from URL when gift design data is loaded
