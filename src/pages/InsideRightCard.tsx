@@ -8,42 +8,48 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MemoryStage } from "@/components/gift/stages/MemoryStage";
 import { supabase } from "@/integrations/supabase/client";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Memory } from "@/types/gift";
 
 const InsideRightCard = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [caption, setCaption] = useState("");
   const [pendingImage, setPendingImage] = useState<string | undefined>();
 
-  useEffect(() => {
-    const loadExistingMemories = async () => {
-      const token = localStorage.getItem('gift_draft_token');
-      if (!token) return;
+  const token = localStorage.getItem('gift_draft_token');
 
-      const { data: giftDesign, error } = await supabase
+  // Fetch the current gift design data with caching
+  const { data: giftDesign } = useQuery({
+    queryKey: ['gift-design', token],
+    queryFn: async () => {
+      if (!token) throw new Error('No gift token found');
+
+      const { data, error } = await supabase
         .from('gift_designs')
-        .select('memories')
+        .select('*')
         .eq('token', token)
         .single();
 
-      if (error) {
-        console.error('Error loading memories:', error);
-        return;
-      }
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!token,
+    staleTime: Infinity // Keep the data fresh indefinitely
+  });
 
-      if (giftDesign?.memories) {
-        // Convert the dates back to Date objects
-        const parsedMemories = (giftDesign.memories as any[]).map(memory => ({
-          ...memory,
-          date: new Date(memory.date)
-        }));
-        setMemories(parsedMemories);
-      }
-    };
-
-    loadExistingMemories();
-  }, []);
+  // Set memories from gift design data when loaded
+  useEffect(() => {
+    if (giftDesign?.memories) {
+      // Convert the dates back to Date objects
+      const parsedMemories = (giftDesign.memories as any[]).map(memory => ({
+        ...memory,
+        date: new Date(memory.date)
+      }));
+      setMemories(parsedMemories);
+    }
+  }, [giftDesign?.memories]);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -74,7 +80,7 @@ const InsideRightCard = () => {
       toast.info('Please add a caption to create your memory');
     } catch (err) {
       console.error('Error uploading image:', err);
-      toast.error('Failed to upload video');
+      toast.error('Failed to upload image');
     }
   };
 
@@ -115,6 +121,12 @@ const InsideRightCard = () => {
         .eq('token', token);
 
       if (updateError) throw updateError;
+
+      // Update the query cache
+      queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
+        ...oldData,
+        memories: memoriesForStorage
+      }));
 
       setMemories([...memories, newMemory]);
       setCaption("");
