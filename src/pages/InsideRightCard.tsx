@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -32,7 +33,12 @@ const InsideRightCard = () => {
       }
 
       if (giftDesign?.memories) {
-        setMemories(giftDesign.memories as Memory[]);
+        // Convert the dates back to Date objects
+        const parsedMemories = (giftDesign.memories as any[]).map(memory => ({
+          ...memory,
+          date: new Date(memory.date)
+        }));
+        setMemories(parsedMemories);
       }
     };
 
@@ -89,7 +95,7 @@ const InsideRightCard = () => {
       return;
     }
 
-    const memory: Memory = {
+    const newMemory: Memory = {
       id: crypto.randomUUID(),
       imageUrl: pendingImage,
       caption: caption,
@@ -97,17 +103,20 @@ const InsideRightCard = () => {
     };
 
     try {
-      const updatedMemories = [...memories, memory];
+      // Convert dates to ISO strings for JSON storage
+      const memoriesForStorage = [...memories, newMemory].map(memory => ({
+        ...memory,
+        date: memory.date.toISOString()
+      }));
 
-      // Update gift design with new memories
       const { error: updateError } = await supabase
         .from('gift_designs')
-        .update({ memories: updatedMemories })
+        .update({ memories: memoriesForStorage })
         .eq('token', token);
 
       if (updateError) throw updateError;
 
-      setMemories(updatedMemories);
+      setMemories([...memories, newMemory]);
       setCaption("");
       setPendingImage(undefined);
       toast.success('Memory added successfully');
