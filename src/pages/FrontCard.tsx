@@ -12,6 +12,7 @@ import { stickerOptions, themeOptions } from "@/constants/giftOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface GiftDesign {
   theme: string | null;
@@ -34,6 +35,7 @@ const FrontCardContent = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const cardRef = useRef<HTMLDivElement>(null);
+  const { user } = useAuth();
   const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
   const {
     placedStickers,
@@ -54,6 +56,7 @@ const FrontCardContent = () => {
     queryKey: ['gift-design', token],
     queryFn: async () => {
       if (!token) throw new Error('No gift token found');
+      if (!user) throw new Error('User not authenticated');
 
       const { data, error } = await supabase
         .from('gift_designs')
@@ -64,9 +67,20 @@ const FrontCardContent = () => {
       if (error) throw error;
       
       if (!data) {
-        toast.error('Gift design not found');
-        navigate('/home');
-        return null;
+        const { data: newGiftDesign, error: createError } = await supabase
+          .from('gift_designs')
+          .insert([
+            { 
+              token,
+              status: 'draft',
+              user_id: user.id
+            }
+          ])
+          .select()
+          .single();
+
+        if (createError) throw createError;
+        return newGiftDesign;
       }
 
       const processedData: GiftDesign = {
@@ -79,10 +93,10 @@ const FrontCardContent = () => {
 
       return processedData;
     },
-    enabled: !!token,
-    staleTime: Infinity, // Never consider the data stale
-    gcTime: Infinity, // Never garbage collect the data
-    retry: false // Don't retry if the query fails
+    enabled: !!token && !!user,
+    staleTime: Infinity,
+    gcTime: Infinity,
+    retry: false
   });
 
   useEffect(() => {
@@ -135,8 +149,8 @@ const FrontCardContent = () => {
 
   useEffect(() => {
     const saveChanges = async () => {
-      if (!token || !giftDesign) {
-        console.error('No gift token or design found');
+      if (!token || !giftDesign || !user) {
+        console.error('Missing required data for saving changes');
         return;
       }
 
@@ -157,7 +171,8 @@ const FrontCardContent = () => {
             theme: selectedThemeOption.text,
             last_edited_at: new Date().toISOString()
           })
-          .eq('token', token);
+          .eq('token', token)
+          .eq('user_id', user.id);
 
         if (error) throw error;
 
@@ -178,7 +193,7 @@ const FrontCardContent = () => {
 
     const timeoutId = setTimeout(saveChanges, 500);
     return () => clearTimeout(timeoutId);
-  }, [selectedThemeOption, placedStickers, token, queryClient, giftDesign]);
+  }, [selectedThemeOption, placedStickers, token, queryClient, giftDesign, user]);
 
   const handleBackClick = () => {
     navigate('/home');
