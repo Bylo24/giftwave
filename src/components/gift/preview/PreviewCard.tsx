@@ -1,4 +1,5 @@
 
+import { useRef, useState } from "react";
 import { Video, Image, Star, DollarSign } from "lucide-react";
 import { PatternType } from "@/types/gift";
 import { GiftDesign } from "@/hooks/useGiftDesign";
@@ -20,12 +21,23 @@ interface PreviewCardProps {
 }
 
 export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesign }: PreviewCardProps) => {
+  // Track video state between page flips
+  const [videoProgress, setVideoProgress] = useState(0);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
   const formatAmount = (amount: number | null) => {
     if (!amount) return "$0";
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
       currency: 'USD'
     }).format(amount);
+  };
+
+  // Handle video state persistence
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setVideoProgress(videoRef.current.currentTime);
+    }
   };
 
   return (
@@ -51,14 +63,16 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
           </div>
           {giftDesign.front_card_stickers?.map((sticker: any, index: number) => (
             <div
-              key={index}
+              key={`sticker-${index}-${sticker.emoji}`}
               style={{
                 position: 'absolute',
-                left: `${sticker.x}px`,
-                top: `${sticker.y}px`,
-                transform: `rotate(${sticker.rotation}deg)`
+                left: `${(sticker.x / window.innerWidth) * 100}%`,
+                top: `${(sticker.y / window.innerHeight) * 100}%`,
+                transform: `rotate(${sticker.rotation}deg)`,
+                maxWidth: '15%',
+                maxHeight: '15%'
               }}
-              className="text-2xl"
+              className="text-2xl pointer-events-none select-none"
             >
               {sticker.emoji}
             </div>
@@ -68,10 +82,18 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
           {giftDesign.message_video_url ? (
             <video
+              ref={videoRef}
               src={giftDesign.message_video_url}
               className="w-full h-full object-cover rounded-lg"
               controls
               playsInline
+              currentTime={videoProgress}
+              onTimeUpdate={handleTimeUpdate}
+              onLoadedMetadata={() => {
+                if (videoRef.current && videoProgress > 0) {
+                  videoRef.current.currentTime = videoProgress;
+                }
+              }}
             />
           ) : (
             <>
@@ -87,10 +109,10 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
       ) : pageIndex === 2 ? (
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
           {giftDesign.memories && giftDesign.memories.length > 0 ? (
-            <div className="grid grid-cols-2 gap-4 w-full">
-              {giftDesign.memories.map((memory: any, index: number) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-h-[80vh] overflow-y-auto">
+              {giftDesign.memories.slice(0, 6).map((memory: any, index: number) => (
                 <div
-                  key={index}
+                  key={`memory-${index}`}
                   className="aspect-square rounded-lg overflow-hidden bg-white shadow-md"
                 >
                   {memory.imageUrl ? (
@@ -98,6 +120,7 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
                       src={memory.imageUrl} 
                       alt={memory.caption}
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center bg-gray-100">
