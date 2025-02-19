@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
@@ -75,8 +76,9 @@ const GiftContent = () => {
     }
   };
 
-  const handleNext = async () => {
-    return Promise.resolve();
+  const handleNext = async (): Promise<void> => {
+    // Making this function async ensures it returns a Promise<void>
+    await Promise.resolve();
   };
 
   const goToNextStep = () => {
