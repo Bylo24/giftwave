@@ -11,6 +11,7 @@ import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { useStickerManager } from "@/hooks/useStickerManager";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { stickerOptions } from "@/constants/giftOptions";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 const FrontCardContent = () => {
