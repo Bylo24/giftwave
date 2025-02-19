@@ -20,7 +20,12 @@ interface PreviewCardProps {
   giftDesign: GiftDesign;
 }
 
-export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesign }: PreviewCardProps) => {
+export const PreviewCard = ({ 
+  pageIndex, 
+  themeOption, 
+  getPatternStyle, 
+  giftDesign 
+}: PreviewCardProps) => {
   // Track video state between page flips
   const [videoProgress, setVideoProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -53,7 +58,9 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
         className="absolute inset-0" 
         style={getPatternStyle(themeOption.pattern)}
       />
+      
       {pageIndex === 0 ? (
+        // Front card
         <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8 p-4">
           <div className="text-center">
             {themeOption.text.split('').map((letter, index) => (
@@ -86,6 +93,7 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
           ))}
         </div>
       ) : pageIndex === 1 ? (
+        // Inside left - Video message
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
           {giftDesign.message_video_url ? (
             <video
@@ -113,6 +121,7 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
           )}
         </div>
       ) : pageIndex === 2 ? (
+        // Inside right - Memories
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
           {giftDesign.memories && giftDesign.memories.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full max-h-[80vh] overflow-y-auto">
@@ -152,6 +161,7 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
           )}
         </div>
       ) : (
+        // Back card - Amount
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
           <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
             <DollarSign className="h-8 w-8 text-gray-600" />

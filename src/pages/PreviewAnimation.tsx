@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -10,7 +11,7 @@ import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
 
-const ANIMATION_DURATION = 500; // Match this with CSS transition duration
+const ANIMATION_DURATION = 500; // Match with CSS transition duration
 const CONFETTI_DURATION = 1500;
 
 const PreviewAnimation = () => {
@@ -36,31 +37,36 @@ const PreviewAnimation = () => {
     isLoading: isLoadingGift, 
     error,
     isPreviewMode,
-    isFinalized
+    isFinalized,
+    startEditing
   } = useGiftDesign(token);
 
-  // Cleanup function for timeouts
-  const clearTimeouts = () => {
-    if (animationTimeoutRef.current) {
-      clearTimeout(animationTimeoutRef.current);
+  // Initialize edit session if needed
+  useEffect(() => {
+    if (giftDesign && !isPreviewMode && !isFinalized) {
+      startEditing();
     }
-    confettiTimeoutRef.current.forEach(clearTimeout);
-    confettiTimeoutRef.current = [];
-  };
+  }, [giftDesign, isPreviewMode, isFinalized, startEditing]);
 
+  // Cleanup timeouts on unmount
   useEffect(() => {
     if (!token) {
       toast.error("No gift token provided");
-      navigate("/home");
+      navigate("/frontcard");
       return;
     }
 
     return () => {
       cleanupRef.current = true;
-      clearTimeouts();
+      if (animationTimeoutRef.current) {
+        clearTimeout(animationTimeoutRef.current);
+      }
+      confettiTimeoutRef.current.forEach(clearTimeout);
+      confettiTimeoutRef.current = [];
     };
   }, [token, navigate]);
 
+  // Handle errors
   useEffect(() => {
     if (error) {
       toast.error("Unable to load gift preview");
@@ -68,18 +74,14 @@ const PreviewAnimation = () => {
     }
   }, [error]);
 
+  // Update loading state
   useEffect(() => {
     if (!isLoadingGift) {
       setIsLoading(false);
     }
   }, [isLoadingGift]);
 
-  useEffect(() => {
-    if (giftDesign && isAnimatingRef.current) {
-      pendingUpdateRef.current = true;
-    }
-  }, [giftDesign]);
-
+  // Handle confetti animation
   useEffect(() => {
     if (showConfetti && !cleanupRef.current) {
       const fadeStartTimeout = setTimeout(() => {
@@ -162,42 +164,47 @@ const PreviewAnimation = () => {
     }
   };
 
+  // Handle missing token
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <p className="text-red-500 mb-4">No gift token provided</p>
         <button 
-          onClick={() => navigate("/home")}
+          onClick={() => navigate("/frontcard")}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
         >
-          Return Home
+          Start New Gift
         </button>
       </div>
     );
   }
 
+  // Show loading state
   if (isLoading) {
     return <GiftLoadingState />;
   }
 
+  // Handle errors or missing data
   if (error || !giftDesign) {
     return <GiftNotFound />;
   }
 
+  // Check for incomplete gift
   if (!isPreviewMode && !isFinalized) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <p className="text-amber-600 mb-4">This gift is still being edited</p>
         <button 
-          onClick={() => navigate("/home")}
+          onClick={() => navigate("/frontcard")}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
         >
-          Return Home
+          Start New Gift
         </button>
       </div>
     );
   }
 
+  // Theme configuration
   const themeOption = {
     text: "Happy Birthday!",
     emoji: "🎉",
@@ -234,6 +241,7 @@ const PreviewAnimation = () => {
           />
         </div>
       )}
+      
       <div className="w-full max-w-md relative">
         <PreviewNavigationButtons
           onPrevious={previousPage}
