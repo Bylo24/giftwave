@@ -1,6 +1,7 @@
 
 import { Video, Image, Star, DollarSign } from "lucide-react";
 import { PatternType } from "@/types/gift";
+import { GiftDesign } from "@/hooks/useGiftDesign";
 
 interface PreviewCardProps {
   pageIndex: number;
@@ -15,9 +16,18 @@ interface PreviewCardProps {
     };
   };
   getPatternStyle: (pattern: { type: PatternType; color: string }) => React.CSSProperties;
+  giftDesign: GiftDesign;
 }
 
-export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle }: PreviewCardProps) => {
+export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesign }: PreviewCardProps) => {
+  const formatAmount = (amount: number | null) => {
+    if (!amount) return "$0";
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
   return (
     <div className={`${themeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
       <div 
@@ -39,28 +49,78 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle }: Preview
           <div className="text-3xl sm:text-4xl md:text-5xl animate-bounce">
             {themeOption.emoji}
           </div>
+          {giftDesign.front_card_stickers?.map((sticker: any, index: number) => (
+            <div
+              key={index}
+              style={{
+                position: 'absolute',
+                left: `${sticker.x}px`,
+                top: `${sticker.y}px`,
+                transform: `rotate(${sticker.rotation}deg)`
+              }}
+              className="text-2xl"
+            >
+              {sticker.emoji}
+            </div>
+          ))}
         </div>
       ) : pageIndex === 1 ? (
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
-          <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
-            <Video className="h-8 w-8 text-gray-600" />
-          </div>
-          <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-            Video message
-          </span>
+          {giftDesign.message_video_url ? (
+            <video
+              src={giftDesign.message_video_url}
+              className="w-full h-full object-cover rounded-lg"
+              controls
+              playsInline
+            />
+          ) : (
+            <>
+              <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
+                <Video className="h-8 w-8 text-gray-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                Video message
+              </span>
+            </>
+          )}
         </div>
       ) : pageIndex === 2 ? (
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
-          <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
-            <Image className="h-8 w-8 text-gray-600" />
-          </div>
-          <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
-            Photo memories
-          </span>
-          <div className="flex flex-col items-center justify-center mt-4">
-            <Star className="h-6 w-6 text-gray-400 mb-2" />
-            <p className="text-sm text-gray-500">Add your first memory</p>
-          </div>
+          {giftDesign.memories && giftDesign.memories.length > 0 ? (
+            <div className="grid grid-cols-2 gap-4 w-full">
+              {giftDesign.memories.map((memory: any, index: number) => (
+                <div
+                  key={index}
+                  className="aspect-square rounded-lg overflow-hidden bg-white shadow-md"
+                >
+                  {memory.imageUrl ? (
+                    <img 
+                      src={memory.imageUrl} 
+                      alt={memory.caption}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center bg-gray-100">
+                      <Image className="h-8 w-8 text-gray-400" />
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="w-16 h-16 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg mb-4">
+                <Image className="h-8 w-8 text-gray-600" />
+              </div>
+              <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
+                Photo memories
+              </span>
+              <div className="flex flex-col items-center justify-center mt-4">
+                <Star className="h-6 w-6 text-gray-400 mb-2" />
+                <p className="text-sm text-gray-500">Add your first memory</p>
+              </div>
+            </>
+          )}
         </div>
       ) : (
         <div className="relative z-10 h-full flex flex-col items-center justify-center p-6">
@@ -68,7 +128,9 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle }: Preview
             <DollarSign className="h-8 w-8 text-gray-600" />
           </div>
           <div className="flex flex-col items-center">
-            <span className="text-4xl font-bold text-gray-700 mb-2">$50</span>
+            <span className="text-4xl font-bold text-gray-700 mb-2">
+              {formatAmount(giftDesign.selected_amount)}
+            </span>
             <span className="text-sm font-medium text-gray-600 bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full">
               Gift amount
             </span>

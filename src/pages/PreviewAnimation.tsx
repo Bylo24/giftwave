@@ -1,50 +1,49 @@
+
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
 import Confetti from 'react-confetti';
 import { PreviewNavigationButtons } from "@/components/gift/preview/PreviewNavigationButtons";
 import { PreviewCard } from "@/components/gift/preview/PreviewCard";
 import { PreviewContainer } from "@/components/gift/preview/PreviewContainer";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
-
-const sampleThemeOption = {
-  text: "Happy Birthday!",
-  emoji: "🎉",
-  bgColor: "bg-purple-100",
-  screenBgColor: "#f3e8ff",
-  textColors: ["text-purple-600"],
-  pattern: {
-    type: "dots" as PatternType,
-    color: "rgba(147, 51, 234, 0.1)"
-  }
-};
+import { useGiftDesign } from "@/hooks/useGiftDesign";
+import { toast } from "sonner";
 
 const PreviewAnimation = () => {
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get('token');
+  const navigate = useNavigate();
+  
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
-  const navigate = useNavigate();
+
+  const { giftDesign, isLoading: isLoadingGift, error } = useGiftDesign(token);
 
   useEffect(() => {
-    setIsLoading(false);
-  }, []);
+    if (error) {
+      toast.error("Failed to load gift preview");
+    }
+  }, [error]);
 
-  const totalPages = 4;
+  useEffect(() => {
+    if (!isLoadingGift) {
+      setIsLoading(false);
+    }
+  }, [isLoadingGift]);
 
   useEffect(() => {
     if (showConfetti) {
-      // Start fading out after 1 second
       const fadeStartTimer = setTimeout(() => {
         setConfettiOpacity(0);
       }, 1000);
 
-      // Remove confetti after fade completes
       const removeTimer = setTimeout(() => {
         setShowConfetti(false);
-        setConfettiOpacity(1); // Reset opacity for next animation
+        setConfettiOpacity(1);
       }, 1500);
 
       return () => {
@@ -57,7 +56,7 @@ const PreviewAnimation = () => {
   const nextPage = () => {
     if (isFlipping) return;
     setIsFlipping(true);
-    setCurrentPage((prev) => (prev + 1) % totalPages);
+    setCurrentPage((prev) => (prev + 1) % 4);
     setShowConfetti(true);
     setTimeout(() => setIsFlipping(false), 500);
   };
@@ -65,7 +64,7 @@ const PreviewAnimation = () => {
   const previousPage = () => {
     if (isFlipping) return;
     setIsFlipping(true);
-    setCurrentPage((prev) => (prev - 1 + totalPages) % totalPages);
+    setCurrentPage((prev) => (prev - 1 + 4) % 4);
     setShowConfetti(true);
     setTimeout(() => setIsFlipping(false), 500);
   };
@@ -99,14 +98,31 @@ const PreviewAnimation = () => {
     return <GiftLoadingState />;
   }
 
-  if (error) {
+  if (error || !giftDesign) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <p className="text-red-500 mb-4">{error}</p>
-        <button onClick={() => navigate("/home")}>Return Home</button>
+        <p className="text-red-500 mb-4">Failed to load gift preview</p>
+        <button 
+          onClick={() => navigate("/home")}
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          Return Home
+        </button>
       </div>
     );
   }
+
+  const themeOption = {
+    text: "Happy Birthday!",
+    emoji: "🎉",
+    bgColor: "bg-purple-100",
+    screenBgColor: "#f3e8ff",
+    textColors: ["text-purple-600"],
+    pattern: {
+      type: (giftDesign.front_card_pattern as PatternType) || "dots",
+      color: "rgba(147, 51, 234, 0.1)"
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center px-8 py-12 sm:p-6">
@@ -154,8 +170,9 @@ const PreviewAnimation = () => {
             >
               <PreviewCard
                 pageIndex={pageIndex}
-                themeOption={sampleThemeOption}
+                themeOption={themeOption}
                 getPatternStyle={getPatternStyle}
+                giftDesign={giftDesign}
               />
             </div>
           ))}
