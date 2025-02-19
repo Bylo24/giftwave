@@ -1,4 +1,3 @@
-
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeOption, Sticker, PatternType } from "@/types/gift";
@@ -51,7 +50,7 @@ const FrontCardContent = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
-  const { data: giftDesign } = useQuery({
+  const { data: giftDesign, isError } = useQuery({
     queryKey: ['gift-design', token],
     queryFn: async () => {
       if (!token) throw new Error('No gift token found');
@@ -60,11 +59,16 @@ const FrontCardContent = () => {
         .from('gift_designs')
         .select('*')
         .eq('token', token)
-        .single();
+        .maybeSingle();
 
       if (error) throw error;
       
-      // Validate and transform the data
+      if (!data) {
+        toast.error('Gift design not found');
+        navigate('/home');
+        return null;
+      }
+
       const processedData: GiftDesign = {
         ...data,
         front_card_pattern: isValidPatternType(data.front_card_pattern) ? data.front_card_pattern : null,
@@ -77,8 +81,16 @@ const FrontCardContent = () => {
     },
     enabled: !!token,
     staleTime: Infinity, // Never consider the data stale
-    gcTime: Infinity // Never garbage collect the data
+    gcTime: Infinity, // Never garbage collect the data
+    retry: false // Don't retry if the query fails
   });
+
+  useEffect(() => {
+    if (isError) {
+      toast.error('Error loading gift design');
+      navigate('/home');
+    }
+  }, [isError, navigate]);
 
   useEffect(() => {
     if (giftDesign) {
@@ -123,8 +135,8 @@ const FrontCardContent = () => {
 
   useEffect(() => {
     const saveChanges = async () => {
-      if (!token) {
-        console.error('No gift token found');
+      if (!token || !giftDesign) {
+        console.error('No gift token or design found');
         return;
       }
 
@@ -149,7 +161,6 @@ const FrontCardContent = () => {
 
         if (error) throw error;
 
-        // Immediately update the query cache with the new data
         queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
           ...oldData,
           front_card_pattern: selectedThemeOption.pattern.type,
@@ -165,10 +176,9 @@ const FrontCardContent = () => {
       }
     };
 
-    // Add a small debounce to avoid too many saves
     const timeoutId = setTimeout(saveChanges, 500);
     return () => clearTimeout(timeoutId);
-  }, [selectedThemeOption, placedStickers, token, queryClient]);
+  }, [selectedThemeOption, placedStickers, token, queryClient, giftDesign]);
 
   const handleBackClick = () => {
     navigate('/home');
