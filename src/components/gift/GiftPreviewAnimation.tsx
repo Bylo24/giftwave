@@ -1,141 +1,137 @@
 
-import { useEffect, useRef, useState } from 'react';
-import Lottie, { LottieRefCurrentProps } from 'lottie-react';
-import animationData from '@/animations/gift-preview.json';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useAnimationDebounce, useAnimationFrame, useIntersectionObserver } from "@/utils/animationUtils";
+import { toast } from "sonner";
+import Lottie from "lottie-react";
+import giftPreviewAnimation from "@/animations/gift-preview.json";
 
 interface GiftPreviewAnimationProps {
-  messageVideo: File | string | null;
-  messageVideoType?: 'file' | 'url';
-  amount: string;
-  memories: Array<{
-    id: string;
-    imageUrl?: string;
-    caption: string;
-    date: Date;
-  }>;
   onComplete: () => void;
 }
 
-export const GiftPreviewAnimation = ({ 
-  messageVideo, 
-  messageVideoType = 'file',
-  amount, 
-  memories,
-  onComplete 
-}: GiftPreviewAnimationProps) => {
-  const lottieRef = useRef<LottieRefCurrentProps>(null);
-  const [animationProgress, setAnimationProgress] = useState(0);
-  
-  // Track animation segments for content timing
-  const segments = {
-    video: { start: 0.2, end: 0.4 },
-    memories: { start: 0.4, end: 0.6 },
-    amount: { start: 0.6, end: 0.8 }
-  };
+export const GiftPreviewAnimation = ({ onComplete }: GiftPreviewAnimationProps) => {
+  const [isAnimating, setIsAnimating] = useState(false);
+  const [showConfetti, setShowConfetti] = useState(false);
+  const isMobile = useIsMobile();
+  const animationContainerRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (lottieRef.current) {
-      lottieRef.current.setSpeed(0.8);
-      
-      const animation = lottieRef.current;
-      const updateProgress = () => {
-        if (animation.animationItem) {
-          const progress = animation.animationItem.currentFrame / animation.animationItem.totalFrames;
-          setAnimationProgress(progress);
-          
-          if (progress >= 1) {
-            onComplete();
-          } else {
-            requestAnimationFrame(updateProgress);
-          }
-        }
-      };
-      
-      requestAnimationFrame(updateProgress);
+  // Debounced animation trigger
+  const triggerAnimation = useAnimationDebounce(() => {
+    setIsAnimating(true);
+    setShowConfetti(true);
+  }, 100);
+
+  // Intersection observer for triggering animation when in view
+  const observerRef = useIntersectionObserver((isIntersecting) => {
+    if (isIntersecting) {
+      triggerAnimation();
     }
-  }, [onComplete]);
+  }, {
+    threshold: 0.5,
+    rootMargin: "50px"
+  });
 
-  // Get video source based on type
-  const getVideoSource = () => {
-    if (!messageVideo) return '';
-    return messageVideoType === 'file' 
-      ? URL.createObjectURL(messageVideo as File) 
-      : messageVideo as string;
+  // Animation frame for smooth confetti
+  useAnimationFrame((deltaTime) => {
+    if (showConfetti) {
+      // Update confetti positions using deltaTime for smooth animation
+      // This ensures consistent animation speed regardless of frame rate
+    }
+  });
+
+  // Clean up animations on unmount
+  useEffect(() => {
+    return () => {
+      setShowConfetti(false);
+      setIsAnimating(false);
+    };
+  }, []);
+
+  const handleAnimationComplete = () => {
+    setShowConfetti(false);
+    onComplete();
   };
 
   return (
-    <div className="relative w-full max-w-md mx-auto aspect-square">
-      <Lottie
-        lottieRef={lottieRef}
-        animationData={animationData}
-        loop={false}
-        className="w-full h-full"
-      />
-
-      <AnimatePresence>
-        {animationProgress >= segments.video.start && messageVideo && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute"
-            style={{
-              top: '30%',
-              left: '50%',
-              transform: 'translate(-50%, -50%)',
-              width: '60%',
-              aspectRatio: '16/9'
+    <div 
+      ref={observerRef}
+      className="min-h-screen flex items-center justify-center p-4 overflow-hidden"
+    >
+      <motion.div
+        ref={animationContainerRef}
+        className="relative w-full max-w-md"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ 
+          scale: isAnimating ? 1 : 0.8, 
+          opacity: isAnimating ? 1 : 0,
+        }}
+        transition={{ 
+          duration: 0.5,
+          type: "spring",
+          stiffness: 200,
+          damping: 20
+        }}
+        onAnimationComplete={handleAnimationComplete}
+      >
+        <div className="relative aspect-square">
+          <Lottie
+            animationData={giftPreviewAnimation}
+            loop={false}
+            className="w-full h-full"
+            onComplete={handleAnimationComplete}
+            rendererSettings={{
+              preserveAspectRatio: "xMidYMid slice",
+              progressiveLoad: true
             }}
-          >
-            <video
-              src={getVideoSource()}
-              className="w-full h-full object-cover rounded-lg"
-              autoPlay
-              muted
-            />
-          </motion.div>
-        )}
+          />
+        </div>
 
-        {animationProgress >= segments.memories.start && memories.map((memory, index) => (
-          <motion.div
-            key={memory.id}
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ delay: index * 0.1 }}
-            className="absolute"
-            style={{
-              top: `${30 + Math.sin(index * (Math.PI * 2 / memories.length)) * 20}%`,
-              left: `${50 + Math.cos(index * (Math.PI * 2 / memories.length)) * 20}%`,
-              transform: 'translate(-50%, -50%)',
-              width: '20%',
-              aspectRatio: '1'
-            }}
-          >
-            {memory.imageUrl && (
-              <img
-                src={memory.imageUrl}
-                alt={memory.caption}
-                className="w-full h-full object-cover rounded-full border-4 border-white shadow-lg"
-              />
-            )}
-          </motion.div>
-        ))}
-
-        {animationProgress >= segments.amount.start && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.5 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.5 }}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          >
-            <span className="text-4xl font-bold text-blue-600 bg-white/90 px-6 py-3 rounded-full shadow-lg">
-              ${amount}
-            </span>
-          </motion.div>
-        )}
-      </AnimatePresence>
+        <AnimatePresence>
+          {showConfetti && (
+            <motion.div
+              className="absolute inset-0 pointer-events-none"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {/* Optimized confetti rendering based on device capabilities */}
+              <div className="confetti-container" style={{
+                willChange: 'transform',
+                transform: 'translateZ(0)',
+              }}>
+                {/* Reduced particle count for mobile devices */}
+                {Array.from({ length: isMobile ? 50 : 100 }).map((_, index) => (
+                  <motion.div
+                    key={index}
+                    className="confetti-particle"
+                    style={{
+                      position: 'absolute',
+                      width: '10px',
+                      height: '10px',
+                      backgroundColor: ['#ff0000', '#00ff00', '#0000ff'][index % 3],
+                      borderRadius: '50%',
+                      willChange: 'transform',
+                    }}
+                    animate={{
+                      y: [0, Math.random() * 500],
+                      x: [0, (Math.random() - 0.5) * 500],
+                      rotate: [0, Math.random() * 360],
+                    }}
+                    transition={{
+                      duration: 1 + Math.random(),
+                      ease: "easeOut",
+                      repeat: 0,
+                    }}
+                  />
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
     </div>
   );
 };

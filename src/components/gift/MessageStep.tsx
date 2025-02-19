@@ -83,15 +83,17 @@ export const MessageStep = ({
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
       
+      // Create upload event handler
+      const handleProgress = (event: ProgressEvent) => {
+        const percent = (event.loaded / event.total) * 100;
+        setUploadProgress(Math.round(percent));
+      };
+
       const { error: uploadError, data } = await supabase.storage
         .from('gift_videos')
         .upload(fileName, file, {
           cacheControl: '3600',
-          upsert: false,
-          onUploadProgress: (progress) => {
-            const percent = (progress.loaded / progress.total) * 100;
-            setUploadProgress(Math.round(percent));
-          },
+          upsert: false
         });
 
       if (uploadError) throw uploadError;
