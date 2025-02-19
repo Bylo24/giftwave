@@ -77,10 +77,8 @@ const GiftContent = () => {
   };
 
   const handleNext = async (): Promise<void> => {
-    // First handle the async operations
+    // Making this function async ensures it returns a Promise<void>
     await Promise.resolve();
-    // Then call goToNextStep to maintain the original flow
-    goToNextStep();
   };
 
   const goToNextStep = () => {
@@ -149,7 +147,7 @@ const GiftContent = () => {
           <AmountStep
             amount={amount}
             setAmount={setAmount}
-            onNext={handleNext}
+            onNext={goToNextStep}
           />
         </div>
       </div>
