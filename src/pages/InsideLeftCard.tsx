@@ -7,10 +7,11 @@ import { BlankCard } from "@/components/gift/cards/BlankCard";
 import { stickerOptions } from "@/constants/giftOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const InsideLeftCardContent = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
   const { selectedThemeOption, handlePatternChange } = useTheme();
   const {
@@ -27,7 +28,7 @@ const InsideLeftCardContent = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
-  // Fetch the current gift design data
+  // Fetch the current gift design data with caching
   const { data: giftDesign } = useQuery({
     queryKey: ['gift-design', token],
     queryFn: async () => {
@@ -42,7 +43,9 @@ const InsideLeftCardContent = () => {
       if (error) throw error;
       return data;
     },
-    enabled: !!token
+    enabled: !!token,
+    staleTime: Infinity, // Keep the data fresh indefinitely
+    cacheTime: 1000 * 60 * 30, // Cache for 30 minutes
   });
 
   // Set video from URL when gift design data is loaded
@@ -101,6 +104,12 @@ const InsideLeftCardContent = () => {
         .eq('token', token);
 
       if (updateError) throw updateError;
+
+      // Update the query cache
+      queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
+        ...oldData,
+        message_video_url: publicUrl
+      }));
 
       setMessageVideo(file);
       toast.success('Video uploaded successfully');
