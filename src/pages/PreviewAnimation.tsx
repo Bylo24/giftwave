@@ -25,6 +25,7 @@ const PreviewAnimation = () => {
   // Use refs to track animation state
   const isAnimatingRef = useRef(false);
   const pendingUpdateRef = useRef(false);
+  const cleanupRef = useRef(false);
 
   const { 
     giftDesign, 
@@ -40,6 +41,11 @@ const PreviewAnimation = () => {
       navigate("/home");
       return;
     }
+
+    // Cleanup flag for avoiding memory leaks
+    return () => {
+      cleanupRef.current = true;
+    };
   }, [token, navigate]);
 
   useEffect(() => {
@@ -58,26 +64,28 @@ const PreviewAnimation = () => {
   // Handle smooth updates when gift design changes
   useEffect(() => {
     if (giftDesign && isAnimatingRef.current) {
-      // If we're currently animating, mark that we have a pending update
       pendingUpdateRef.current = true;
     }
   }, [giftDesign]);
 
   useEffect(() => {
-    if (showConfetti) {
+    if (showConfetti && !cleanupRef.current) {
       const fadeStartTimer = setTimeout(() => {
-        setConfettiOpacity(0);
+        if (!cleanupRef.current) {
+          setConfettiOpacity(0);
+        }
       }, 1000);
 
       const removeTimer = setTimeout(() => {
-        setShowConfetti(false);
-        setConfettiOpacity(1);
-        
-        // After confetti animation, check for pending updates
-        if (pendingUpdateRef.current) {
-          pendingUpdateRef.current = false;
-          // Force a re-render if needed
-          setCurrentPage(curr => curr);
+        if (!cleanupRef.current) {
+          setShowConfetti(false);
+          setConfettiOpacity(1);
+          
+          // After confetti animation, check for pending updates
+          if (pendingUpdateRef.current) {
+            pendingUpdateRef.current = false;
+            setCurrentPage(curr => curr);
+          }
         }
       }, 1500);
 
@@ -93,10 +101,14 @@ const PreviewAnimation = () => {
     isAnimatingRef.current = true;
     setIsFlipping(true);
     setCurrentPage((prev) => (prev + 1) % 4);
-    setShowConfetti(true);
+    if (!cleanupRef.current) {
+      setShowConfetti(true);
+    }
     setTimeout(() => {
-      setIsFlipping(false);
-      isAnimatingRef.current = false;
+      if (!cleanupRef.current) {
+        setIsFlipping(false);
+        isAnimatingRef.current = false;
+      }
     }, 500);
   };
 
@@ -105,10 +117,14 @@ const PreviewAnimation = () => {
     isAnimatingRef.current = true;
     setIsFlipping(true);
     setCurrentPage((prev) => (prev - 1 + 4) % 4);
-    setShowConfetti(true);
+    if (!cleanupRef.current) {
+      setShowConfetti(true);
+    }
     setTimeout(() => {
-      setIsFlipping(false);
-      isAnimatingRef.current = false;
+      if (!cleanupRef.current) {
+        setIsFlipping(false);
+        isAnimatingRef.current = false;
+      }
     }, 500);
   };
 
