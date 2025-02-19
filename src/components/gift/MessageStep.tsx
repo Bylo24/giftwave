@@ -1,10 +1,10 @@
-
 import { X, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { handleError, createUploadError, createValidationError } from "@/utils/errorHandler";
 
 interface MessageStepProps {
   isOpen: boolean;
@@ -39,7 +39,7 @@ export const MessageStep = ({
     };
   }, [videoPreviewUrl]);
 
-  const validateVideo = (file: File): Promise<boolean> => {
+  const validateVideo = async (file: File): Promise<boolean> => {
     return new Promise((resolve) => {
       const video = document.createElement('video');
       video.preload = 'metadata';
@@ -47,7 +47,10 @@ export const MessageStep = ({
       video.onloadedmetadata = () => {
         window.URL.revokeObjectURL(video.src);
         if (video.duration > MAX_VIDEO_DURATION) {
-          toast.error(`Video must be shorter than ${MAX_VIDEO_DURATION} seconds`);
+          handleError(createValidationError(
+            `Video must be shorter than ${MAX_VIDEO_DURATION} seconds`,
+            { duration: video.duration }
+          ));
           resolve(false);
           return;
         }
@@ -56,7 +59,7 @@ export const MessageStep = ({
       };
 
       video.onerror = () => {
-        toast.error('Error validating video format');
+        handleError(createValidationError('Invalid video format'));
         resolve(false);
       };
 
@@ -66,52 +69,59 @@ export const MessageStep = ({
 
   const handleMessageUpload = async (file: File) => {
     if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
-      toast.error('Please upload an MP4, MOV, or WebM video');
+      handleError(createValidationError(
+        'Please upload an MP4, MOV, or WebM video',
+        { fileType: file.type }
+      ));
       return;
     }
 
     if (file.size > MAX_VIDEO_SIZE) {
-      toast.error('Video must be smaller than 50MB');
+      handleError(createValidationError(
+        'Video must be smaller than 50MB',
+        { fileSize: file.size }
+      ));
       return;
     }
 
     const isValid = await validateVideo(file);
     if (!isValid) return;
 
-    setIsUploading(true);
+    const upload = async () => {
+      setIsUploading(true);
+      try {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${crypto.randomUUID()}.${fileExt}`;
+        
+        const { error: uploadError, data } = await supabase.storage
+          .from('gift_videos')
+          .upload(fileName, file, {
+            cacheControl: '3600',
+            upsert: false
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from('gift_videos')
+          .getPublicUrl(fileName);
+
+        setMessageVideo(file);
+        setVideoPreviewUrl(publicUrl);
+        toast.success('Video message uploaded successfully!');
+        onClose();
+      } catch (error) {
+        throw createUploadError('Failed to upload video', () => upload());
+      } finally {
+        setIsUploading(false);
+        setUploadProgress(0);
+      }
+    };
+
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${crypto.randomUUID()}.${fileExt}`;
-      
-      // Create upload event handler
-      const handleProgress = (event: ProgressEvent) => {
-        const percent = (event.loaded / event.total) * 100;
-        setUploadProgress(Math.round(percent));
-      };
-
-      const { error: uploadError, data } = await supabase.storage
-        .from('gift_videos')
-        .upload(fileName, file, {
-          cacheControl: '3600',
-          upsert: false
-        });
-
-      if (uploadError) throw uploadError;
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('gift_videos')
-        .getPublicUrl(fileName);
-
-      setMessageVideo(file);
-      setVideoPreviewUrl(publicUrl);
-      toast.success('Video message uploaded successfully!');
-      onClose();
+      await upload();
     } catch (error) {
-      console.error('Upload error:', error);
-      toast.error('Failed to upload video. Please try again.');
-    } finally {
-      setIsUploading(false);
-      setUploadProgress(0);
+      handleError(error);
     }
   };
 
