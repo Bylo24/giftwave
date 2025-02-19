@@ -1,5 +1,5 @@
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import { Video, Image, Star, DollarSign } from "lucide-react";
 import { PatternType } from "@/types/gift";
 import { GiftDesign } from "@/hooks/useGiftDesign";
@@ -24,6 +24,13 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
   // Track video state between page flips
   const [videoProgress, setVideoProgress] = useState(0);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  // Update video time when progress changes
+  useEffect(() => {
+    if (videoRef.current && videoProgress > 0) {
+      videoRef.current.currentTime = videoProgress;
+    }
+  }, [videoProgress]);
 
   const formatAmount = (amount: number | null) => {
     if (!amount) return "$0";
@@ -87,7 +94,6 @@ export const PreviewCard = ({ pageIndex, themeOption, getPatternStyle, giftDesig
               className="w-full h-full object-cover rounded-lg"
               controls
               playsInline
-              currentTime={videoProgress}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={() => {
                 if (videoRef.current && videoProgress > 0) {
