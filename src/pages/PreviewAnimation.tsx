@@ -190,7 +190,7 @@ const PreviewAnimation = () => {
   }
 
   // Check for incomplete gift
-  if (giftDesign.status !== 'preview' && !isFinalized) {
+  if (!isPreviewMode && !isFinalized) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <p className="text-amber-600 mb-4">This gift is still being edited</p>

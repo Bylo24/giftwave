@@ -100,8 +100,9 @@ export const useGiftDesignStatus = (
   const setPreviewMode = async () => {
     if (!giftDesign || !user) return;
 
-    if (giftDesign.status !== 'editing') {
-      toast.error('Gift must be in editing state before preview');
+    // Allow preview transition from both draft and editing states
+    if (giftDesign.status !== 'draft' && giftDesign.status !== 'editing') {
+      toast.error('Gift must be in draft or editing state before preview');
       return;
     }
 

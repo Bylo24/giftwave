@@ -78,15 +78,11 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
         throw new Error("Gift design not found");
       }
 
-      // Update the gift design with amount and set status to preview
+      // Update only the amount, status will be handled by useGiftDesignStatus
       const { data, error } = await supabase
         .from('gift_designs')
         .update({
-          selected_amount: parseFloat(amount),
-          status: 'preview',
-          editing_session_id: null,
-          editing_user_id: null,
-          last_edited_at: new Date().toISOString()
+          selected_amount: parseFloat(amount)
         })
         .eq('token', draftToken)
         .eq('user_id', user.id)
