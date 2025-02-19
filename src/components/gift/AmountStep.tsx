@@ -68,7 +68,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
         .insert([{
           user_id: user.id,
           selected_amount: parseFloat(amount),
-          status: 'draft'
+          status: 'preview'  // Set initial status to preview for immediate viewing
         }])
         .select()
         .single();
@@ -87,12 +87,29 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['gift-design'] });
-      navigate(`/testanimation?id=${data.id}`);
-      toast({
-        title: "Success",
-        description: "Gift design created successfully",
-      });
+      // Navigate to preview animation with the token
+      if (data?.token) {
+        navigate(`/previewanimation?token=${data.token}`);
+        toast({
+          title: "Success",
+          description: "Gift design created successfully",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "No token received for gift preview",
+          variant: "destructive",
+        });
+      }
     },
+    onError: (error) => {
+      console.error("Failed to create gift design:", error);
+      toast({
+        title: "Error",
+        description: "Failed to create gift preview. Please try again.",
+        variant: "destructive",
+      });
+    }
   });
 
   const handleContinue = async () => {

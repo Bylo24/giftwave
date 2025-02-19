@@ -11,7 +11,7 @@ const SelectAmountContent = () => {
   const [amount, setAmount] = useState("");
 
   const handleNext = () => {
-    navigate('/preview-gift');
+    // The navigation is now handled in AmountStep after creating the gift design
   };
 
   return (
