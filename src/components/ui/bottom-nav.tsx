@@ -22,7 +22,7 @@ export const BottomNav = () => {
     try {
       const { data, error } = await supabase
         .from('gift_designs')
-        .insert([{}])
+        .insert([{ status: 'draft' }])
         .select()
         .single();
 
@@ -45,16 +45,15 @@ export const BottomNav = () => {
         .eq('status', 'draft')
         .order('last_edited_at', { ascending: false })
         .limit(1)
-        .single();
+        .maybeSingle();
 
-      if (error) {
-        if (error.code === 'PGRST116') {
-          toast.info('No draft found. Starting new gift...');
-          handleNewGift();
-          return;
-        }
-        throw error;
+      if (!data) {
+        toast.info('No draft found. Starting new gift...');
+        handleNewGift();
+        return;
       }
+
+      if (error) throw error;
 
       localStorage.setItem('gift_draft_token', data.token);
       toast.success('Continuing from last draft');
