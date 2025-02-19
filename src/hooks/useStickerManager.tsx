@@ -68,6 +68,7 @@ export const useStickerManager = () => {
 
   return {
     placedStickers,
+    setPlacedStickers, // Added this to allow setting initial stickers
     selectedSticker,
     showStickers,
     setShowStickers,

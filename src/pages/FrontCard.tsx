@@ -9,7 +9,7 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { useStickerManager } from "@/hooks/useStickerManager";
-import { stickerOptions } from "@/constants/giftOptions";
+import { stickerOptions, themeOptions } from "@/constants/giftOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -28,7 +28,8 @@ const FrontCardContent = () => {
     handleStickerDragEnd,
     handleStickerTap,
     handleStickerRemove,
-    handleStickerRotate
+    handleStickerRotate,
+    setPlacedStickers
   } = useStickerManager();
 
   const token = localStorage.getItem('gift_draft_token');
@@ -49,8 +50,35 @@ const FrontCardContent = () => {
       return data;
     },
     enabled: !!token,
-    staleTime: Infinity // Keep the data fresh indefinitely
+    staleTime: Infinity, // Keep the data fresh indefinitely
+    gcTime: 1000 * 60 * 30 // Cache for 30 minutes before garbage collection
   });
+
+  // Initialize theme, pattern, and stickers from gift design data when loaded
+  useEffect(() => {
+    if (giftDesign) {
+      // Set theme if it exists in gift design
+      if (giftDesign.theme) {
+        const savedTheme = themeOptions.find(t => t.text === giftDesign.theme);
+        if (savedTheme) {
+          // Update the pattern type from saved data
+          const themeWithPattern = {
+            ...savedTheme,
+            pattern: {
+              ...savedTheme.pattern,
+              type: giftDesign.front_card_pattern || savedTheme.pattern.type
+            }
+          };
+          setSelectedThemeOption(themeWithPattern);
+        }
+      }
+
+      // Set stickers if they exist in gift design
+      if (giftDesign.front_card_stickers) {
+        setPlacedStickers(giftDesign.front_card_stickers);
+      }
+    }
+  }, [giftDesign, setSelectedThemeOption, setPlacedStickers]);
 
   // Save changes whenever relevant state changes
   useEffect(() => {
@@ -88,6 +116,8 @@ const FrontCardContent = () => {
           front_card_stickers: stickersForDb,
           theme: selectedThemeOption.text
         }));
+
+        console.log('Card changes saved successfully');
       } catch (err) {
         console.error('Error saving card changes:', err);
         toast.error('Failed to save changes');
