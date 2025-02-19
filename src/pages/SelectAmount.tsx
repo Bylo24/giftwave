@@ -5,49 +5,59 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AmountStep } from "@/components/gift/AmountStep";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
-import { supabase } from "@/integrations/supabase/client";
+import { useGiftDesign } from "@/hooks/useGiftDesign";
+import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
+import { GiftNotFound } from "@/components/gift/GiftNotFound";
 
 const SelectAmountContent = () => {
   const navigate = useNavigate();
   const [amount, setAmount] = useState("");
-  const { toast } = useToast();
   const draftToken = localStorage.getItem('gift_draft_token');
+  
+  const {
+    giftDesign,
+    isLoading,
+    error,
+    setPreviewMode,
+    isEditable
+  } = useGiftDesign(draftToken);
 
-  // Check for existing draft on mount
   useEffect(() => {
-    const checkDraft = async () => {
-      if (draftToken) {
-        const { data, error } = await supabase
-          .from('gift_designs')
-          .select('*')
-          .eq('token', draftToken)
-          .single();
+    if (giftDesign?.selected_amount) {
+      setAmount(giftDesign.selected_amount.toString());
+    }
+  }, [giftDesign]);
 
-        if (error || !data) {
-          toast({
-            title: "Error",
-            description: "Could not find your gift draft. Starting over.",
-            variant: "destructive",
-          });
-          localStorage.removeItem('gift_draft_token');
-          navigate('/frontcard');
-          return;
-        }
+  // Handle missing token
+  if (!draftToken) {
+    navigate('/frontcard');
+    return null;
+  }
 
-        // If amount is already set, use it
-        if (data.selected_amount) {
-          setAmount(data.selected_amount.toString());
-        }
-      }
-    };
+  // Show loading state
+  if (isLoading) {
+    return <GiftLoadingState />;
+  }
 
-    checkDraft();
-  }, [draftToken, navigate, toast]);
+  // Handle errors or missing data
+  if (error || !giftDesign) {
+    return <GiftNotFound />;
+  }
 
-  const handleNext = () => {
-    // Navigation is handled in AmountStep
-  };
+  // Check if gift is editable
+  if (!isEditable) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <p className="text-amber-600 mb-4">This gift cannot be edited</p>
+        <Button 
+          onClick={() => navigate("/frontcard")}
+          className="bg-purple-600 hover:bg-purple-700"
+        >
+          Start New Gift
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50/50">
@@ -66,7 +76,7 @@ const SelectAmountContent = () => {
         <AmountStep 
           amount={amount}
           setAmount={setAmount}
-          onNext={handleNext}
+          onNext={setPreviewMode}
         />
       </div>
     </div>
@@ -82,3 +92,4 @@ const SelectAmount = () => {
 };
 
 export default SelectAmount;
+

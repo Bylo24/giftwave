@@ -14,7 +14,7 @@ import { supabase } from "@/integrations/supabase/client";
 interface AmountStepProps {
   amount: string;
   setAmount: (value: string) => void;
-  onNext: () => void;
+  onNext: () => Promise<void>;
 }
 
 export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
@@ -78,7 +78,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
         throw new Error("Gift design not found");
       }
 
-      // Update only the amount, status will be handled by useGiftDesignStatus
+      // Update only the amount
       const { data, error } = await supabase
         .from('gift_designs')
         .update({
@@ -96,11 +96,19 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
 
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       if (data?.token) {
         queryClient.invalidateQueries({ queryKey: ['gift-design'] });
-        navigate(`/previewanimation?token=${data.token}`);
-        toast.success("Gift preview ready");
+        
+        // After updating amount, trigger status change to preview
+        try {
+          await onNext();
+          navigate(`/previewanimation?token=${data.token}`);
+          toast.success("Gift preview ready");
+        } catch (error) {
+          console.error("Error transitioning to preview:", error);
+          toast.error("Failed to prepare gift preview");
+        }
       }
     },
     onError: (error) => {
