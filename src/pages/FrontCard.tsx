@@ -126,7 +126,15 @@ const FrontCardContent = () => {
       }
 
       if (giftDesign.front_card_stickers && Array.isArray(giftDesign.front_card_stickers)) {
-        const validStickers = giftDesign.front_card_stickers.filter(isValidSticker);
+        const validStickers = giftDesign.front_card_stickers
+          .filter(isValidSticker)
+          .map(sticker => ({
+            id: String(sticker.id),
+            emoji: String(sticker.emoji),
+            x: Number(sticker.x),
+            y: Number(sticker.y),
+            rotation: Number(sticker.rotation)
+          }));
         setPlacedStickers(validStickers);
       }
     }

@@ -1,4 +1,3 @@
-
 import { DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -19,7 +18,6 @@ interface AmountStepProps {
 
 export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
   const presetAmounts = [5, 10, 20, 50, 100, 200];
-  const { toast } = useToast();
   const navigate = useNavigate();
   const { user } = useAuth();
   const queryClient = useQueryClient();
@@ -31,11 +29,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     if (value === "") {
       setAmount("");
     } else if (numValue <= 0) {
-      toast({
-        title: "Invalid amount",
-        description: "Please enter an amount greater than $0",
-        variant: "destructive",
-      });
+      toast.error("Please enter an amount greater than $0");
       setAmount("");
     } else {
       setAmount(value);
@@ -49,11 +43,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       if (!isNaN(numAmount) && numAmount > 0) {
         setAmount(numAmount.toString());
       } else {
-        toast({
-          title: "Invalid amount",
-          description: "Please enter a valid amount greater than $0",
-          variant: "destructive",
-        });
+        toast.error("Please enter a valid amount greater than $0");
       }
     }
   };
@@ -65,11 +55,7 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       }
 
       if (!draftToken) {
-        toast({
-          title: "Error",
-          description: "No draft token found. Please start over.",
-          variant: "destructive",
-        });
+        toast.error("No draft token found. Please start over.");
         navigate('/frontcard');
         return null;
       }
@@ -115,29 +101,18 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       if (data?.token) {
         queryClient.invalidateQueries({ queryKey: ['gift-design'] });
         navigate(`/previewanimation?token=${data.token}`);
-        toast({
-          title: "Success",
-          description: "Gift preview ready",
-        });
+        toast.success("Gift preview ready");
       }
     },
     onError: (error) => {
       console.error("Failed to update gift design:", error);
-      toast({
-        title: "Error",
-        description: "Failed to create gift preview. Please try again.",
-        variant: "destructive",
-      });
+      toast.error("Failed to create gift preview. Please try again.");
     }
   });
 
   const handleContinue = async () => {
     if (!amount || parseFloat(amount) <= 0) {
-      toast({
-        title: "Invalid amount",
-        description: "Please select or enter an amount",
-        variant: "destructive",
-      });
+      toast.error("Please select or enter an amount");
       return;
     }
 
