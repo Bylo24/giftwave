@@ -12,9 +12,11 @@ import { useStickerManager } from "@/hooks/useStickerManager";
 import { stickerOptions } from "@/constants/giftOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 const FrontCardContent = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const cardRef = useRef<HTMLDivElement>(null);
   const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
   const {
@@ -29,10 +31,30 @@ const FrontCardContent = () => {
     handleStickerRotate
   } = useStickerManager();
 
+  const token = localStorage.getItem('gift_draft_token');
+
+  // Fetch the current gift design data with caching
+  const { data: giftDesign } = useQuery({
+    queryKey: ['gift-design', token],
+    queryFn: async () => {
+      if (!token) throw new Error('No gift token found');
+
+      const { data, error } = await supabase
+        .from('gift_designs')
+        .select('*')
+        .eq('token', token)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!token,
+    staleTime: Infinity // Keep the data fresh indefinitely
+  });
+
   // Save changes whenever relevant state changes
   useEffect(() => {
     const saveChanges = async () => {
-      const token = localStorage.getItem('gift_draft_token');
       if (!token) {
         console.error('No gift token found');
         return;
@@ -58,6 +80,14 @@ const FrontCardContent = () => {
           .eq('token', token);
 
         if (error) throw error;
+
+        // Update the query cache
+        queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
+          ...oldData,
+          front_card_pattern: selectedThemeOption.pattern.type,
+          front_card_stickers: stickersForDb,
+          theme: selectedThemeOption.text
+        }));
       } catch (err) {
         console.error('Error saving card changes:', err);
         toast.error('Failed to save changes');
@@ -65,7 +95,7 @@ const FrontCardContent = () => {
     };
 
     saveChanges();
-  }, [selectedThemeOption, placedStickers]);
+  }, [selectedThemeOption, placedStickers, token, queryClient]);
 
   const handleBackClick = () => {
     navigate('/home');
