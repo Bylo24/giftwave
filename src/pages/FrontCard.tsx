@@ -1,3 +1,4 @@
+
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeOption, Sticker, PatternType } from "@/types/gift";
@@ -14,9 +15,20 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 interface GiftDesign {
-  theme: string;
-  front_card_pattern: PatternType;
-  front_card_stickers: Sticker[];
+  theme: string | null;
+  front_card_pattern: PatternType | null;
+  front_card_stickers: Sticker[] | null;
+  id: string;
+  created_at: string;
+  editing_session_id: string | null;
+  editing_user_id: string | null;
+  last_edited_at: string | null;
+  memories: any | null;
+  message_video_url: string | null;
+  selected_amount: number | null;
+  status: string | null;
+  token: string | null;
+  user_id: string | null;
 }
 
 const FrontCardContent = () => {
@@ -51,7 +63,17 @@ const FrontCardContent = () => {
         .single();
 
       if (error) throw error;
-      return data as GiftDesign;
+      
+      // Validate and transform the data
+      const processedData: GiftDesign = {
+        ...data,
+        front_card_pattern: isValidPatternType(data.front_card_pattern) ? data.front_card_pattern : null,
+        front_card_stickers: Array.isArray(data.front_card_stickers) 
+          ? data.front_card_stickers.filter(isValidSticker)
+          : null
+      };
+
+      return processedData;
     },
     enabled: !!token,
     staleTime: Infinity,
