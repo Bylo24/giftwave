@@ -77,8 +77,8 @@ const GiftContent = () => {
   };
 
   const handleNext = async (): Promise<void> => {
-    // Making this function async ensures it returns a Promise<void>
-    await Promise.resolve();
+    // Since we're now explicitly returning a Promise<void>, TypeScript will be happy
+    return Promise.resolve();
   };
 
   const goToNextStep = () => {
@@ -147,7 +147,7 @@ const GiftContent = () => {
           <AmountStep
             amount={amount}
             setAmount={setAmount}
-            onNext={goToNextStep}
+            onNext={handleNext}
           />
         </div>
       </div>
