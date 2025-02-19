@@ -1,3 +1,4 @@
+
 import { DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -5,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -20,7 +21,6 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
   const presetAmounts = [5, 10, 20, 50, 100, 200];
   const { toast } = useToast();
   const navigate = useNavigate();
-  const location = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
   
@@ -58,91 +58,101 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     }
   };
 
+  const validateGiftDesign = async (design: any) => {
+    const validationChecks = {
+      frontCard: !!(design.front_card_pattern || design.theme),
+      insideLeft: !!design.message_video_url,
+      insideRight: !!(design.memories && design.memories.length > 0),
+      amount: !!(design.selected_amount && design.selected_amount > 0)
+    };
+
+    const missingSteps = [];
+    if (!validationChecks.frontCard) missingSteps.push("front card design");
+    if (!validationChecks.insideLeft) missingSteps.push("video message");
+    if (!validationChecks.insideRight) missingSteps.push("photo memories");
+    if (!validationChecks.amount) missingSteps.push("gift amount");
+
+    return {
+      isValid: Object.values(validationChecks).every(check => check),
+      missingSteps
+    };
+  };
+
   const updateGiftDesign = useMutation({
     mutationFn: async () => {
       if (!user) {
         throw new Error("You must be logged in to create a gift design");
       }
 
-      if (draftToken) {
-        const { data: existingDesign, error: fetchError } = await supabase
-          .from('gift_designs')
-          .select('*')
-          .eq('token', draftToken)
-          .single();
-
-        if (fetchError) {
-          console.error("Error fetching existing design:", fetchError);
-          throw fetchError;
-        }
-
-        if (!existingDesign.front_card_pattern || !existingDesign.message_video_url) {
-          toast({
-            title: "Missing information",
-            description: "Please complete all previous steps before continuing",
-            variant: "destructive",
-          });
-          navigate('/frontcard');
-          return null;
-        }
-
-        const { data, error } = await supabase
-          .from('gift_designs')
-          .update({
-            selected_amount: parseFloat(amount),
-            status: 'preview'
-          })
-          .eq('token', draftToken)
-          .select()
-          .single();
-
-        if (error) {
-          console.error("Error updating gift design:", error);
-          throw error;
-        }
-
-        return data;
-      } else {
-        const { data, error } = await supabase
-          .from('gift_designs')
-          .insert([{
-            user_id: user.id,
-            selected_amount: parseFloat(amount),
-            status: 'draft'
-          }])
-          .select()
-          .single();
-
-        if (error) {
-          console.error("Error creating gift design:", error);
-          throw error;
-        }
-
-        if (data?.token) {
-          localStorage.setItem('gift_draft_token', data.token);
-        }
-
+      if (!draftToken) {
+        toast({
+          title: "Error",
+          description: "No draft token found. Please start over.",
+          variant: "destructive",
+        });
         navigate('/frontcard');
         return null;
       }
+
+      // Fetch existing design
+      const { data: existingDesign, error: fetchError } = await supabase
+        .from('gift_designs')
+        .select('*')
+        .eq('token', draftToken)
+        .single();
+
+      if (fetchError) {
+        console.error("Error fetching existing design:", fetchError);
+        throw fetchError;
+      }
+
+      // Validate the gift design
+      const validation = await validateGiftDesign(existingDesign);
+      if (!validation.isValid) {
+        toast({
+          title: "Missing information",
+          description: `Please complete these steps first: ${validation.missingSteps.join(", ")}`,
+          variant: "destructive",
+        });
+        
+        // Navigate to the appropriate step
+        if (validation.missingSteps.includes("front card design")) {
+          navigate('/frontcard');
+        } else if (validation.missingSteps.includes("video message")) {
+          navigate('/insideleftcard');
+        } else if (validation.missingSteps.includes("photo memories")) {
+          navigate('/insiderightcard');
+        }
+        return null;
+      }
+
+      // Update the gift design with amount and change status to preview
+      const { data, error } = await supabase
+        .from('gift_designs')
+        .update({
+          selected_amount: parseFloat(amount),
+          status: 'preview',
+          last_edited_at: new Date().toISOString()
+        })
+        .eq('token', draftToken)
+        .select()
+        .single();
+
+      if (error) {
+        console.error("Error updating gift design:", error);
+        throw error;
+      }
+
+      return data;
     },
     onSuccess: (data) => {
       if (data) {
         queryClient.invalidateQueries({ queryKey: ['gift-design'] });
-        if (data?.token) {
-          localStorage.removeItem('gift_draft_token');
-          navigate(`/previewanimation?token=${data.token}`);
-          toast({
-            title: "Success",
-            description: "Gift preview ready",
-          });
-        } else {
-          toast({
-            title: "Error",
-            description: "No token received for gift preview",
-            variant: "destructive",
-          });
-        }
+        navigate(`/previewanimation?token=${data.token}`);
+        toast({
+          title: "Success",
+          description: "Gift preview ready",
+        });
       }
     },
     onError: (error) => {
