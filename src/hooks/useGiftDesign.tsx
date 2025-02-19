@@ -6,7 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
-type Json = Database['public']['Tables']['gift_designs']['Row'];
+type GiftDesignRow = Database['public']['Tables']['gift_designs']['Row'];
 
 export type GiftStatus = 'draft' | 'editing' | 'preview' | 'finalized' | 'sent';
 
@@ -193,7 +193,7 @@ export const useGiftDesign = (token: string | null) => {
 
     const channel = supabase
       .channel('gift-design-changes')
-      .on<Json>(
+      .on<GiftDesignRow>(
         'postgres_changes',
         {
           event: '*',
@@ -201,11 +201,11 @@ export const useGiftDesign = (token: string | null) => {
           table: 'gift_designs',
           filter: `token=eq.${token}`
         },
-        (payload: RealtimePostgresChangesPayload<Json>) => {
+        (payload: RealtimePostgresChangesPayload<GiftDesignRow>) => {
           console.log('Realtime update received:', payload);
           if (!payload.new) return;
           
-          const newData = payload.new;
+          const newData = payload.new as GiftDesignRow;
           
           // Parse JSON fields and handle nullables for realtime updates
           const frontCardStickers = newData.front_card_stickers ? 
@@ -232,7 +232,7 @@ export const useGiftDesign = (token: string | null) => {
             memories: Array.isArray(memories) ? memories : [],
             message_video_url: newData.message_video_url,
             theme: newData.theme,
-            token: newData.token,
+            token: newData.token || '',
             status: (newData.status || 'draft') as GiftStatus,
             editing_session_id: (newData as any).editing_session_id || null,
             editing_user_id: (newData as any).editing_user_id || null,
