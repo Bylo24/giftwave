@@ -1,5 +1,5 @@
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
 import Confetti from 'react-confetti';
@@ -21,6 +21,10 @@ const PreviewAnimation = () => {
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
+  
+  // Use refs to track animation state
+  const isAnimatingRef = useRef(false);
+  const pendingUpdateRef = useRef(false);
 
   const { 
     giftDesign, 
@@ -51,6 +55,14 @@ const PreviewAnimation = () => {
     }
   }, [isLoadingGift]);
 
+  // Handle smooth updates when gift design changes
+  useEffect(() => {
+    if (giftDesign && isAnimatingRef.current) {
+      // If we're currently animating, mark that we have a pending update
+      pendingUpdateRef.current = true;
+    }
+  }, [giftDesign]);
+
   useEffect(() => {
     if (showConfetti) {
       const fadeStartTimer = setTimeout(() => {
@@ -60,6 +72,13 @@ const PreviewAnimation = () => {
       const removeTimer = setTimeout(() => {
         setShowConfetti(false);
         setConfettiOpacity(1);
+        
+        // After confetti animation, check for pending updates
+        if (pendingUpdateRef.current) {
+          pendingUpdateRef.current = false;
+          // Force a re-render if needed
+          setCurrentPage(curr => curr);
+        }
       }, 1500);
 
       return () => {
@@ -71,18 +90,26 @@ const PreviewAnimation = () => {
 
   const nextPage = () => {
     if (isFlipping) return;
+    isAnimatingRef.current = true;
     setIsFlipping(true);
     setCurrentPage((prev) => (prev + 1) % 4);
     setShowConfetti(true);
-    setTimeout(() => setIsFlipping(false), 500);
+    setTimeout(() => {
+      setIsFlipping(false);
+      isAnimatingRef.current = false;
+    }, 500);
   };
 
   const previousPage = () => {
     if (isFlipping) return;
+    isAnimatingRef.current = true;
     setIsFlipping(true);
     setCurrentPage((prev) => (prev - 1 + 4) % 4);
     setShowConfetti(true);
-    setTimeout(() => setIsFlipping(false), 500);
+    setTimeout(() => {
+      setIsFlipping(false);
+      isAnimatingRef.current = false;
+    }, 500);
   };
 
   const getPatternStyle = (pattern: { type: PatternType; color: string }) => {
@@ -195,7 +222,7 @@ const PreviewAnimation = () => {
         >
           {[0, 1, 2, 3].map((pageIndex) => (
             <div
-              key={pageIndex}
+              key={`${pageIndex}-${giftDesign.id}`}
               className="w-full h-full absolute bg-white rounded-xl shadow-xl"
               style={{
                 transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
