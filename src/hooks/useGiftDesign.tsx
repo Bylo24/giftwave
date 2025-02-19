@@ -1,9 +1,11 @@
-
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { Database } from '@/integrations/supabase/types';
+
+type GiftDesignRow = Database['public']['Tables']['gift_designs']['Row'];
 
 export type GiftStatus = 'draft' | 'editing' | 'preview' | 'finalized' | 'sent';
 
@@ -48,13 +50,15 @@ export const useGiftDesign = (token: string | null) => {
         throw error;
       }
 
+      if (!data) throw new Error('No gift design found');
+
       // Explicitly construct the GiftDesign object with all required properties
       const giftDesign: GiftDesign = {
         id: data.id,
         front_card_pattern: data.front_card_pattern,
-        front_card_stickers: data.front_card_stickers,
+        front_card_stickers: Array.isArray(data.front_card_stickers) ? data.front_card_stickers : null,
         selected_amount: data.selected_amount,
-        memories: data.memories,
+        memories: Array.isArray(data.memories) ? data.memories : [],
         message_video_url: data.message_video_url,
         theme: data.theme,
         token: data.token,
@@ -189,7 +193,9 @@ export const useGiftDesign = (token: string | null) => {
         },
         (payload) => {
           console.log('Realtime update received:', payload);
-          const newData = payload.new;
+          if (!payload.new) return;
+          
+          const newData = payload.new as GiftDesignRow;
           
           // Don't apply updates if they're from a different editing session
           if (newData.editing_session_id && 
@@ -202,9 +208,9 @@ export const useGiftDesign = (token: string | null) => {
           const updatedGiftDesign: GiftDesign = {
             id: newData.id,
             front_card_pattern: newData.front_card_pattern,
-            front_card_stickers: newData.front_card_stickers,
+            front_card_stickers: Array.isArray(newData.front_card_stickers) ? newData.front_card_stickers : null,
             selected_amount: newData.selected_amount,
-            memories: newData.memories,
+            memories: Array.isArray(newData.memories) ? newData.memories : [],
             message_video_url: newData.message_video_url,
             theme: newData.theme,
             token: newData.token,
