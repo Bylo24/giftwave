@@ -1,7 +1,6 @@
-
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ThemeOption, Sticker } from "@/types/gift";
+import { ThemeOption, Sticker, PatternType } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
 import { PatternSelector } from "@/components/gift/PatternSelector";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
@@ -13,6 +12,12 @@ import { stickerOptions, themeOptions } from "@/constants/giftOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+
+interface GiftDesign {
+  theme: string;
+  front_card_pattern: PatternType;
+  front_card_stickers: Sticker[];
+}
 
 const FrontCardContent = () => {
   const navigate = useNavigate();
@@ -34,8 +39,7 @@ const FrontCardContent = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
-  // Fetch the current gift design data with caching
-  const { data: giftDesign } = useQuery({
+  const { data: giftDesign } = useQuery<GiftDesign>({
     queryKey: ['gift-design', token],
     queryFn: async () => {
       if (!token) throw new Error('No gift token found');
@@ -47,40 +51,54 @@ const FrontCardContent = () => {
         .single();
 
       if (error) throw error;
-      return data;
+      return data as GiftDesign;
     },
     enabled: !!token,
-    staleTime: Infinity, // Keep the data fresh indefinitely
-    gcTime: 1000 * 60 * 30 // Cache for 30 minutes before garbage collection
+    staleTime: Infinity,
+    gcTime: 1000 * 60 * 30
   });
 
-  // Initialize theme, pattern, and stickers from gift design data when loaded
   useEffect(() => {
     if (giftDesign) {
-      // Set theme if it exists in gift design
       if (giftDesign.theme) {
         const savedTheme = themeOptions.find(t => t.text === giftDesign.theme);
         if (savedTheme) {
-          // Update the pattern type from saved data
-          const themeWithPattern = {
-            ...savedTheme,
-            pattern: {
-              ...savedTheme.pattern,
-              type: giftDesign.front_card_pattern || savedTheme.pattern.type
-            }
-          };
-          setSelectedThemeOption(themeWithPattern);
+          const patternType = giftDesign.front_card_pattern || savedTheme.pattern.type;
+          if (isValidPatternType(patternType)) {
+            const themeWithPattern = {
+              ...savedTheme,
+              pattern: {
+                ...savedTheme.pattern,
+                type: patternType
+              }
+            };
+            setSelectedThemeOption(themeWithPattern);
+          }
         }
       }
 
-      // Set stickers if they exist in gift design
-      if (giftDesign.front_card_stickers) {
-        setPlacedStickers(giftDesign.front_card_stickers);
+      if (giftDesign.front_card_stickers && Array.isArray(giftDesign.front_card_stickers)) {
+        const validStickers = giftDesign.front_card_stickers.filter(isValidSticker);
+        setPlacedStickers(validStickers);
       }
     }
   }, [giftDesign, setSelectedThemeOption, setPlacedStickers]);
 
-  // Save changes whenever relevant state changes
+  const isValidPatternType = (type: any): type is PatternType => {
+    return ['dots', 'grid', 'waves', 'none'].includes(type);
+  };
+
+  const isValidSticker = (sticker: any): sticker is Sticker => {
+    return (
+      sticker &&
+      typeof sticker.id === 'string' &&
+      typeof sticker.emoji === 'string' &&
+      typeof sticker.x === 'number' &&
+      typeof sticker.y === 'number' &&
+      typeof sticker.rotation === 'number'
+    );
+  };
+
   useEffect(() => {
     const saveChanges = async () => {
       if (!token) {
@@ -89,7 +107,6 @@ const FrontCardContent = () => {
       }
 
       try {
-        // Convert stickers to a JSON-compatible format
         const stickersForDb = placedStickers.map(sticker => ({
           id: sticker.id,
           emoji: sticker.emoji,
@@ -109,7 +126,6 @@ const FrontCardContent = () => {
 
         if (error) throw error;
 
-        // Update the query cache
         queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
           ...oldData,
           front_card_pattern: selectedThemeOption.pattern.type,
