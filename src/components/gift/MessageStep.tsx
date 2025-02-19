@@ -1,10 +1,11 @@
-import { X, AlertCircle } from "lucide-react";
+
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { toast } from "sonner";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { handleError, createUploadError, createValidationError } from "@/utils/errorHandler";
+import { cn } from "@/lib/utils";
 
 interface MessageStepProps {
   isOpen: boolean;
@@ -13,10 +14,6 @@ interface MessageStepProps {
   setMessageVideo: (file: File | null) => void;
   onNext: () => void;
 }
-
-const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
-const ALLOWED_VIDEO_TYPES = ['video/mp4', 'video/quicktime', 'video/webm'];
-const MAX_VIDEO_DURATION = 60; // seconds
 
 export const MessageStep = ({
   isOpen,
@@ -27,78 +24,17 @@ export const MessageStep = ({
 }: MessageStepProps) => {
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [videoDuration, setVideoDuration] = useState(0);
-
-  useEffect(() => {
-    return () => {
-      // Cleanup preview URL when component unmounts
-      if (videoPreviewUrl) {
-        URL.revokeObjectURL(videoPreviewUrl);
-      }
-    };
-  }, [videoPreviewUrl]);
-
-  const validateVideo = async (file: File): Promise<boolean> => {
-    return new Promise((resolve) => {
-      const video = document.createElement('video');
-      video.preload = 'metadata';
-
-      video.onloadedmetadata = () => {
-        window.URL.revokeObjectURL(video.src);
-        if (video.duration > MAX_VIDEO_DURATION) {
-          handleError(createValidationError(
-            `Video must be shorter than ${MAX_VIDEO_DURATION} seconds`,
-            { duration: video.duration }
-          ));
-          resolve(false);
-          return;
-        }
-        setVideoDuration(video.duration);
-        resolve(true);
-      };
-
-      video.onerror = () => {
-        handleError(createValidationError('Invalid video format'));
-        resolve(false);
-      };
-
-      video.src = URL.createObjectURL(file);
-    });
-  };
 
   const handleMessageUpload = async (file: File) => {
-    if (!ALLOWED_VIDEO_TYPES.includes(file.type)) {
-      handleError(createValidationError(
-        'Please upload an MP4, MOV, or WebM video',
-        { fileType: file.type }
-      ));
-      return;
-    }
-
-    if (file.size > MAX_VIDEO_SIZE) {
-      handleError(createValidationError(
-        'Video must be smaller than 50MB',
-        { fileSize: file.size }
-      ));
-      return;
-    }
-
-    const isValid = await validateVideo(file);
-    if (!isValid) return;
-
-    const upload = async () => {
+    if (file.type.startsWith('video/')) {
       setIsUploading(true);
       try {
         const fileExt = file.name.split('.').pop();
         const fileName = `${crypto.randomUUID()}.${fileExt}`;
         
-        const { error: uploadError, data } = await supabase.storage
+        const { error: uploadError } = await supabase.storage
           .from('gift_videos')
-          .upload(fileName, file, {
-            cacheControl: '3600',
-            upsert: false
-          });
+          .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
@@ -111,17 +47,13 @@ export const MessageStep = ({
         toast.success('Video message uploaded successfully!');
         onClose();
       } catch (error) {
-        throw createUploadError('Failed to upload video', () => upload());
+        console.error('Upload error:', error);
+        toast.error('Failed to upload video. Please try again.');
       } finally {
         setIsUploading(false);
-        setUploadProgress(0);
       }
-    };
-
-    try {
-      await upload();
-    } catch (error) {
-      handleError(error);
+    } else {
+      toast.error('Please upload a video file');
     }
   };
 
@@ -147,10 +79,10 @@ export const MessageStep = ({
               />
             ) : (
               <div className="w-full h-full bg-gray-900 flex items-center justify-center">
-                <div className="text-center space-y-4">
+                <div className="text-center">
                   <input 
                     type="file" 
-                    accept={ALLOWED_VIDEO_TYPES.join(',')}
+                    accept="video/*"
                     capture="user"
                     className="hidden" 
                     id="video-upload"
@@ -162,27 +94,13 @@ export const MessageStep = ({
                   >
                     <Button
                       variant="ghost"
-                      className="bg-white/10 hover:bg-white/20 text-white"
+                      className="bg-black/10 hover:bg-black/20 text-gray-700"
                       disabled={isUploading}
                     >
-                      {isUploading ? `Uploading: ${uploadProgress}%` : 'Upload/Record a video message'}
+                      {isUploading ? 'Uploading...' : 'Upload/Record a video message'}
                     </Button>
                   </label>
-                  <div className="space-y-2 text-white/80 text-sm">
-                    <p>Maximum video length: {MAX_VIDEO_DURATION} seconds</p>
-                    <p>Maximum file size: 50MB</p>
-                    <p>Supported formats: MP4, MOV, WebM</p>
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Upload Progress */}
-            {isUploading && (
-              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                <div className="text-center text-white">
-                  <div className="w-16 h-16 border-4 border-white border-t-transparent rounded-full animate-spin mb-4" />
-                  <p>Uploading: {uploadProgress}%</p>
+                  <p className="text-sm text-gray-500 mt-2">Videos will be saved automatically</p>
                 </div>
               </div>
             )}

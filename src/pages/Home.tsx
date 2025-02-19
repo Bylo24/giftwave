@@ -27,7 +27,7 @@ const Home = () => {
       <div className="sticky top-0 bg-white z-10 px-4 pt-4 pb-2 shadow-sm">
         <div className="flex items-center justify-between gap-4 mb-4">
           <img 
-            src="/placeholder.svg"
+            src="/lovable-uploads/d0eaee07-4183-4bee-82ec-c2b979790c51.png"
             alt="GiftWave Logo"
             className="h-8 w-auto"
           />

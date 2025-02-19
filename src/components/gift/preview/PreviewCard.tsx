@@ -3,7 +3,6 @@ import { useRef, useState, useEffect } from "react";
 import { Video, Image, Star, DollarSign } from "lucide-react";
 import { PatternType } from "@/types/gift";
 import { GiftDesign } from "@/hooks/useGiftDesign";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface PreviewCardProps {
   pageIndex: number;
@@ -27,26 +26,16 @@ export const PreviewCard = ({
   getPatternStyle, 
   giftDesign 
 }: PreviewCardProps) => {
+  // Track video state between page flips
   const [videoProgress, setVideoProgress] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  // Update video time when progress changes
   useEffect(() => {
     if (videoRef.current && videoProgress > 0) {
       videoRef.current.currentTime = videoProgress;
     }
   }, [videoProgress]);
-
-  useEffect(() => {
-    const loadContent = async () => {
-      setIsLoading(true);
-      // Simulate content loading
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setIsLoading(false);
-    };
-
-    loadContent();
-  }, [pageIndex]);
 
   const formatAmount = (amount: number | null) => {
     if (!amount) return "$0";
@@ -56,19 +45,12 @@ export const PreviewCard = ({
     }).format(amount);
   };
 
+  // Handle video state persistence
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setVideoProgress(videoRef.current.currentTime);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className={`${themeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
-        <Skeleton className="w-full h-full" />
-      </div>
-    );
-  }
 
   return (
     <div className={`${themeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
