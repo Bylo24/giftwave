@@ -1,4 +1,3 @@
-
 import { DollarSign } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -6,7 +5,7 @@ import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { motion } from "framer-motion";
 import { useToast } from "@/hooks/use-toast";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -21,8 +20,11 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
   const presetAmounts = [5, 10, 20, 50, 100, 200];
   const { toast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  
+  const draftToken = localStorage.getItem('gift_draft_token');
 
   const handleAmountChange = (value: string) => {
     const numValue = parseFloat(value);
@@ -56,54 +58,95 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     }
   };
 
-  // Create a new gift design
-  const createGiftDesign = useMutation({
+  const updateGiftDesign = useMutation({
     mutationFn: async () => {
       if (!user) {
         throw new Error("You must be logged in to create a gift design");
       }
 
-      const { data, error } = await supabase
-        .from('gift_designs')
-        .insert([{
-          user_id: user.id,
-          selected_amount: parseFloat(amount),
-          status: 'preview'  // Set initial status to preview for immediate viewing
-        }])
-        .select()
-        .single();
+      if (draftToken) {
+        const { data: existingDesign, error: fetchError } = await supabase
+          .from('gift_designs')
+          .select('*')
+          .eq('token', draftToken)
+          .single();
 
-      if (error) {
-        console.error("Error creating gift design:", error);
-        toast({
-          title: "Error",
-          description: "Failed to create gift preview",
-          variant: "destructive",
-        });
-        throw error;
+        if (fetchError) {
+          console.error("Error fetching existing design:", fetchError);
+          throw fetchError;
+        }
+
+        if (!existingDesign.front_card_pattern || !existingDesign.message_video_url) {
+          toast({
+            title: "Missing information",
+            description: "Please complete all previous steps before continuing",
+            variant: "destructive",
+          });
+          navigate('/frontcard');
+          return null;
+        }
+
+        const { data, error } = await supabase
+          .from('gift_designs')
+          .update({
+            selected_amount: parseFloat(amount),
+            status: 'preview'
+          })
+          .eq('token', draftToken)
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error updating gift design:", error);
+          throw error;
+        }
+
+        return data;
+      } else {
+        const { data, error } = await supabase
+          .from('gift_designs')
+          .insert([{
+            user_id: user.id,
+            selected_amount: parseFloat(amount),
+            status: 'draft'
+          }])
+          .select()
+          .single();
+
+        if (error) {
+          console.error("Error creating gift design:", error);
+          throw error;
+        }
+
+        if (data?.token) {
+          localStorage.setItem('gift_draft_token', data.token);
+        }
+
+        navigate('/frontcard');
+        return null;
       }
-
-      return data;
     },
     onSuccess: (data) => {
-      queryClient.invalidateQueries({ queryKey: ['gift-design'] });
-      // Navigate to preview animation with the token
-      if (data?.token) {
-        navigate(`/previewanimation?token=${data.token}`);
-        toast({
-          title: "Success",
-          description: "Gift design created successfully",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "No token received for gift preview",
-          variant: "destructive",
-        });
+      if (data) {
+        queryClient.invalidateQueries({ queryKey: ['gift-design'] });
+        if (data?.token) {
+          localStorage.removeItem('gift_draft_token');
+          navigate(`/previewanimation?token=${data.token}`);
+          toast({
+            title: "Success",
+            description: "Gift preview ready",
+          });
+        } else {
+          toast({
+            title: "Error",
+            description: "No token received for gift preview",
+            variant: "destructive",
+          });
+        }
       }
     },
     onError: (error) => {
-      console.error("Failed to create gift design:", error);
+      console.error("Failed to update gift design:", error);
       toast({
         title: "Error",
         description: "Failed to create gift preview. Please try again.",
@@ -123,9 +166,9 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
     }
 
     try {
-      await createGiftDesign.mutateAsync();
+      await updateGiftDesign.mutateAsync();
     } catch (error) {
-      console.error("Failed to create gift design:", error);
+      console.error("Failed to update gift design:", error);
     }
   };
 
@@ -200,10 +243,10 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
       >
         <Button 
           onClick={handleContinue}
-          disabled={!amount || parseFloat(amount) <= 0 || createGiftDesign.isPending}
+          disabled={!amount || parseFloat(amount) <= 0 || updateGiftDesign.isPending}
           className="w-full h-14 text-lg font-medium bg-blue-600 hover:bg-blue-700 transition-colors"
         >
-          {createGiftDesign.isPending ? "Creating..." : "Continue"}
+          {updateGiftDesign.isPending ? "Creating..." : "Continue"}
         </Button>
       </motion.div>
     </div>
