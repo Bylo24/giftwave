@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -21,7 +20,13 @@ const PreviewAnimation = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
 
-  const { giftDesign, isLoading: isLoadingGift, error } = useGiftDesign(token);
+  const { 
+    giftDesign, 
+    isLoading: isLoadingGift, 
+    error,
+    isPreviewMode,
+    isFinalized
+  } = useGiftDesign(token);
 
   useEffect(() => {
     if (error) {
@@ -102,6 +107,20 @@ const PreviewAnimation = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <p className="text-red-500 mb-4">Failed to load gift preview</p>
+        <button 
+          onClick={() => navigate("/home")}
+          className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+        >
+          Return Home
+        </button>
+      </div>
+    );
+  }
+
+  if (!isPreviewMode && !isFinalized) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <p className="text-amber-600 mb-4">This gift is still being edited</p>
         <button 
           onClick={() => navigate("/home")}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
