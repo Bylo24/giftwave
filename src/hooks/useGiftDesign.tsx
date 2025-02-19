@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
@@ -47,14 +48,25 @@ export const useGiftDesign = (token: string | null) => {
         throw error;
       }
 
-      // Cast the response to match our GiftDesign type
-      return {
-        ...data,
+      // Explicitly construct the GiftDesign object with all required properties
+      const giftDesign: GiftDesign = {
+        id: data.id,
+        front_card_pattern: data.front_card_pattern,
+        front_card_stickers: data.front_card_stickers,
+        selected_amount: data.selected_amount,
+        memories: data.memories,
+        message_video_url: data.message_video_url,
+        theme: data.theme,
+        token: data.token,
         status: (data.status || 'draft') as GiftStatus,
         editing_session_id: data.editing_session_id || null,
         editing_user_id: data.editing_user_id || null,
-        last_edited_at: data.last_edited_at || data.created_at
-      } as GiftDesign;
+        last_edited_at: data.last_edited_at || data.created_at,
+        user_id: data.user_id,
+        created_at: data.created_at
+      };
+
+      return giftDesign;
     },
     enabled: !!token
   });
@@ -186,14 +198,25 @@ export const useGiftDesign = (token: string | null) => {
             return;
           }
           
-          // Cast the payload to match our GiftDesign type
-          setRealtimeGiftDesign({
-            ...newData,
+          // Explicitly construct the GiftDesign object for realtime updates
+          const updatedGiftDesign: GiftDesign = {
+            id: newData.id,
+            front_card_pattern: newData.front_card_pattern,
+            front_card_stickers: newData.front_card_stickers,
+            selected_amount: newData.selected_amount,
+            memories: newData.memories,
+            message_video_url: newData.message_video_url,
+            theme: newData.theme,
+            token: newData.token,
             status: (newData.status || 'draft') as GiftStatus,
             editing_session_id: newData.editing_session_id || null,
             editing_user_id: newData.editing_user_id || null,
-            last_edited_at: newData.last_edited_at || newData.created_at
-          } as GiftDesign);
+            last_edited_at: newData.last_edited_at || newData.created_at,
+            user_id: newData.user_id,
+            created_at: newData.created_at
+          };
+          
+          setRealtimeGiftDesign(updatedGiftDesign);
         }
       )
       .subscribe();
