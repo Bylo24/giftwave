@@ -129,11 +129,11 @@ const FrontCardContent = () => {
         const validStickers = giftDesign.front_card_stickers
           .filter(isValidSticker)
           .map(sticker => ({
-            id: String(sticker.id),
-            emoji: String(sticker.emoji),
-            x: Number(sticker.x),
-            y: Number(sticker.y),
-            rotation: Number(sticker.rotation)
+            id: sticker.id as string,
+            emoji: sticker.emoji as string,
+            x: sticker.x as number,
+            y: sticker.y as number,
+            rotation: sticker.rotation as number
           }));
         setPlacedStickers(validStickers);
       }
