@@ -1,5 +1,5 @@
 
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeOption, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
@@ -9,12 +9,17 @@ import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { useStickerManager } from "@/hooks/useStickerManager";
+import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { stickerOptions } from "@/constants/giftOptions";
+import { toast } from "sonner";
 
 const FrontCardContent = () => {
   const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
   const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
+  const draftToken = localStorage.getItem('gift_draft_token');
+  const { giftDesign, isLoading, error } = useGiftDesign(draftToken);
+  
   const {
     placedStickers,
     selectedSticker,
@@ -26,6 +31,32 @@ const FrontCardContent = () => {
     handleStickerRemove,
     handleStickerRotate
   } = useStickerManager();
+
+  useEffect(() => {
+    const initializeDraft = async () => {
+      if (!draftToken) {
+        try {
+          // Create a new draft gift design
+          const { data, error } = await supabase
+            .from('gift_designs')
+            .insert([{}])
+            .select()
+            .single();
+
+          if (error) throw error;
+
+          // Store the new token
+          localStorage.setItem('gift_draft_token', data.token);
+          toast.success('Started new gift draft');
+        } catch (err) {
+          console.error('Error creating draft:', err);
+          toast.error('Failed to start new gift draft');
+        }
+      }
+    };
+
+    initializeDraft();
+  }, [draftToken]);
 
   const handleBackClick = () => {
     navigate('/home');
@@ -55,6 +86,32 @@ const FrontCardContent = () => {
         return {};
     }
   };
+
+  // Show loading state while initializing
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
+      </div>
+    );
+  }
+
+  // Show error state if initialization failed
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-4">
+          <p className="text-red-500">Failed to load gift draft</p>
+          <Button 
+            onClick={() => window.location.reload()}
+            variant="outline"
+          >
+            Try Again
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div 
