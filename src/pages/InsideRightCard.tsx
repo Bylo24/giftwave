@@ -7,12 +7,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MemoryStage } from "@/components/gift/stages/MemoryStage";
-
-interface Memory {
-  id: string;
-  imageUrl?: string;
-  caption: string;
-}
+import { supabase } from "@/integrations/supabase/client";
+import type { Memory } from "@/types/gift";
 
 const InsideRightCard = () => {
   const navigate = useNavigate();
@@ -29,12 +25,31 @@ const InsideRightCard = () => {
       return;
     }
 
-    // For now, we'll use a placeholder URL since we don't have image upload set up
-    setPendingImage('/placeholder.svg');
-    toast.info('Please add a caption to create your memory');
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      
+      // Upload image to Supabase Storage
+      const { error: uploadError, data } = await supabase.storage
+        .from('gift_images')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      // Get the public URL for the uploaded image
+      const { data: { publicUrl } } = supabase.storage
+        .from('gift_images')
+        .getPublicUrl(fileName);
+
+      setPendingImage(publicUrl);
+      toast.info('Please add a caption to create your memory');
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      toast.error('Failed to upload image');
+    }
   };
 
-  const handleAddMemory = () => {
+  const handleAddMemory = async () => {
     if (!pendingImage) {
       toast.error('Please upload a photo first');
       return;
@@ -45,16 +60,48 @@ const InsideRightCard = () => {
       return;
     }
 
+    const token = localStorage.getItem('gift_draft_token');
+    if (!token) {
+      toast.error('No gift token found');
+      return;
+    }
+
     const memory: Memory = {
       id: crypto.randomUUID(),
       imageUrl: pendingImage,
-      caption: caption
+      caption: caption,
+      date: new Date()
     };
 
-    setMemories(prev => [...prev, memory]);
-    setCaption("");
-    setPendingImage(undefined);
-    toast.success('Memory added successfully');
+    try {
+      // Get current memories from gift design
+      const { data: giftDesign, error: fetchError } = await supabase
+        .from('gift_designs')
+        .select('memories')
+        .eq('token', token)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Add new memory to existing memories
+      const updatedMemories = [...(giftDesign?.memories || []), memory];
+
+      // Update gift design with new memories
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ memories: updatedMemories })
+        .eq('token', token);
+
+      if (updateError) throw updateError;
+
+      setMemories(prev => [...prev, memory]);
+      setCaption("");
+      setPendingImage(undefined);
+      toast.success('Memory added successfully');
+    } catch (err) {
+      console.error('Error saving memory:', err);
+      toast.error('Failed to save memory');
+    }
   };
 
   return (
