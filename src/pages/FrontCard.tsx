@@ -39,11 +39,20 @@ const FrontCardContent = () => {
       }
 
       try {
+        // Convert stickers to a JSON-compatible format
+        const stickersForDb = placedStickers.map(sticker => ({
+          id: sticker.id,
+          emoji: sticker.emoji,
+          x: sticker.x,
+          y: sticker.y,
+          rotation: sticker.rotation
+        }));
+
         const { error } = await supabase
           .from('gift_designs')
           .update({
             front_card_pattern: selectedThemeOption.pattern.type,
-            front_card_stickers: placedStickers,
+            front_card_stickers: stickersForDb,
             theme: selectedThemeOption.text
           })
           .eq('token', token);
