@@ -1,5 +1,4 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Upload, Plus, Star } from "lucide-react";
@@ -15,6 +14,30 @@ const InsideRightCard = () => {
   const [memories, setMemories] = useState<Memory[]>([]);
   const [caption, setCaption] = useState("");
   const [pendingImage, setPendingImage] = useState<string | undefined>();
+
+  useEffect(() => {
+    const loadExistingMemories = async () => {
+      const token = localStorage.getItem('gift_draft_token');
+      if (!token) return;
+
+      const { data: giftDesign, error } = await supabase
+        .from('gift_designs')
+        .select('memories')
+        .eq('token', token)
+        .single();
+
+      if (error) {
+        console.error('Error loading memories:', error);
+        return;
+      }
+
+      if (giftDesign?.memories) {
+        setMemories(giftDesign.memories as Memory[]);
+      }
+    };
+
+    loadExistingMemories();
+  }, []);
 
   const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -45,7 +68,7 @@ const InsideRightCard = () => {
       toast.info('Please add a caption to create your memory');
     } catch (err) {
       console.error('Error uploading image:', err);
-      toast.error('Failed to upload image');
+      toast.error('Failed to upload video');
     }
   };
 
@@ -74,17 +97,7 @@ const InsideRightCard = () => {
     };
 
     try {
-      // Get current memories from gift design
-      const { data: giftDesign, error: fetchError } = await supabase
-        .from('gift_designs')
-        .select('memories')
-        .eq('token', token)
-        .single();
-
-      if (fetchError) throw fetchError;
-
-      // Add new memory to existing memories
-      const updatedMemories = [...(giftDesign?.memories || []), memory];
+      const updatedMemories = [...memories, memory];
 
       // Update gift design with new memories
       const { error: updateError } = await supabase
@@ -94,7 +107,7 @@ const InsideRightCard = () => {
 
       if (updateError) throw updateError;
 
-      setMemories(prev => [...prev, memory]);
+      setMemories(updatedMemories);
       setCaption("");
       setPendingImage(undefined);
       toast.success('Memory added successfully');
