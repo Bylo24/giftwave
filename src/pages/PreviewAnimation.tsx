@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -6,6 +7,7 @@ import { PreviewNavigationButtons } from "@/components/gift/preview/PreviewNavig
 import { PreviewCard } from "@/components/gift/preview/PreviewCard";
 import { PreviewContainer } from "@/components/gift/preview/PreviewContainer";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
+import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
 
@@ -29,8 +31,17 @@ const PreviewAnimation = () => {
   } = useGiftDesign(token);
 
   useEffect(() => {
+    if (!token) {
+      toast.error("No gift token provided");
+      navigate("/home");
+      return;
+    }
+  }, [token, navigate]);
+
+  useEffect(() => {
     if (error) {
-      toast.error("Failed to load gift preview");
+      toast.error("Unable to load gift preview");
+      console.error("Gift preview error:", error);
     }
   }, [error]);
 
@@ -99,14 +110,10 @@ const PreviewAnimation = () => {
     }
   };
 
-  if (isLoading) {
-    return <GiftLoadingState />;
-  }
-
-  if (error || !giftDesign) {
+  if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <p className="text-red-500 mb-4">Failed to load gift preview</p>
+        <p className="text-red-500 mb-4">No gift token provided</p>
         <button 
           onClick={() => navigate("/home")}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
@@ -115,6 +122,14 @@ const PreviewAnimation = () => {
         </button>
       </div>
     );
+  }
+
+  if (isLoading) {
+    return <GiftLoadingState />;
+  }
+
+  if (error || !giftDesign) {
+    return <GiftNotFound />;
   }
 
   if (!isPreviewMode && !isFinalized) {
