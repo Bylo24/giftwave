@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { useStickerManager } from "@/hooks/useStickerManager";
@@ -7,6 +7,7 @@ import { BlankCard } from "@/components/gift/cards/BlankCard";
 import { stickerOptions } from "@/constants/giftOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
 
 const InsideLeftCardContent = () => {
   const navigate = useNavigate();
@@ -24,6 +25,45 @@ const InsideLeftCardContent = () => {
     handleStickerRotate
   } = useStickerManager();
 
+  const token = localStorage.getItem('gift_draft_token');
+
+  // Fetch the current gift design data
+  const { data: giftDesign } = useQuery({
+    queryKey: ['gift-design', token],
+    queryFn: async () => {
+      if (!token) throw new Error('No gift token found');
+
+      const { data, error } = await supabase
+        .from('gift_designs')
+        .select('*')
+        .eq('token', token)
+        .single();
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!token
+  });
+
+  // Set video from URL when gift design data is loaded
+  useEffect(() => {
+    const fetchVideoFile = async () => {
+      if (giftDesign?.message_video_url) {
+        try {
+          const response = await fetch(giftDesign.message_video_url);
+          const blob = await response.blob();
+          const file = new File([blob], 'message_video.mp4', { type: 'video/mp4' });
+          setMessageVideo(file);
+        } catch (error) {
+          console.error('Error fetching video:', error);
+          toast.error('Failed to load saved video');
+        }
+      }
+    };
+
+    fetchVideoFile();
+  }, [giftDesign?.message_video_url]);
+
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -33,7 +73,6 @@ const InsideLeftCardContent = () => {
       return;
     }
 
-    const token = localStorage.getItem('gift_draft_token');
     if (!token) {
       toast.error('No gift token found');
       return;
