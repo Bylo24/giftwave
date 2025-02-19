@@ -51,7 +51,7 @@ const FrontCardContent = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
-  const { data: giftDesign } = useQuery<GiftDesign>({
+  const { data: giftDesign } = useQuery({
     queryKey: ['gift-design', token],
     queryFn: async () => {
       if (!token) throw new Error('No gift token found');
@@ -76,8 +76,8 @@ const FrontCardContent = () => {
       return processedData;
     },
     enabled: !!token,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 30
+    staleTime: Infinity, // Never consider the data stale
+    gcTime: Infinity // Never garbage collect the data
   });
 
   useEffect(() => {
@@ -142,17 +142,20 @@ const FrontCardContent = () => {
           .update({
             front_card_pattern: selectedThemeOption.pattern.type,
             front_card_stickers: stickersForDb,
-            theme: selectedThemeOption.text
+            theme: selectedThemeOption.text,
+            last_edited_at: new Date().toISOString()
           })
           .eq('token', token);
 
         if (error) throw error;
 
+        // Immediately update the query cache with the new data
         queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
           ...oldData,
           front_card_pattern: selectedThemeOption.pattern.type,
           front_card_stickers: stickersForDb,
-          theme: selectedThemeOption.text
+          theme: selectedThemeOption.text,
+          last_edited_at: new Date().toISOString()
         }));
 
         console.log('Card changes saved successfully');
@@ -162,7 +165,9 @@ const FrontCardContent = () => {
       }
     };
 
-    saveChanges();
+    // Add a small debounce to avoid too many saves
+    const timeoutId = setTimeout(saveChanges, 500);
+    return () => clearTimeout(timeoutId);
   }, [selectedThemeOption, placedStickers, token, queryClient]);
 
   const handleBackClick = () => {
