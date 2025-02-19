@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -11,6 +10,9 @@ import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
 
+const ANIMATION_DURATION = 500; // Match this with CSS transition duration
+const CONFETTI_DURATION = 1500;
+
 const PreviewAnimation = () => {
   const [searchParams] = useSearchParams();
   const token = searchParams.get('token');
@@ -22,10 +24,12 @@ const PreviewAnimation = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
   
-  // Use refs to track animation state
+  // Use refs to track animation and cleanup state
   const isAnimatingRef = useRef(false);
   const pendingUpdateRef = useRef(false);
   const cleanupRef = useRef(false);
+  const animationTimeoutRef = useRef<NodeJS.Timeout>();
+  const confettiTimeoutRef = useRef<NodeJS.Timeout[]>([]);
 
   const { 
     giftDesign, 
@@ -35,6 +39,15 @@ const PreviewAnimation = () => {
     isFinalized
   } = useGiftDesign(token);
 
+  // Cleanup function for timeouts
+  const clearTimeouts = () => {
+    if (animationTimeoutRef.current) {
+      clearTimeout(animationTimeoutRef.current);
+    }
+    confettiTimeoutRef.current.forEach(clearTimeout);
+    confettiTimeoutRef.current = [];
+  };
+
   useEffect(() => {
     if (!token) {
       toast.error("No gift token provided");
@@ -42,9 +55,9 @@ const PreviewAnimation = () => {
       return;
     }
 
-    // Cleanup flag for avoiding memory leaks
     return () => {
       cleanupRef.current = true;
+      clearTimeouts();
     };
   }, [token, navigate]);
 
@@ -61,7 +74,6 @@ const PreviewAnimation = () => {
     }
   }, [isLoadingGift]);
 
-  // Handle smooth updates when gift design changes
   useEffect(() => {
     if (giftDesign && isAnimatingRef.current) {
       pendingUpdateRef.current = true;
@@ -70,63 +82,60 @@ const PreviewAnimation = () => {
 
   useEffect(() => {
     if (showConfetti && !cleanupRef.current) {
-      const fadeStartTimer = setTimeout(() => {
+      const fadeStartTimeout = setTimeout(() => {
         if (!cleanupRef.current) {
           setConfettiOpacity(0);
         }
-      }, 1000);
+      }, CONFETTI_DURATION - 500);
 
-      const removeTimer = setTimeout(() => {
+      const removeTimeout = setTimeout(() => {
         if (!cleanupRef.current) {
           setShowConfetti(false);
           setConfettiOpacity(1);
           
-          // After confetti animation, check for pending updates
           if (pendingUpdateRef.current) {
             pendingUpdateRef.current = false;
             setCurrentPage(curr => curr);
           }
         }
-      }, 1500);
+      }, CONFETTI_DURATION);
+
+      confettiTimeoutRef.current = [fadeStartTimeout, removeTimeout];
 
       return () => {
-        clearTimeout(fadeStartTimer);
-        clearTimeout(removeTimer);
+        clearTimeout(fadeStartTimeout);
+        clearTimeout(removeTimeout);
       };
     }
   }, [showConfetti]);
 
-  const nextPage = () => {
+  const handlePageChange = (direction: 'next' | 'previous') => {
     if (isFlipping) return;
+    
     isAnimatingRef.current = true;
     setIsFlipping(true);
-    setCurrentPage((prev) => (prev + 1) % 4);
+    
+    setCurrentPage((prev) => {
+      if (direction === 'next') {
+        return (prev + 1) % 4;
+      }
+      return (prev - 1 + 4) % 4;
+    });
+
     if (!cleanupRef.current) {
       setShowConfetti(true);
     }
-    setTimeout(() => {
+
+    animationTimeoutRef.current = setTimeout(() => {
       if (!cleanupRef.current) {
         setIsFlipping(false);
         isAnimatingRef.current = false;
       }
-    }, 500);
+    }, ANIMATION_DURATION);
   };
 
-  const previousPage = () => {
-    if (isFlipping) return;
-    isAnimatingRef.current = true;
-    setIsFlipping(true);
-    setCurrentPage((prev) => (prev - 1 + 4) % 4);
-    if (!cleanupRef.current) {
-      setShowConfetti(true);
-    }
-    setTimeout(() => {
-      if (!cleanupRef.current) {
-        setIsFlipping(false);
-        isAnimatingRef.current = false;
-      }
-    }, 500);
-  };
+  const nextPage = () => handlePageChange('next');
+  const previousPage = () => handlePageChange('previous');
 
   const getPatternStyle = (pattern: { type: PatternType; color: string }) => {
     switch (pattern.type) {
