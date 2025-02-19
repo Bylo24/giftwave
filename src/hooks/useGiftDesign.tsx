@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
+import { RealtimeChannel, RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 type Json = Database['public']['Tables']['gift_designs']['Row'];
 
@@ -192,7 +193,7 @@ export const useGiftDesign = (token: string | null) => {
 
     const channel = supabase
       .channel('gift-design-changes')
-      .on(
+      .on<Json>(
         'postgres_changes',
         {
           event: '*',
@@ -200,7 +201,7 @@ export const useGiftDesign = (token: string | null) => {
           table: 'gift_designs',
           filter: `token=eq.${token}`
         },
-        (payload: { new: Json | null }) => {
+        (payload: RealtimePostgresChangesPayload<Json>) => {
           console.log('Realtime update received:', payload);
           if (!payload.new) return;
           
