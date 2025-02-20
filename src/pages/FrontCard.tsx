@@ -46,6 +46,7 @@ interface GiftDesign {
   status: string | null;
   token: string | null;
   user_id: string | null;
+  screen_bg_color: string | null;
 }
 
 const isValidStickerObject = (value: any): value is { 
@@ -108,7 +109,7 @@ const FrontCardContent = () => {
 
         if (error) throw error;
 
-        queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
+        queryClient.setQueryData(['gift-design', token], (oldData: GiftDesign | null) => ({
           ...oldData,
           theme: updatedTheme.text,
           screen_bg_color: color,
@@ -165,12 +166,13 @@ const FrontCardContent = () => {
 
   useEffect(() => {
     if (giftDesign?.screen_bg_color) {
-      setSelectedThemeOption(prev => ({
-        ...prev,
+      const updatedTheme: ThemeOption = {
+        ...selectedThemeOption,
         screenBgColor: giftDesign.screen_bg_color
-      }));
+      };
+      setSelectedThemeOption(updatedTheme);
     }
-  }, [giftDesign?.screen_bg_color, setSelectedThemeOption]);
+  }, [giftDesign?.screen_bg_color, selectedThemeOption, setSelectedThemeOption]);
 
   useEffect(() => {
     if (isError) {
