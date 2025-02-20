@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -44,9 +43,9 @@ const PreviewAnimation = () => {
     startEditing
   } = useGiftDesign(token);
 
-  // Update bgColor when gift design loads
   useEffect(() => {
     if (giftDesign?.screen_bg_color) {
+      console.log('Updating background color to:', giftDesign.screen_bg_color);
       setBgColor(giftDesign.screen_bg_color);
     }
   }, [giftDesign?.screen_bg_color]);
@@ -143,6 +142,7 @@ const PreviewAnimation = () => {
 
   const handleColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const newColor = e.target.value;
+    console.log('Changing color to:', newColor);
     setBgColor(newColor);
 
     if (!token) return;
@@ -157,6 +157,9 @@ const PreviewAnimation = () => {
     } catch (err) {
       console.error('Error updating background color:', err);
       toast.error('Failed to save background color');
+      if (giftDesign?.screen_bg_color) {
+        setBgColor(giftDesign.screen_bg_color);
+      }
     }
   };
 
@@ -242,7 +245,7 @@ const PreviewAnimation = () => {
       style={{ backgroundColor: bgColor }}
     >
       {/* Color picker */}
-      <div className="fixed top-4 right-4 flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+      <div className="fixed top-4 right-4 flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg z-50">
         <Input
           type="color"
           value={bgColor}
