@@ -1,14 +1,20 @@
 
 import { loadStripe } from '@stripe/stripe-js';
+import { supabase } from "@/integrations/supabase/client";
 
-// Get the publishable key directly - it should be set in the frontend
-const publishableKey = 'pk_test_51PLdMqKonEVXP26LWRu94HNC4Q7r1sw4EbWQmJkPphPfkizP5QLQQWdZ6HT123RYODmHhsmfET56ffd5NsDYWxeW00dxp0CyvZ';
+async function getPublishableKey() {
+  const { data: { publicKey }, error } = await supabase.functions.invoke('get-stripe-public-key');
+  
+  if (error || !publicKey) {
+    console.error('Failed to get Stripe publishable key:', error);
+    throw new Error('Failed to get Stripe publishable key');
+  }
 
-if (!publishableKey) {
-  console.error('Stripe publishable key is not set');
-  throw new Error('Stripe publishable key is not set');
+  return publicKey;
 }
 
-console.log('Initializing Stripe with publishable key:', publishableKey);
+// Initialize Stripe with the publishable key
+const publishableKey = await getPublishableKey();
+console.log('Initializing Stripe with publishable key');
 
 export const stripePromise = loadStripe(publishableKey);
