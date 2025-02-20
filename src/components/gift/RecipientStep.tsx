@@ -1,4 +1,5 @@
-import { Phone } from "lucide-react";
+
+import { Phone, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -13,10 +14,18 @@ import {
 interface RecipientStepProps {
   phoneNumber: string;
   setPhoneNumber: (value: string) => void;
+  recipientName: string;
+  setRecipientName: (value: string) => void;
   onNext: () => void;
 }
 
-export const RecipientStep = ({ phoneNumber, setPhoneNumber, onNext }: RecipientStepProps) => {
+export const RecipientStep = ({ 
+  phoneNumber, 
+  setPhoneNumber, 
+  recipientName,
+  setRecipientName,
+  onNext 
+}: RecipientStepProps) => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow numbers
     const value = e.target.value.replace(/[^\d]/g, '');
@@ -114,49 +123,70 @@ export const RecipientStep = ({ phoneNumber, setPhoneNumber, onNext }: Recipient
   ].sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically by country code
 
   return (
-    <Card className="p-6 space-y-4 bg-gradient-to-br from-pink-50 to-purple-50">
+    <Card className="p-6 space-y-6 bg-gradient-to-br from-pink-50 to-purple-50">
       <div className="flex items-center gap-3 mb-4">
-        <div className="p-3 bg-primary/10 rounded-full animate-bounce">
-          <Phone className="h-6 w-6 text-primary" />
+        <div className="p-3 bg-primary/10 rounded-full">
+          <User className="h-6 w-6 text-primary" />
         </div>
         <h2 className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
           Who's the Lucky Person?
         </h2>
       </div>
-      <p className="text-gray-600">Enter their phone number to send them a special surprise!</p>
       
-      <div className="flex gap-2">
-        <Select defaultValue="+1">
-          <SelectTrigger className="w-[140px]">
-            <SelectValue placeholder="Country" />
-          </SelectTrigger>
-          <SelectContent className="max-h-[300px]">
-            {countryCodes.map((code) => (
-              <SelectItem key={code.value} value={code.value}>
-                {code.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        
-        <Input
-          type="tel"
-          placeholder="Phone"
-          value={phoneNumber}
-          onChange={handlePhoneChange}
-          className="text-lg border-2 border-primary/20 focus:border-primary/40 transition-colors flex-1"
-          inputMode="numeric"
-          pattern="[0-9]*"
-        />
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-600">Their Name</label>
+          <div className="relative">
+            <Input
+              type="text"
+              placeholder="Enter their name"
+              value={recipientName}
+              onChange={(e) => setRecipientName(e.target.value)}
+              className="text-lg border-2 border-primary/20 focus:border-primary/40 transition-colors pl-4"
+            />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-600">Their Phone Number</label>
+          <div className="flex gap-2">
+            <Select defaultValue="+1">
+              <SelectTrigger className="w-[140px]">
+                <SelectValue placeholder="Country" />
+              </SelectTrigger>
+              <SelectContent className="max-h-[300px]">
+                {countryCodes.map((code) => (
+                  <SelectItem key={code.value} value={code.value}>
+                    {code.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            
+            <Input
+              type="tel"
+              placeholder="Phone"
+              value={phoneNumber}
+              onChange={handlePhoneChange}
+              className="text-lg border-2 border-primary/20 focus:border-primary/40 transition-colors flex-1"
+              inputMode="numeric"
+              pattern="[0-9]*"
+            />
+          </div>
+        </div>
       </div>
 
       <Button 
-        className="w-full bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity animate-fade-in"
+        className="w-full bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity"
         onClick={onNext}
-        disabled={!phoneNumber || phoneNumber.length < 10}
+        disabled={!phoneNumber || phoneNumber.length < 10 || !recipientName.trim()}
       >
         Continue to Message
       </Button>
+
+      <p className="text-sm text-gray-500 text-center">
+        We'll send them a special notification when their gift is ready!
+      </p>
     </Card>
   );
 };

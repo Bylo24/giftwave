@@ -7,6 +7,7 @@ import { RecipientStep } from "@/components/gift/RecipientStep";
 const SelectRecipientContent = () => {
   const navigate = useNavigate();
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [recipientName, setRecipientName] = useState("");
 
   const handleNext = () => {
     navigate('/add-message');
@@ -18,6 +19,8 @@ const SelectRecipientContent = () => {
         <RecipientStep 
           phoneNumber={phoneNumber}
           setPhoneNumber={setPhoneNumber}
+          recipientName={recipientName}
+          setRecipientName={setRecipientName}
           onNext={handleNext}
         />
       </div>
