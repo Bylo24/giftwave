@@ -181,7 +181,7 @@ export const RecipientStep = ({
         onClick={onNext}
         disabled={!phoneNumber || phoneNumber.length < 10 || !recipientName.trim()}
       >
-        Continue to Message
+        Continue to Preview
       </Button>
 
       <p className="text-sm text-gray-500 text-center">
