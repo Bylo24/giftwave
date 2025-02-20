@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -265,14 +266,6 @@ const PreviewAnimation = () => {
     }
   };
 
-  const handleChoosePerson = () => {
-    if (token) {
-      navigate(`/select-recipient?token=${token}`);
-    } else {
-      toast.error("No gift token found");
-    }
-  };
-
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -311,9 +304,10 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
+      {/* Compressed color palette selector */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-50">
         <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 w-[85vw] max-w-[360px]">
           <h3 className="text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
@@ -413,15 +407,6 @@ const PreviewAnimation = () => {
             </div>
           ))}
         </PreviewContainer>
-      </div>
-
-      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-8">
-        <Button
-          onClick={handleChoosePerson}
-          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
-        >
-          Choose a Person
-        </Button>
       </div>
     </div>
   );
