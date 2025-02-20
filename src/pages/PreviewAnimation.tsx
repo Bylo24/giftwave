@@ -302,7 +302,7 @@ const PreviewAnimation = () => {
   }
 
   const handleChoosePerson = () => {
-    navigate('/select-recipient');
+    navigate('/choose-person');
   };
 
   return (
