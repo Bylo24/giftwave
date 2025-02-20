@@ -26,6 +26,7 @@ export interface GiftDesign {
   last_edited_at: string;
   user_id: string | null;
   created_at: string;
+  screen_bg_color: string | null;
 }
 
 export const useGiftDesign = (token: string | null) => {
@@ -74,7 +75,8 @@ export const useGiftDesign = (token: string | null) => {
         editing_user_id: data.editing_user_id || null,
         last_edited_at: data.last_edited_at || data.created_at,
         user_id: data.user_id,
-        created_at: data.created_at
+        created_at: data.created_at,
+        screen_bg_color: data.screen_bg_color || '#FEC6A1'
       };
 
       return giftDesign;

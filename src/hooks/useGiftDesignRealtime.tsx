@@ -60,7 +60,8 @@ export const useGiftDesignRealtime = (token: string | null, sessionId: string) =
             editing_user_id: newData.editing_user_id || null,
             last_edited_at: newData.last_edited_at || newData.created_at,
             user_id: newData.user_id,
-            created_at: newData.created_at
+            created_at: newData.created_at,
+            screen_bg_color: newData.screen_bg_color || '#FEC6A1'
           };
           
           setRealtimeGiftDesign(updatedGiftDesign);
