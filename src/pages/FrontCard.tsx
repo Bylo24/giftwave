@@ -110,7 +110,7 @@ const FrontCardContent = () => {
         if (error) throw error;
 
         queryClient.setQueryData(['gift-design', token], (oldData: GiftDesign | null) => ({
-          ...oldData,
+          ...oldData!,
           theme: updatedTheme.text,
           screen_bg_color: color,
           last_edited_at: new Date().toISOString()
@@ -153,10 +153,10 @@ const FrontCardContent = () => {
           .single();
 
         if (createError) throw createError;
-        return newGiftDesign;
+        return newGiftDesign as GiftDesign;
       }
 
-      return data;
+      return data as GiftDesign;
     },
     enabled: !!token && !!user,
     staleTime: Infinity,
@@ -172,7 +172,7 @@ const FrontCardContent = () => {
       };
       setSelectedThemeOption(updatedTheme);
     }
-  }, [giftDesign?.screen_bg_color]);
+  }, [giftDesign?.screen_bg_color, selectedThemeOption, setSelectedThemeOption]);
 
   useEffect(() => {
     if (isError) {
