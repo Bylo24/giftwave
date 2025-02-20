@@ -2,11 +2,17 @@
 interface PageContainerProps {
   children: React.ReactNode;
   className?: string;
+  bgColor?: string;
 }
 
-export const PageContainer = ({ children, className = "" }: PageContainerProps) => {
+export const PageContainer = ({ children, className = "", bgColor }: PageContainerProps) => {
   return (
-    <div className={`min-h-screen bg-gradient-to-br from-[#FDE1D3] via-[#FEC6A1] to-[#FFDEE2] pb-24 ${className}`}>
+    <div 
+      className={`min-h-screen ${className}`}
+      style={{ 
+        background: bgColor || 'linear-gradient(to bottom right, #FDE1D3, #FEC6A1, #FFDEE2)'
+      }}
+    >
       {children}
     </div>
   );

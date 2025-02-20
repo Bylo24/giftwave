@@ -102,7 +102,7 @@ const GiftContent = () => {
 
   if (currentStep === 'reveal') {
     return (
-      <PageContainer>
+      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
         <GiftRevealAnimation
           messageVideo={messageVideoUrl}
           amount={amount}
@@ -119,7 +119,7 @@ const GiftContent = () => {
 
   if (currentStep === 'memory') {
     return (
-      <PageContainer>
+      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-full max-w-md">
             <MemoryReplayScreen
@@ -135,7 +135,7 @@ const GiftContent = () => {
 
   if (currentStep === 'amount') {
     return (
-      <PageContainer>
+      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-full max-w-md">
             <AmountStep
@@ -151,7 +151,7 @@ const GiftContent = () => {
 
   if (currentPage === 'front') {
     return (
-      <PageContainer>
+      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
         <FrontCard
           selectedThemeOption={selectedThemeOption}
           placedStickers={placedStickers}
@@ -175,7 +175,7 @@ const GiftContent = () => {
 
   if (currentPage === 'blank') {
     return (
-      <PageContainer>
+      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
         <BlankCard
           selectedThemeOption={selectedThemeOption}
           messageVideo={messageVideo}
@@ -201,7 +201,7 @@ const GiftContent = () => {
 
   if (currentPage === 'inside-left') {
     return (
-      <PageContainer>
+      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
         <InsideLeftCard
           selectedThemeOption={selectedThemeOption}
           onBack={() => setCurrentPage('blank')}
