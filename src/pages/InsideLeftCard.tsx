@@ -68,7 +68,43 @@ const InsideLeftCardContent = () => {
       return;
     }
 
-    setMessageVideo(file);
+    if (!token) {
+      toast.error('No gift token found');
+      return;
+    }
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      
+      const { error: uploadError, data } = await supabase.storage
+        .from('gift_videos')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gift_videos')
+        .getPublicUrl(fileName);
+
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ message_video_url: publicUrl })
+        .eq('token', token);
+
+      if (updateError) throw updateError;
+
+      queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
+        ...oldData,
+        message_video_url: publicUrl
+      }));
+
+      setMessageVideo(file);
+      toast.success('Video uploaded successfully');
+    } catch (err) {
+      console.error('Error uploading video:', err);
+      toast.error('Failed to upload video');
+    }
   };
 
   return (
