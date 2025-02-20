@@ -32,6 +32,7 @@ interface GiftDesign {
   user_id: string | null;
 }
 
+// Helper type guard to check if a value is a valid sticker object
 const isValidStickerObject = (value: any): value is { 
   id: string; 
   emoji: string; 
@@ -253,7 +254,7 @@ const FrontCardContent = () => {
 
   return (
     <div 
-      className="min-h-screen relative transition-colors duration-300 bg-white"
+      className="min-h-screen relative transition-colors duration-300"
       style={{ backgroundColor: selectedThemeOption.screenBgColor }}
     >
       <div className="absolute inset-0" 
