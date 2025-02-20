@@ -307,12 +307,12 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center px-4 pb-8 pt-20 md:px-8 transition-colors duration-300"
+      className="min-h-screen flex flex-col items-center px-4 pb-8 pt-8 md:px-8 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Color palette selector - adjusted positioning */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-50">
-        <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 w-[85vw] max-w-[360px]">
+      {/* Color palette selector */}
+      <div className="mb-8 w-[85vw] max-w-[360px]">
+        <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20">
           <h3 className="text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
             Color Theme
           </h3>
@@ -371,8 +371,8 @@ const PreviewAnimation = () => {
         </div>
       )}
       
-      {/* Main content container - adjusted spacing */}
-      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto mt-16">
+      {/* Main content container */}
+      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto">
         <PreviewNavigationButtons
           onPrevious={previousPage}
           onNext={nextPage}
@@ -413,7 +413,7 @@ const PreviewAnimation = () => {
         </PreviewContainer>
       </div>
 
-      {/* Choose a Person button - adjusted spacing */}
+      {/* Choose a Person button */}
       <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-8">
         <Button
           onClick={handleChoosePerson}
