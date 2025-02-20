@@ -265,6 +265,37 @@ const PreviewAnimation = () => {
     }
   };
 
+  const handleCheckout = async () => {
+    if (!token || !giftDesign) {
+      toast.error("Gift details not found");
+      return;
+    }
+
+    try {
+      const { data: sessionData, error: checkoutError } = await supabase.functions.invoke(
+        'create-checkout-session',
+        {
+          body: { 
+            giftId: giftDesign.id,
+            amount: giftDesign.selected_amount || 0,
+            token: token
+          }
+        }
+      );
+
+      if (checkoutError) throw checkoutError;
+
+      if (sessionData?.sessionUrl) {
+        window.location.href = sessionData.sessionUrl;
+      } else {
+        throw new Error('No checkout URL received');
+      }
+    } catch (error) {
+      console.error('Checkout error:', error);
+      toast.error("Failed to start checkout process");
+    }
+  };
+
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -416,10 +447,10 @@ const PreviewAnimation = () => {
       {/* Choose a Person button - pushed to bottom */}
       <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-auto pt-12">
         <Button
-          onClick={handleChoosePerson}
+          onClick={handleCheckout}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
         >
-          Choose a Person
+          Continue to Cart
         </Button>
       </div>
     </div>

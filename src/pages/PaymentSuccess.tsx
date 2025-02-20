@@ -12,11 +12,12 @@ const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const sessionId = searchParams.get("session_id");
+  const token = searchParams.get("token");
 
   useEffect(() => {
     const handlePaymentSuccess = async () => {
-      if (!sessionId) {
-        toast.error("No session ID found");
+      if (!sessionId || !token) {
+        toast.error("Missing payment information");
         navigate("/");
         return;
       }
@@ -25,7 +26,7 @@ const PaymentSuccess = () => {
         const { data, error } = await supabase.functions.invoke(
           "handle-payment-success",
           {
-            body: { sessionId },
+            body: { sessionId, token },
           }
         );
 
@@ -41,7 +42,7 @@ const PaymentSuccess = () => {
     };
 
     handlePaymentSuccess();
-  }, [sessionId, navigate]);
+  }, [sessionId, token, navigate]);
 
   return (
     <PageContainer>
