@@ -374,7 +374,7 @@ const PreviewAnimation = () => {
         </div>
       )}
       
-      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto">
+      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto mt-32">
         <PreviewNavigationButtons
           onPrevious={previousPage}
           onNext={nextPage}
@@ -413,15 +413,15 @@ const PreviewAnimation = () => {
             </div>
           ))}
         </PreviewContainer>
+      </div>
 
-        <div className="mt-8">
-          <Button
-            onClick={handleChoosePerson}
-            className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
-          >
-            Choose a Person
-          </Button>
-        </div>
+      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-8">
+        <Button
+          onClick={handleChoosePerson}
+          className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
+        >
+          Choose a Person
+        </Button>
       </div>
     </div>
   );
