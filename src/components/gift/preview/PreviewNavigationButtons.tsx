@@ -13,7 +13,7 @@ export const PreviewNavigationButtons = ({
   isFlipping
 }: PreviewNavigationButtonsProps) => {
   return (
-    <div className="flex justify-between mb-4 px-6 absolute -bottom-20 left-0 right-0 w-full">
+    <div className="flex justify-between mb-16 sm:mb-20 px-6">
       <button
         onClick={onPrevious}
         disabled={isFlipping}
