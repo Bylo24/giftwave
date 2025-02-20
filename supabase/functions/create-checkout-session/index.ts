@@ -1,7 +1,7 @@
 
-import { serve } from "https://deno.fresh.dev/std@v9.6.1/http/server.ts";
-import { stripe } from "../_shared/stripe.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from '@supabase/supabase-js';
+import { stripe } from '../_shared/stripe.ts';
 import { corsHeaders } from '../_shared/cors.ts';
 
 serve(async (req) => {
@@ -12,18 +12,29 @@ serve(async (req) => {
     }
 
     // Get the request body
-    const { giftId, amount, token } = await req.json();
+    const { giftId } = await req.json();
 
-    if (!giftId || !amount || !token) {
+    if (!giftId) {
       throw new Error('Missing required parameters');
     }
 
-    console.log('Creating checkout session for:', { giftId, amount, token });
+    console.log('Creating checkout session for:', { giftId });
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Get gift details from database
+    const { data: gift, error: giftError } = await supabase
+      .from('gifts')
+      .select('*')
+      .eq('id', giftId)
+      .single();
+
+    if (giftError || !gift) {
+      throw new Error('Gift not found');
+    }
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -35,19 +46,28 @@ serve(async (req) => {
             product_data: {
               name: 'Gift',
             },
-            unit_amount: amount * 100, // Convert to cents
+            unit_amount: gift.amount * 100, // Convert to cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}&gift_id=${giftId}&token=${token}`,
-      cancel_url: `${req.headers.get('origin')}/previewanimation?token=${token}`,
+      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}&gift_id=${giftId}`,
+      cancel_url: `${req.headers.get('origin')}/gift`,
       metadata: {
-        gift_id: giftId,
-        token: token
+        gift_id: giftId
       }
     });
+
+    // Update gift with session ID
+    const { error: updateError } = await supabase
+      .from('gifts')
+      .update({ stripe_session_id: session.id })
+      .eq('id', giftId);
+
+    if (updateError) {
+      console.error('Error updating gift:', updateError);
+    }
 
     // Return the session URL
     return new Response(
