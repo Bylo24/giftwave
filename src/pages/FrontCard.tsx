@@ -88,10 +88,11 @@ const FrontCardContent = () => {
   const token = localStorage.getItem('gift_draft_token');
 
   const handleColorChange = (color: string) => {
-    setSelectedThemeOption(prev => ({
-      ...prev,
+    const updatedTheme: ThemeOption = {
+      ...selectedThemeOption,
       screenBgColor: color
-    }));
+    };
+    setSelectedThemeOption(updatedTheme);
   };
 
   const { data: giftDesign, isError } = useQuery({
