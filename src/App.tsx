@@ -1,91 +1,70 @@
 
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
+import { AnimatePresence } from "framer-motion";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { LoginForm } from "./components/auth/LoginForm";
-import { PhoneVerification } from "./components/auth/PhoneVerification";
-import { CodeVerification } from "./components/auth/CodeVerification";
-import { AccountSetup } from "./components/auth/AccountSetup";
-import { RequireAuth } from "./components/auth/RequireAuth";
-import { UpdatePhone } from "./components/profile/UpdatePhone";
-import { PullToRefresh } from "./components/ui/pull-to-refresh";
-import { AuthProvider } from "./contexts/AuthContext";
-import { DarkModeProvider } from "./contexts/DarkModeContext";
-import Home from "./pages/Home";
-import NotFound from "./pages/NotFound";
-import PromoCode from "./pages/PromoCode";
-import Wallet from "./pages/Wallet";
-import SearchResults from "./pages/SearchResults";
-import Gift from "./pages/Gift";
-import GiftV2 from "./pages/GiftV2";
-import MyGifts from "./pages/MyGifts";
-import Profile from "./pages/Profile";
-import Notifications from "./pages/Notifications";
-import CollectGift from "./pages/CollectGift";
-import Contacts from "./pages/Contacts";
-import SelectRecipient from "./pages/SelectRecipient";
-import AddMessage from "./pages/AddMessage";
-import AddMemories from "./pages/AddMemories";
-import SelectAmount from "./pages/SelectAmount";
-import PreviewGift from "./pages/PreviewGift";
-import PaymentSuccess from "./pages/PaymentSuccess";
-import { FrontCard } from "./pages/FrontCard";
-import InsideLeftCard from "./pages/InsideLeftCard";
-import InsideRightCard from "./pages/InsideRightCard";
-import PreviewAnimation from "./pages/PreviewAnimation";
-import RecipientGift from "./pages/RecipientGift";
+
+// Pages
+import Home from "@/pages/Home";
+import NotFound from "@/pages/NotFound";
+import AddMemories from "@/pages/AddMemories";
+import AddMessage from "@/pages/AddMessage";
+import FrontCard from "@/pages/FrontCard";
+import Gift from "@/pages/Gift";
+import GiftV2 from "@/pages/GiftV2";
+import InsideLeftCard from "@/pages/InsideLeftCard";
+import InsideLeftScreen from "@/pages/InsideLeftScreen";
+import InsideRightCard from "@/pages/InsideRightCard";
+import Preview from "@/pages/Preview";
+import PreviewAnimation from "@/pages/PreviewAnimation";
+import PreviewGift from "@/pages/PreviewGift";
+import Profile from "@/pages/Profile";
+import PromoCode from "@/pages/PromoCode";
+import RecipientGift from "@/pages/RecipientGift";
+import SearchResults from "@/pages/SearchResults";
+import SelectAmount from "@/pages/SelectAmount";
+import SelectRecipient from "@/pages/SelectRecipient";
+import Wallet from "@/pages/Wallet";
+import PaymentSuccess from "@/pages/PaymentSuccess";
+
+const queryClient = new QueryClient();
 
 function App() {
-  const queryClient = new QueryClient();
-
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <DarkModeProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AuthProvider>
-              <PullToRefresh />
-              <Routes>
-                <Route path="/" element={<Navigate to="/wallet" replace />} />
-                <Route path="/home" element={<Home />} />
-                <Route path="/login" element={<LoginForm />} />
-                <Route path="/verify" element={<PhoneVerification />} />
-                <Route path="/verify-code" element={<CodeVerification />} />
-                <Route path="/setup" element={<AccountSetup />} />
-                <Route path="/update-phone" element={<UpdatePhone />} />
-                <Route path="/previewanimation" element={<PreviewAnimation />} />
-                <Route path="/gifttoken" element={<RecipientGift />} />
-                <Route path="/payment-success" element={<PaymentSuccess />} />
-                
-                {/* Protected Routes */}
-                <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
-                <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
-                <Route path="/search" element={<RequireAuth><SearchResults /></RequireAuth>} />
-                <Route path="/gift" element={<RequireAuth><Gift /></RequireAuth>} />
-                <Route path="/gift-v2" element={<RequireAuth><GiftV2 /></RequireAuth>} />
-                <Route path="/frontcard" element={<RequireAuth><FrontCard /></RequireAuth>} />
-                <Route path="/insideleftcard" element={<RequireAuth><InsideLeftCard /></RequireAuth>} />
-                <Route path="/insiderightcard" element={<RequireAuth><InsideRightCard /></RequireAuth>} />
-                <Route path="/select-recipient" element={<RequireAuth><SelectRecipient /></RequireAuth>} />
-                <Route path="/add-message" element={<RequireAuth><AddMessage /></RequireAuth>} />
-                <Route path="/add-memories" element={<RequireAuth><AddMemories /></RequireAuth>} />
-                <Route path="/select-amount" element={<RequireAuth><SelectAmount /></RequireAuth>} />
-                <Route path="/preview-gift" element={<RequireAuth><PreviewGift /></RequireAuth>} />
-                <Route path="/my-gifts" element={<RequireAuth><MyGifts /></RequireAuth>} />
-                <Route path="/profile" element={<RequireAuth><Profile /></RequireAuth>} />
-                <Route path="/notifications" element={<RequireAuth><Notifications /></RequireAuth>} />
-                <Route path="/collect/:giftId" element={<RequireAuth><CollectGift /></RequireAuth>} />
-                <Route path="/contacts" element={<RequireAuth><Contacts /></RequireAuth>} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </AuthProvider>
-          </BrowserRouter>
-        </DarkModeProvider>
-      </TooltipProvider>
+      <Router>
+        <AnimatePresence mode="wait">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/add-memories" element={<AddMemories />} />
+            <Route path="/add-message" element={<AddMessage />} />
+            <Route path="/frontcard" element={<FrontCard />} />
+            <Route path="/gift" element={<Gift />} />
+            <Route path="/gift-v2" element={<GiftV2 />} />
+            <Route path="/inside-left" element={<InsideLeftCard />} />
+            <Route path="/inside-left-screen" element={<InsideLeftScreen />} />
+            <Route path="/inside-right" element={<InsideRightCard />} />
+            <Route path="/preview" element={<Preview />} />
+            <Route path="/preview-animation" element={<PreviewAnimation />} />
+            <Route path="/preview-gift" element={<PreviewGift />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/promo-code" element={<PromoCode />} />
+            <Route path="/recipient-gift" element={<RecipientGift />} />
+            <Route path="/search" element={<SearchResults />} />
+            <Route path="/select-amount" element={<SelectAmount />} />
+            <Route path="/select-recipient" element={<SelectRecipient />} />
+            <Route path="/wallet" element={<Wallet />} />
+            <Route path="/payment-success" element={<PaymentSuccess />} />
+            
+            {/* Add redirect from /choose-person to /select-recipient */}
+            <Route path="/choose-person" element={<Navigate to="/select-recipient" replace />} />
+            
+            {/* Catch all 404s and redirect to NotFound page */}
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </AnimatePresence>
+        <Toaster />
+      </Router>
     </QueryClientProvider>
   );
 }
