@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -10,6 +9,7 @@ import { MemoryStage } from "@/components/gift/stages/MemoryStage";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Memory } from "@/types/gift";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 const InsideRightCard = () => {
   const navigate = useNavigate();
@@ -20,7 +20,6 @@ const InsideRightCard = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
-  // Fetch the current gift design data with caching
   const { data: giftDesign } = useQuery({
     queryKey: ['gift-design', token],
     queryFn: async () => {
@@ -36,13 +35,11 @@ const InsideRightCard = () => {
       return data;
     },
     enabled: !!token,
-    staleTime: Infinity // Keep the data fresh indefinitely
+    staleTime: Infinity
   });
 
-  // Set memories from gift design data when loaded
   useEffect(() => {
     if (giftDesign?.memories) {
-      // Convert the dates back to Date objects
       const parsedMemories = (giftDesign.memories as any[]).map(memory => ({
         ...memory,
         date: new Date(memory.date)
@@ -64,14 +61,12 @@ const InsideRightCard = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
       
-      // Upload image to Supabase Storage
       const { error: uploadError, data } = await supabase.storage
         .from('gift_images')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
-      // Get the public URL for the uploaded image
       const { data: { publicUrl } } = supabase.storage
         .from('gift_images')
         .getPublicUrl(fileName);
@@ -109,7 +104,6 @@ const InsideRightCard = () => {
     };
 
     try {
-      // Convert dates to ISO strings for JSON storage
       const memoriesForStorage = [...memories, newMemory].map(memory => ({
         ...memory,
         date: memory.date.toISOString()
@@ -122,7 +116,6 @@ const InsideRightCard = () => {
 
       if (updateError) throw updateError;
 
-      // Update the query cache
       queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
         ...oldData,
         memories: memoriesForStorage
@@ -139,16 +132,8 @@ const InsideRightCard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#FDE1D3]">
-      {/* Background dots pattern */}
-      <div className="absolute inset-0" style={{
-        backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 2px, transparent 2px)',
-        backgroundSize: '24px 24px'
-      }} />
-
-      {/* Content */}
+    <PageContainer>
       <div className="relative z-10">
-        {/* Header */}
         <div className="flex justify-between items-center p-4">
           <Button
             variant="ghost"
@@ -170,9 +155,7 @@ const InsideRightCard = () => {
           </Button>
         </div>
 
-        {/* Main Content */}
         <div className="p-4 space-y-4">
-          {/* Upload Card */}
           <motion.div 
             className="bg-white rounded-3xl p-6 space-y-4"
             initial={{ opacity: 0, y: 20 }}
@@ -230,7 +213,6 @@ const InsideRightCard = () => {
             </Button>
           </motion.div>
 
-          {/* Memories Display */}
           <div className="flex items-center justify-center">
             <motion.div 
               className="bg-white rounded-3xl p-6 w-full max-w-md aspect-[3/4]"
@@ -253,7 +235,7 @@ const InsideRightCard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

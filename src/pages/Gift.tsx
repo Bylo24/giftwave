@@ -12,6 +12,7 @@ import { stickerOptions } from "@/constants/giftOptions";
 import { toast } from "sonner";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 const GiftContent = () => {
   const navigate = useNavigate();
@@ -109,104 +110,112 @@ const GiftContent = () => {
 
   if (currentStep === 'reveal') {
     return (
-      <GiftRevealAnimation
-        messageVideo={messageVideoUrl}
-        amount={amount}
-        memories={memories}
-        memory={null}
-        onComplete={() => {
-          setPreviousSteps(prev => [...prev, 'reveal']);
-          setCurrentStep('preview');
-        }}
-      />
+      <PageContainer>
+        <GiftRevealAnimation
+          messageVideo={messageVideoUrl}
+          amount={amount}
+          memories={memories}
+          memory={null}
+          onComplete={() => {
+            setPreviousSteps(prev => [...prev, 'reveal']);
+            setCurrentStep('preview');
+          }}
+        />
+      </PageContainer>
     );
   }
 
   if (currentStep === 'memory') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
-      >
-        <div className="w-full max-w-md">
-          <MemoryReplayScreen
-            memories={memories}
-            onAddMemory={handleAddMemory}
-            onNext={goToNextStep}
-          />
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            <MemoryReplayScreen
+              memories={memories}
+              onAddMemory={handleAddMemory}
+              onNext={goToNextStep}
+            />
+          </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (currentStep === 'amount') {
     return (
-      <div className="min-h-screen flex items-center justify-center p-4"
-        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
-      >
-        <div className="w-full max-w-md">
-          <AmountStep
-            amount={amount}
-            setAmount={setAmount}
-            onNext={goToNextStep}
-          />
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="w-full max-w-md">
+            <AmountStep
+              amount={amount}
+              setAmount={setAmount}
+              onNext={goToNextStep}
+            />
+          </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   if (currentPage === 'front') {
     return (
-      <FrontCard
-        selectedThemeOption={selectedThemeOption}
-        placedStickers={placedStickers}
-        selectedSticker={selectedSticker}
-        showStickers={showStickers}
-        stickerOptions={stickerOptions}
-        onBack={goToPreviousStep}
-        onNext={goToNextStep}
-        onPatternChange={handlePatternChange}
-        onThemeChange={setSelectedThemeOption}
-        onShowStickers={setShowStickers}
-        onStickerClick={handleStickerClick}
-        onStickerTap={handleStickerTap}
-        onStickerDragEnd={handleStickerDragEnd}
-        onStickerRemove={handleStickerRemove}
-        onStickerRotate={handleStickerRotate}
-      />
+      <PageContainer>
+        <FrontCard
+          selectedThemeOption={selectedThemeOption}
+          placedStickers={placedStickers}
+          selectedSticker={selectedSticker}
+          showStickers={showStickers}
+          stickerOptions={stickerOptions}
+          onBack={goToPreviousStep}
+          onNext={goToNextStep}
+          onPatternChange={handlePatternChange}
+          onThemeChange={setSelectedThemeOption}
+          onShowStickers={setShowStickers}
+          onStickerClick={handleStickerClick}
+          onStickerTap={handleStickerTap}
+          onStickerDragEnd={handleStickerDragEnd}
+          onStickerRemove={handleStickerRemove}
+          onStickerRotate={handleStickerRotate}
+        />
+      </PageContainer>
     );
   }
 
   if (currentPage === 'blank') {
     return (
-      <BlankCard
-        selectedThemeOption={selectedThemeOption}
-        messageVideo={messageVideo}
-        placedStickers={placedStickers}
-        selectedSticker={selectedSticker}
-        showStickers={showStickers}
-        stickerOptions={stickerOptions}
-        onBack={goToPreviousStep}
-        onNext={goToNextStep}
-        onPatternChange={handlePatternChange}
-        onShowStickers={setShowStickers}
-        onStickerClick={handleStickerClick}
-        onStickerTap={handleStickerTap}
-        onStickerDragEnd={handleStickerDragEnd}
-        onStickerRemove={handleStickerRemove}
-        onStickerRotate={handleStickerRotate}
-        onFileChange={handleFileChange}
-        setMessageVideo={setMessageVideo}
-      />
+      <PageContainer>
+        <BlankCard
+          selectedThemeOption={selectedThemeOption}
+          messageVideo={messageVideo}
+          placedStickers={placedStickers}
+          selectedSticker={selectedSticker}
+          showStickers={showStickers}
+          stickerOptions={stickerOptions}
+          onBack={goToPreviousStep}
+          onNext={goToNextStep}
+          onPatternChange={handlePatternChange}
+          onShowStickers={setShowStickers}
+          onStickerClick={handleStickerClick}
+          onStickerTap={handleStickerTap}
+          onStickerDragEnd={handleStickerDragEnd}
+          onStickerRemove={handleStickerRemove}
+          onStickerRotate={handleStickerRotate}
+          onFileChange={handleFileChange}
+          setMessageVideo={setMessageVideo}
+        />
+      </PageContainer>
     );
   }
 
   if (currentPage === 'inside-left') {
     return (
-      <InsideLeftCard
-        selectedThemeOption={selectedThemeOption}
-        onBack={() => setCurrentPage('blank')}
-        onNext={goToNextStep}
-      />
+      <PageContainer>
+        <InsideLeftCard
+          selectedThemeOption={selectedThemeOption}
+          onBack={() => setCurrentPage('blank')}
+          onNext={goToNextStep}
+        />
+      </PageContainer>
     );
   }
 

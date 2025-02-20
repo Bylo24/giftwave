@@ -8,6 +8,7 @@ import { stickerOptions } from "@/constants/giftOptions";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 const InsideLeftCardContent = () => {
   const navigate = useNavigate();
@@ -120,25 +121,27 @@ const InsideLeftCardContent = () => {
   };
 
   return (
-    <BlankCard
-      selectedThemeOption={selectedThemeOption}
-      messageVideo={messageVideo}
-      placedStickers={placedStickers}
-      selectedSticker={selectedSticker}
-      showStickers={showStickers}
-      stickerOptions={stickerOptions}
-      onBack={() => navigate(-1)}
-      onNext={() => navigate('/insiderightcard')}
-      onPatternChange={handlePatternChange}
-      onShowStickers={setShowStickers}
-      onStickerClick={handleStickerClick}
-      onStickerTap={handleStickerTap}
-      onStickerDragEnd={handleStickerDragEnd}
-      onStickerRemove={handleStickerRemove}
-      onStickerRotate={handleStickerRotate}
-      onFileChange={handleFileChange}
-      setMessageVideo={setMessageVideo}
-    />
+    <PageContainer>
+      <BlankCard
+        selectedThemeOption={selectedThemeOption}
+        messageVideo={messageVideo}
+        placedStickers={placedStickers}
+        selectedSticker={selectedSticker}
+        showStickers={showStickers}
+        stickerOptions={stickerOptions}
+        onBack={() => navigate(-1)}
+        onNext={() => navigate('/insiderightcard')}
+        onPatternChange={handlePatternChange}
+        onShowStickers={setShowStickers}
+        onStickerClick={handleStickerClick}
+        onStickerTap={handleStickerTap}
+        onStickerDragEnd={handleStickerDragEnd}
+        onStickerRemove={handleStickerRemove}
+        onStickerRotate={handleStickerRotate}
+        onFileChange={handleFileChange}
+        setMessageVideo={setMessageVideo}
+      />
+    </PageContainer>
   );
 };
 

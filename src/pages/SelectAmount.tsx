@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
+import { PageContainer } from "@/components/layout/PageContainer";
 
 const SelectAmountContent = () => {
   const navigate = useNavigate();
@@ -36,31 +37,41 @@ const SelectAmountContent = () => {
 
   // Show loading state
   if (isLoading) {
-    return <GiftLoadingState />;
+    return (
+      <PageContainer>
+        <GiftLoadingState />
+      </PageContainer>
+    );
   }
 
   // Handle errors or missing data
   if (error || !giftDesign) {
-    return <GiftNotFound />;
+    return (
+      <PageContainer>
+        <GiftNotFound />
+      </PageContainer>
+    );
   }
 
   // Check if gift is editable
   if (!isEditable) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
-        <p className="text-amber-600 mb-4">This gift cannot be edited</p>
-        <Button 
-          onClick={() => navigate("/frontcard")}
-          className="bg-purple-600 hover:bg-purple-700"
-        >
-          Start New Gift
-        </Button>
-      </div>
+      <PageContainer>
+        <div className="min-h-screen flex flex-col items-center justify-center p-4">
+          <p className="text-amber-600 mb-4">This gift cannot be edited</p>
+          <Button 
+            onClick={() => navigate("/frontcard")}
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            Start New Gift
+          </Button>
+        </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
+    <PageContainer>
       <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
         <Button
           variant="ghost"
@@ -79,7 +90,7 @@ const SelectAmountContent = () => {
           onNext={setPreviewMode}
         />
       </div>
-    </div>
+    </PageContainer>
   );
 };
 
@@ -92,4 +103,3 @@ const SelectAmount = () => {
 };
 
 export default SelectAmount;
-
