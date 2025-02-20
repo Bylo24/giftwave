@@ -219,6 +219,14 @@ const PreviewAnimation = () => {
     }
   };
 
+  const adjustColor = (color: string, amount: number) => {
+    const hex = color.replace('#', '');
+    const r = Math.max(Math.min(parseInt(hex.substring(0, 2), 16) + amount, 255), 0);
+    const g = Math.max(Math.min(parseInt(hex.substring(2, 4), 16) + amount, 255), 0);
+    const b = Math.max(Math.min(parseInt(hex.substring(4, 6), 16) + amount, 255), 0);
+    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+  };
+
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -271,33 +279,39 @@ const PreviewAnimation = () => {
     <div 
       className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6 relative overflow-hidden"
       style={{ 
-        background: `linear-gradient(135deg, ${bgColor}dd 0%, ${bgColor}99 100%)`
+        background: `linear-gradient(135deg, ${bgColor} 0%, ${adjustColor(bgColor, -20)} 100%)`
       }}
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-purple-500/10 blur-3xl" />
-        <div className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-pink-500/10 blur-3xl" />
+        <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-purple-500/5 blur-3xl" />
+        <div className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-pink-500/5 blur-3xl" />
       </div>
 
       <div className="fixed top-4 right-4 flex flex-col gap-4 z-50">
-        <div className="flex items-center gap-2 backdrop-blur-xl bg-white/70 p-4 rounded-2xl shadow-lg border border-white/20">
-          <Input
-            type="color"
-            value={bgColor}
-            onChange={handleColorChange}
-            className="w-12 h-12 p-1 cursor-pointer rounded-xl"
-          />
+        <div className="flex items-center gap-3 backdrop-blur-xl bg-white/90 p-4 rounded-2xl shadow-lg border border-white/20">
+          <div className="relative group">
+            <Input
+              type="color"
+              value={bgColor}
+              onChange={handleColorChange}
+              className="w-12 h-12 p-1 cursor-pointer rounded-xl border-2 border-gray-200 transition-all hover:border-purple-300"
+            />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
+          </div>
           <span className="text-sm font-medium text-gray-700">
             Screen Color
           </span>
         </div>
-        <div className="flex items-center gap-2 backdrop-blur-xl bg-white/70 p-4 rounded-2xl shadow-lg border border-white/20">
-          <Input
-            type="color"
-            value={cardBgColor}
-            onChange={handleCardColorChange}
-            className="w-12 h-12 p-1 cursor-pointer rounded-xl"
-          />
+        <div className="flex items-center gap-3 backdrop-blur-xl bg-white/90 p-4 rounded-2xl shadow-lg border border-white/20">
+          <div className="relative group">
+            <Input
+              type="color"
+              value={cardBgColor}
+              onChange={handleCardColorChange}
+              className="w-12 h-12 p-1 cursor-pointer rounded-xl border-2 border-gray-200 transition-all hover:border-purple-300"
+            />
+            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
+          </div>
           <span className="text-sm font-medium text-gray-700">
             Card Color
           </span>
@@ -329,9 +343,9 @@ const PreviewAnimation = () => {
       )}
       
       <div className="w-full max-w-md relative">
-        <div className="absolute inset-0 -m-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-2xl" />
+        <div className="absolute inset-0 -m-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-3xl blur-2xl" />
         
-        <div className="relative backdrop-blur-lg bg-white/30 p-8 rounded-3xl shadow-xl border border-white/20">
+        <div className="relative backdrop-blur-lg bg-white/80 p-8 rounded-3xl shadow-xl border border-white/40">
           <PreviewNavigationButtons
             onPrevious={previousPage}
             onNext={nextPage}
@@ -349,8 +363,8 @@ const PreviewAnimation = () => {
                 style={{
                   transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
                   backfaceVisibility: "hidden",
-                  backgroundColor: `${cardBgColor}ee`,
-                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                  backgroundColor: `${cardBgColor}`,
+                  border: '1px solid rgba(255, 255, 255, 0.4)'
                 }}
               >
                 <PreviewCard
