@@ -34,6 +34,7 @@ import { FrontCard } from "./pages/FrontCard";
 import InsideLeftCard from "./pages/InsideLeftCard";
 import InsideRightCard from "./pages/InsideRightCard";
 import PreviewAnimation from "./pages/PreviewAnimation";
+import RecipientGift from "./pages/RecipientGift";
 
 function App() {
   const queryClient = new QueryClient();
@@ -56,6 +57,7 @@ function App() {
                 <Route path="/setup" element={<AccountSetup />} />
                 <Route path="/update-phone" element={<UpdatePhone />} />
                 <Route path="/previewanimation" element={<PreviewAnimation />} />
+                <Route path="/gifttoken" element={<RecipientGift />} />
                 
                 {/* Protected Routes */}
                 <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
