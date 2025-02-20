@@ -303,26 +303,26 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12"
       style={{ backgroundColor: bgColor }}
     >
-      <div className="fixed top-1/2 -translate-y-1/2 left-4 flex flex-col gap-4">
-        <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
-          <h3 className="text-base font-medium text-gray-700 mb-4">Color Theme</h3>
-          <div className="grid grid-cols-1 gap-3">
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:left-4 md:top-1/2 md:-translate-x-0 md:-translate-y-1/2 flex flex-col gap-4 z-50">
+        <div className="bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-2xl shadow-lg max-w-[320px] md:max-w-none">
+          <h3 className="text-base font-medium text-gray-700 mb-3 md:mb-4">Color Theme</h3>
+          <div className="grid grid-cols-2 md:grid-cols-1 gap-2 md:gap-3">
             {colorPalettes.map((palette, index) => (
               <button
                 key={palette.name}
                 onClick={() => handlePaletteChange(index)}
-                className={`flex items-center gap-3 p-2 rounded-xl transition-colors ${
+                className={`flex items-center gap-2 p-2 rounded-xl transition-colors ${
                   selectedPaletteIndex === index ? 'bg-purple-50' : 'hover:bg-gray-50'
                 }`}
               >
                 <div 
-                  className="w-8 h-8 rounded-full border border-gray-200"
+                  className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-gray-200"
                   style={{ backgroundColor: palette.screenBg }}
                 />
-                <span className="text-sm text-gray-600">{palette.name}</span>
+                <span className="text-xs md:text-sm text-gray-600">{palette.name}</span>
               </button>
             ))}
           </div>
@@ -352,7 +352,7 @@ const PreviewAnimation = () => {
         </div>
       )}
       
-      <div className="w-full max-w-md relative">
+      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto">
         <PreviewNavigationButtons
           onPrevious={previousPage}
           onNext={nextPage}
