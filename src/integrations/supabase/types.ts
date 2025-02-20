@@ -160,9 +160,13 @@ export type Database = {
           last_edited_at: string | null
           memories: Json | null
           message_video_url: string | null
+          paid_at: string | null
+          payment_status: string | null
+          platform_fee: number | null
           screen_bg_color: string | null
           selected_amount: number | null
           status: string | null
+          stripe_session_id: string | null
           theme: string | null
           token: string | null
           user_id: string | null
@@ -178,9 +182,13 @@ export type Database = {
           last_edited_at?: string | null
           memories?: Json | null
           message_video_url?: string | null
+          paid_at?: string | null
+          payment_status?: string | null
+          platform_fee?: number | null
           screen_bg_color?: string | null
           selected_amount?: number | null
           status?: string | null
+          stripe_session_id?: string | null
           theme?: string | null
           token?: string | null
           user_id?: string | null
@@ -196,9 +204,13 @@ export type Database = {
           last_edited_at?: string | null
           memories?: Json | null
           message_video_url?: string | null
+          paid_at?: string | null
+          payment_status?: string | null
+          platform_fee?: number | null
           screen_bg_color?: string | null
           selected_amount?: number | null
           status?: string | null
+          stripe_session_id?: string | null
           theme?: string | null
           token?: string | null
           user_id?: string | null
