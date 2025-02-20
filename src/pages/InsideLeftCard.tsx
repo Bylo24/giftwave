@@ -129,7 +129,7 @@ const InsideLeftCardContent = () => {
         selectedSticker={selectedSticker}
         showStickers={showStickers}
         stickerOptions={stickerOptions}
-        onBack={() => navigate(-1)}
+        onBack={() => navigate('/frontcard')}
         onNext={() => navigate('/insiderightcard')}
         onPatternChange={handlePatternChange}
         onShowStickers={setShowStickers}
