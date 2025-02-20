@@ -87,12 +87,40 @@ const FrontCardContent = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
-  const handleColorChange = (color: string) => {
+  const handleColorChange = async (color: string) => {
     const updatedTheme: ThemeOption = {
       ...selectedThemeOption,
       screenBgColor: color
     };
     setSelectedThemeOption(updatedTheme);
+
+    if (token && user) {
+      try {
+        const { error } = await supabase
+          .from('gift_designs')
+          .update({
+            theme: updatedTheme.text,
+            screen_bg_color: color,
+            last_edited_at: new Date().toISOString()
+          })
+          .eq('token', token)
+          .eq('user_id', user.id);
+
+        if (error) throw error;
+
+        queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
+          ...oldData,
+          theme: updatedTheme.text,
+          screen_bg_color: color,
+          last_edited_at: new Date().toISOString()
+        }));
+
+        console.log('Background color saved successfully');
+      } catch (err) {
+        console.error('Error saving background color:', err);
+        toast.error('Failed to save background color');
+      }
+    }
   };
 
   const { data: giftDesign, isError } = useQuery({
@@ -116,7 +144,8 @@ const FrontCardContent = () => {
             { 
               token,
               status: 'draft',
-              user_id: user.id
+              user_id: user.id,
+              screen_bg_color: selectedThemeOption.screenBgColor
             }
           ])
           .select()
@@ -126,21 +155,22 @@ const FrontCardContent = () => {
         return newGiftDesign;
       }
 
-      const processedData: GiftDesign = {
-        ...data,
-        front_card_pattern: isValidPatternType(data.front_card_pattern) ? data.front_card_pattern : null,
-        front_card_stickers: Array.isArray(data.front_card_stickers) 
-          ? data.front_card_stickers.filter(isValidSticker)
-          : null
-      };
-
-      return processedData;
+      return data;
     },
     enabled: !!token && !!user,
     staleTime: Infinity,
     gcTime: Infinity,
     retry: false
   });
+
+  useEffect(() => {
+    if (giftDesign?.screen_bg_color) {
+      setSelectedThemeOption(prev => ({
+        ...prev,
+        screenBgColor: giftDesign.screen_bg_color
+      }));
+    }
+  }, [giftDesign?.screen_bg_color, setSelectedThemeOption]);
 
   useEffect(() => {
     if (isError) {
