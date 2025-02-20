@@ -159,6 +159,7 @@ export type Database = {
           last_edited_at: string | null
           memories: Json | null
           message_video_url: string | null
+          screen_bg_color: string | null
           selected_amount: number | null
           status: string | null
           theme: string | null
@@ -175,6 +176,7 @@ export type Database = {
           last_edited_at?: string | null
           memories?: Json | null
           message_video_url?: string | null
+          screen_bg_color?: string | null
           selected_amount?: number | null
           status?: string | null
           theme?: string | null
@@ -191,6 +193,7 @@ export type Database = {
           last_edited_at?: string | null
           memories?: Json | null
           message_video_url?: string | null
+          screen_bg_color?: string | null
           selected_amount?: number | null
           status?: string | null
           theme?: string | null

@@ -172,7 +172,7 @@ const FrontCardContent = () => {
       };
       setSelectedThemeOption(updatedTheme);
     }
-  }, [giftDesign?.screen_bg_color, selectedThemeOption, setSelectedThemeOption]);
+  }, [giftDesign?.screen_bg_color]);
 
   useEffect(() => {
     if (isError) {
