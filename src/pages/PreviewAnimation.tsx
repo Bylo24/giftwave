@@ -10,8 +10,11 @@ import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { supabase } from "@/integrations/supabase/client";
 
-const ANIMATION_DURATION = 500; // Match with CSS transition duration
+const ANIMATION_DURATION = 500;
 const CONFETTI_DURATION = 1500;
 
 const PreviewAnimation = () => {
@@ -24,8 +27,8 @@ const PreviewAnimation = () => {
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
+  const [bgColor, setBgColor] = useState("#f3e8ff"); // Default purple background
   
-  // Use refs to track animation and cleanup state
   const isAnimatingRef = useRef(false);
   const pendingUpdateRef = useRef(false);
   const cleanupRef = useRef(false);
@@ -41,14 +44,19 @@ const PreviewAnimation = () => {
     startEditing
   } = useGiftDesign(token);
 
-  // Initialize edit session if needed
+  // Update bgColor when gift design loads
+  useEffect(() => {
+    if (giftDesign?.screen_bg_color) {
+      setBgColor(giftDesign.screen_bg_color);
+    }
+  }, [giftDesign?.screen_bg_color]);
+
   useEffect(() => {
     if (giftDesign && !isPreviewMode && !isFinalized && giftDesign.status === 'draft') {
       startEditing();
     }
   }, [giftDesign, isPreviewMode, isFinalized, startEditing]);
 
-  // Cleanup timeouts on unmount
   useEffect(() => {
     if (!token) {
       toast.error("No gift token provided");
@@ -66,7 +74,6 @@ const PreviewAnimation = () => {
     };
   }, [token, navigate]);
 
-  // Handle errors
   useEffect(() => {
     if (error) {
       toast.error("Unable to load gift preview");
@@ -74,14 +81,12 @@ const PreviewAnimation = () => {
     }
   }, [error]);
 
-  // Update loading state
   useEffect(() => {
     if (!isLoadingGift) {
       setIsLoading(false);
     }
   }, [isLoadingGift]);
 
-  // Handle confetti animation
   useEffect(() => {
     if (showConfetti && !cleanupRef.current) {
       const fadeStartTimeout = setTimeout(() => {
@@ -136,6 +141,25 @@ const PreviewAnimation = () => {
     }, ANIMATION_DURATION);
   };
 
+  const handleColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    setBgColor(newColor);
+
+    if (!token) return;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ screen_bg_color: newColor })
+        .eq('token', token);
+
+      if (updateError) throw updateError;
+    } catch (err) {
+      console.error('Error updating background color:', err);
+      toast.error('Failed to save background color');
+    }
+  };
+
   const nextPage = () => handlePageChange('next');
   const previousPage = () => handlePageChange('previous');
 
@@ -164,7 +188,6 @@ const PreviewAnimation = () => {
     }
   };
 
-  // Handle missing token
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -179,17 +202,14 @@ const PreviewAnimation = () => {
     );
   }
 
-  // Show loading state
   if (isLoading) {
     return <GiftLoadingState />;
   }
 
-  // Handle errors or missing data
   if (error || !giftDesign) {
     return <GiftNotFound />;
   }
 
-  // Check for incomplete gift
   if (!isPreviewMode && !isFinalized) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -204,12 +224,11 @@ const PreviewAnimation = () => {
     );
   }
 
-  // Theme configuration
   const themeOption = {
     text: "Happy Birthday!",
     emoji: "🎉",
     bgColor: "bg-purple-100",
-    screenBgColor: "#f3e8ff",
+    screenBgColor: bgColor,
     textColors: ["text-purple-600"],
     pattern: {
       type: (giftDesign.front_card_pattern as PatternType) || "dots",
@@ -218,7 +237,23 @@ const PreviewAnimation = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex items-center justify-center px-8 py-12 sm:p-6">
+    <div 
+      className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex flex-col items-center justify-center px-8 py-12 sm:p-6"
+      style={{ backgroundColor: bgColor }}
+    >
+      {/* Color picker */}
+      <div className="fixed top-4 right-4 flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+        <Input
+          type="color"
+          value={bgColor}
+          onChange={handleColorChange}
+          className="w-12 h-12 p-1 cursor-pointer"
+        />
+        <span className="text-sm font-medium text-gray-600">
+          Background Color
+        </span>
+      </div>
+
       {showConfetti && (
         <div style={{ 
           position: 'fixed', 
