@@ -14,6 +14,22 @@ import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { Json } from "@/integrations/supabase/types";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+
+const colorOptions = [
+  { name: 'Soft Peach', value: '#FDE1D3' },
+  { name: 'Soft Orange', value: '#FEC6A1' },
+  { name: 'Soft Pink', value: '#FFDEE2' },
+  { name: 'Soft Purple', value: '#E5DEFF' },
+  { name: 'Soft Blue', value: '#D3E4FD' },
+  { name: 'Soft Green', value: '#F2FCE2' },
+  { name: 'Soft Yellow', value: '#FEF7CD' },
+  { name: 'Soft Gray', value: '#F1F0FB' },
+];
 
 interface GiftDesign {
   theme: string | null;
@@ -32,7 +48,6 @@ interface GiftDesign {
   user_id: string | null;
 }
 
-// Helper type guard to check if a value is a valid sticker object
 const isValidStickerObject = (value: any): value is { 
   id: string; 
   emoji: string; 
@@ -71,6 +86,13 @@ const FrontCardContent = () => {
   } = useStickerManager();
 
   const token = localStorage.getItem('gift_draft_token');
+
+  const handleColorChange = (color: string) => {
+    setSelectedThemeOption(prev => ({
+      ...prev,
+      screenBgColor: color
+    }));
+  };
 
   const { data: giftDesign, isError } = useQuery({
     queryKey: ['gift-design', token],
@@ -268,20 +290,50 @@ const FrontCardContent = () => {
       <div className="relative z-10 min-h-screen flex flex-col">
         <div className="flex items-center justify-between p-4">
           <button 
-            onClick={handleBackClick}
+            onClick={() => navigate('/home')}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           
-          <ThemeSelector
-            themes={[selectedThemeOption]}
-            selectedTheme={selectedThemeOption}
-            onThemeChange={setSelectedThemeOption}
-          />
+          <div className="flex items-center gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="h-10 px-4 rounded-full">
+                  <div 
+                    className="w-4 h-4 rounded-full mr-2"
+                    style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+                  />
+                  Background
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64 p-4">
+                <div className="grid grid-cols-4 gap-2">
+                  {colorOptions.map((color) => (
+                    <button
+                      key={color.value}
+                      className="w-12 h-12 rounded-lg border-2 transition-all hover:scale-105"
+                      style={{ 
+                        backgroundColor: color.value,
+                        borderColor: selectedThemeOption.screenBgColor === color.value ? '#000' : 'transparent'
+                      }}
+                      onClick={() => handleColorChange(color.value)}
+                      title={color.name}
+                    />
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+
+            <ThemeSelector
+              themes={[selectedThemeOption]}
+              selectedTheme={selectedThemeOption}
+              onThemeChange={setSelectedThemeOption}
+            />
+          </div>
           
           <Button 
-            onClick={() => navigate('/insideleftcard')}
+            onClick={() => navigate('/insideleftscreen')}
             className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
           >
             Next
@@ -361,10 +413,12 @@ const FrontCardContent = () => {
   );
 };
 
-export const FrontCard = () => {
+const FrontCard = () => {
   return (
     <ThemeProvider>
       <FrontCardContent />
     </ThemeProvider>
   );
 };
+
+export default FrontCard;
