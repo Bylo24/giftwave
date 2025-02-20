@@ -39,11 +39,17 @@ export const useGiftDesign = (token: string | null) => {
     queryFn: async () => {
       if (!token) throw new Error('No token provided');
       
-      const { data, error } = await supabase
+      let query = supabase
         .from('gift_designs')
         .select('*')
-        .eq('token', token)
-        .single();
+        .eq('token', token);
+
+      // If user is logged in, also check user_id
+      if (user) {
+        query = query.eq('user_id', user.id);
+      }
+
+      const { data, error } = await query.maybeSingle();
 
       if (error) {
         console.error('Error fetching gift design:', error);
