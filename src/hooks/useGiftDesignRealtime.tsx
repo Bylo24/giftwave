@@ -61,7 +61,8 @@ export const useGiftDesignRealtime = (token: string | null, sessionId: string) =
             last_edited_at: newData.last_edited_at || newData.created_at,
             user_id: newData.user_id,
             created_at: newData.created_at,
-            screen_bg_color: newData.screen_bg_color || '#FEC6A1'
+            screen_bg_color: newData.screen_bg_color || '#FEC6A1',
+            card_bg_color: newData.card_bg_color || '#ffffff'
           };
           
           setRealtimeGiftDesign(updatedGiftDesign);

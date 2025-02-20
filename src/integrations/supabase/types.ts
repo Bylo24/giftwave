@@ -150,6 +150,7 @@ export type Database = {
       }
       gift_designs: {
         Row: {
+          card_bg_color: string | null
           created_at: string
           editing_session_id: string | null
           editing_user_id: string | null
@@ -167,6 +168,7 @@ export type Database = {
           user_id: string | null
         }
         Insert: {
+          card_bg_color?: string | null
           created_at?: string
           editing_session_id?: string | null
           editing_user_id?: string | null
@@ -184,6 +186,7 @@ export type Database = {
           user_id?: string | null
         }
         Update: {
+          card_bg_color?: string | null
           created_at?: string
           editing_session_id?: string | null
           editing_user_id?: string | null
