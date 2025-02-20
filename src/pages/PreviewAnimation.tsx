@@ -79,7 +79,10 @@ const PreviewAnimation = () => {
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md">
           <GiftPreviewAnimation
-            giftDesign={giftDesign}
+            messageVideo={giftDesign?.message_video_url || null}
+            messageVideoType="url"
+            amount={giftDesign?.selected_amount?.toString() || "0"}
+            memories={giftDesign?.memories || []}
             onComplete={() => {}}
           />
           <div className="mt-8">
