@@ -246,9 +246,14 @@ export type Database = {
           created_at: string
           id: string
           message_video_url: string | null
+          payment_intent_id: string | null
+          payment_status: string | null
+          platform_fee: number | null
           recipient_phone: string | null
+          redemption_date: string | null
           sender_id: string | null
           status: string
+          stripe_session_id: string | null
           theme: string
           token: string | null
           updated_at: string
@@ -258,9 +263,14 @@ export type Database = {
           created_at?: string
           id?: string
           message_video_url?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
+          platform_fee?: number | null
           recipient_phone?: string | null
+          redemption_date?: string | null
           sender_id?: string | null
           status?: string
+          stripe_session_id?: string | null
           theme: string
           token?: string | null
           updated_at?: string
@@ -270,9 +280,14 @@ export type Database = {
           created_at?: string
           id?: string
           message_video_url?: string | null
+          payment_intent_id?: string | null
+          payment_status?: string | null
+          platform_fee?: number | null
           recipient_phone?: string | null
+          redemption_date?: string | null
           sender_id?: string | null
           status?: string
+          stripe_session_id?: string | null
           theme?: string
           token?: string | null
           updated_at?: string

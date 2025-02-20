@@ -30,6 +30,7 @@ import AddMessage from "./pages/AddMessage";
 import AddMemories from "./pages/AddMemories";
 import SelectAmount from "./pages/SelectAmount";
 import PreviewGift from "./pages/PreviewGift";
+import PaymentSuccess from "./pages/PaymentSuccess";
 import { FrontCard } from "./pages/FrontCard";
 import InsideLeftCard from "./pages/InsideLeftCard";
 import InsideRightCard from "./pages/InsideRightCard";
@@ -58,6 +59,7 @@ function App() {
                 <Route path="/update-phone" element={<UpdatePhone />} />
                 <Route path="/previewanimation" element={<PreviewAnimation />} />
                 <Route path="/gifttoken" element={<RecipientGift />} />
+                <Route path="/payment-success" element={<PaymentSuccess />} />
                 
                 {/* Protected Routes */}
                 <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
