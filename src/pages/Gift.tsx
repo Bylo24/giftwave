@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
@@ -58,7 +57,6 @@ const GiftContent = () => {
     }
 
     setMessageVideo(file);
-    // Create a temporary URL for the video file
     const videoUrl = URL.createObjectURL(file);
     setMessageVideoUrl(videoUrl);
   };
@@ -77,12 +75,7 @@ const GiftContent = () => {
     }
   };
 
-  const handleNext = async (): Promise<void> => {
-    // Making this function async ensures it returns a Promise<void>
-    await Promise.resolve();
-  };
-
-  const goToNextStep = () => {
+  const goToNextStep = async (): Promise<void> => {
     if (currentStep === 'memory') {
       setPreviousSteps(prev => [...prev, currentStep]);
       setCurrentStep('reveal');
@@ -99,7 +92,6 @@ const GiftContent = () => {
     }
   };
 
-  // Clean up object URLs when component unmounts
   useEffect(() => {
     return () => {
       if (messageVideoUrl) {
