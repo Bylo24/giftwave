@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { MemoryStage } from "@/components/gift/stages/MemoryStage";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import type { Memory } from "@/types/gift";
 import { PageContainer } from "@/components/layout/PageContainer";
 
 const InsideRightCardContent = () => {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [caption, setCaption] = useState("");
   const [pendingImage, setPendingImage] = useState<string | undefined>();
@@ -38,6 +39,13 @@ const InsideRightCardContent = () => {
     gcTime: 1000 * 60 * 30
   });
 
+  // Load existing memories when gift design data is loaded
+  useEffect(() => {
+    if (giftDesign?.memories) {
+      setMemories(giftDesign.memories);
+    }
+  }, [giftDesign?.memories]);
+
   // Update theme when gift design data is loaded
   useEffect(() => {
     if (giftDesign?.screen_bg_color) {
@@ -58,11 +66,34 @@ const InsideRightCardContent = () => {
       return;
     }
 
-    const imageUrl = URL.createObjectURL(file);
-    setPendingImage(imageUrl);
+    if (!token) {
+      toast.error('No gift token found');
+      return;
+    }
+
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${crypto.randomUUID()}.${fileExt}`;
+      
+      const { error: uploadError } = await supabase.storage
+        .from('gift_videos')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('gift_videos')
+        .getPublicUrl(fileName);
+
+      setPendingImage(publicUrl);
+      toast.success('Image uploaded successfully');
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      toast.error('Failed to upload image');
+    }
   };
 
-  const handleAddMemory = () => {
+  const handleAddMemory = async () => {
     if (!pendingImage) {
       toast.error('Please upload an image first');
       return;
@@ -70,6 +101,11 @@ const InsideRightCardContent = () => {
 
     if (!caption.trim()) {
       toast.error('Please add a caption');
+      return;
+    }
+
+    if (!token) {
+      toast.error('No gift token found');
       return;
     }
 
@@ -85,10 +121,29 @@ const InsideRightCardContent = () => {
       date: new Date()
     };
 
-    setMemories(prev => [...prev, newMemory]);
-    setPendingImage(undefined);
-    setCaption('');
-    toast.success('Memory added successfully!');
+    const updatedMemories = [...memories, newMemory];
+
+    try {
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ memories: updatedMemories })
+        .eq('token', token);
+
+      if (updateError) throw updateError;
+
+      queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
+        ...oldData,
+        memories: updatedMemories
+      }));
+
+      setMemories(updatedMemories);
+      setPendingImage(undefined);
+      setCaption('');
+      toast.success('Memory added successfully!');
+    } catch (err) {
+      console.error('Error saving memory:', err);
+      toast.error('Failed to save memory');
+    }
   };
 
   return (
