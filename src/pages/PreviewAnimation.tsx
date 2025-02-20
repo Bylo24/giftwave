@@ -413,8 +413,8 @@ const PreviewAnimation = () => {
         </PreviewContainer>
       </div>
 
-      {/* Choose a Person button */}
-      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-8">
+      {/* Choose a Person button - pushed to bottom */}
+      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-auto pt-12">
         <Button
           onClick={handleChoosePerson}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
