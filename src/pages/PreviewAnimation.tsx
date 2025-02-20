@@ -307,32 +307,32 @@ const PreviewAnimation = () => {
       className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Modernized color palette selector */}
-      <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-4 z-50">
-        <div className="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 w-[90vw] max-w-[480px]">
-          <h3 className="text-base font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+      {/* Compressed color palette selector */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-50">
+        <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 w-[85vw] max-w-[360px]">
+          <h3 className="text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
             Color Theme
           </h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div className="grid grid-cols-2 gap-2">
             {colorPalettes.map((palette, index) => (
               <button
                 key={palette.name}
                 onClick={() => handlePaletteChange(index)}
-                className={`group flex items-center gap-2 p-3 rounded-2xl transition-all duration-300 ${
+                className={`group flex items-center gap-2 p-2 rounded-xl transition-all duration-300 ${
                   selectedPaletteIndex === index 
                     ? 'bg-purple-50 shadow-sm scale-[0.98]' 
                     : 'hover:bg-gray-50/50 hover:scale-[1.02]'
                 }`}
               >
                 <div 
-                  className={`w-8 h-8 rounded-xl border-2 transition-shadow duration-300 ${
+                  className={`w-6 h-6 rounded-lg border-2 transition-shadow duration-300 ${
                     selectedPaletteIndex === index 
                       ? 'border-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.35)]' 
                       : 'border-gray-200 group-hover:border-purple-200'
                   }`}
                   style={{ backgroundColor: palette.screenBg }}
                 />
-                <span className={`text-sm transition-colors duration-300 ${
+                <span className={`text-xs transition-colors duration-300 ${
                   selectedPaletteIndex === index 
                     ? 'text-purple-700' 
                     : 'text-gray-600 group-hover:text-gray-800'
