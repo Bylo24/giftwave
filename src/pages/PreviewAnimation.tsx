@@ -306,16 +306,15 @@ const PreviewAnimation = () => {
       className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Color palette selector */}
-      <div className="fixed top-4 right-4 flex flex-col gap-4">
-        <div className="bg-white p-4 rounded-xl shadow-lg">
-          <h3 className="text-sm font-medium text-gray-700 mb-3">Color Theme</h3>
-          <div className="grid grid-cols-1 gap-2">
+      <div className="fixed top-1/2 -translate-y-1/2 left-4 flex flex-col gap-4">
+        <div className="bg-white/90 backdrop-blur-sm p-6 rounded-2xl shadow-lg">
+          <h3 className="text-base font-medium text-gray-700 mb-4">Color Theme</h3>
+          <div className="grid grid-cols-1 gap-3">
             {colorPalettes.map((palette, index) => (
               <button
                 key={palette.name}
                 onClick={() => handlePaletteChange(index)}
-                className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
+                className={`flex items-center gap-3 p-2 rounded-xl transition-colors ${
                   selectedPaletteIndex === index ? 'bg-purple-50' : 'hover:bg-gray-50'
                 }`}
               >
@@ -380,7 +379,6 @@ const PreviewAnimation = () => {
                   text: "Happy Birthday!",
                   emoji: "🎉",
                   bgColor: cardBgColor,
-                  screenBgColor: bgColor,
                   textColors: ["text-purple-600"],
                   pattern: {
                     type: (giftDesign.front_card_pattern as PatternType) || "dots",
