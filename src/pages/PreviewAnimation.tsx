@@ -352,7 +352,7 @@ const PreviewAnimation = () => {
         </div>
       )}
       
-      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto">
+      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto mt-32">
         <PreviewNavigationButtons
           onPrevious={previousPage}
           onNext={nextPage}
