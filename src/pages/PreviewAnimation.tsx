@@ -272,6 +272,8 @@ const PreviewAnimation = () => {
     }
 
     try {
+      toast.loading("Preparing checkout...");
+
       const { data: sessionData, error: checkoutError } = await supabase.functions.invoke(
         'create-checkout-session',
         {
