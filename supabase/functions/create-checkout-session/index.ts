@@ -19,7 +19,7 @@ serve(async (req) => {
   }
 
   try {
-    const { giftId } = await req.json();
+    const { giftId, amount, token } = await req.json();
     
     // Initialize Supabase client
     const supabaseClient = createClient(
@@ -29,7 +29,7 @@ serve(async (req) => {
 
     // Fetch gift details
     const { data: gift, error: giftError } = await supabaseClient
-      .from('gifts')
+      .from('gift_designs')
       .select('*')
       .eq('id', giftId)
       .single();
@@ -39,8 +39,8 @@ serve(async (req) => {
     }
 
     // Calculate total amount (gift amount + platform fee)
-    const platformFee = parseFloat((gift.amount * 0.05).toFixed(2)); // 5% platform fee
-    const totalAmount = gift.amount + platformFee;
+    const platformFee = parseFloat((amount * 0.05).toFixed(2)); // 5% platform fee
+    const totalAmount = amount + platformFee;
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -59,17 +59,17 @@ serve(async (req) => {
         },
       ],
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${req.headers.get('origin')}/preview-gift?token=${gift.token}`,
+      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}&token=${token}`,
+      cancel_url: `${req.headers.get('origin')}/previewanimation?token=${token}`,
       metadata: {
         giftId: gift.id,
-        token: gift.token,
+        token: token,
       },
     });
 
     // Update gift with Stripe session ID
     await supabaseClient
-      .from('gifts')
+      .from('gift_designs')
       .update({
         stripe_session_id: session.id,
         platform_fee: platformFee,
