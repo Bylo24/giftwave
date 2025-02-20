@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -26,7 +27,7 @@ const PreviewAnimation = () => {
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
-  const [bgColor, setBgColor] = useState("#f3e8ff"); // Default purple background
+  const [bgColor, setBgColor] = useState("#f3e8ff");
   
   const isAnimatingRef = useRef(false);
   const pendingUpdateRef = useRef(false);
@@ -241,7 +242,7 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 flex flex-col items-center justify-center px-8 py-12 sm:p-6"
+      className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6"
       style={{ backgroundColor: bgColor }}
     >
       {/* Color picker */}
