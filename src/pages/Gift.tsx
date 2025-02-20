@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
@@ -76,18 +77,11 @@ const GiftContent = () => {
     }
   };
 
-  const handleNext = async (): Promise<void> => {
-    return new Promise((resolve) => {
-      // You can add any async operations here if needed
-      resolve();
-    });
-  };
-
-  const goToNextStep = () => {
+  const goToNextStep = async () => {
     if (currentStep === 'memory') {
       setPreviousSteps(prev => [...prev, currentStep]);
       setCurrentStep('reveal');
-      return;
+      return Promise.resolve();
     }
 
     if (currentPage === 'front') {
@@ -98,6 +92,7 @@ const GiftContent = () => {
       setPreviousSteps(prev => [...prev, currentStep]);
       setCurrentStep('memory');
     }
+    return Promise.resolve();
   };
 
   // Clean up object URLs when component unmounts

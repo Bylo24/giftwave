@@ -26,7 +26,7 @@ export interface GiftDesign {
   last_edited_at: string;
   user_id: string | null;
   created_at: string;
-  screen_bg_color: string | null;
+  screen_bg_color: string;
 }
 
 export const useGiftDesign = (token: string | null) => {
