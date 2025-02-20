@@ -77,7 +77,7 @@ const SelectAmountContent = () => {
           variant="ghost"
           size="icon"
           className="rounded-full w-10 h-10 hover:bg-gray-100"
-          onClick={() => navigate('/insiderightcard')}
+          onClick={() => navigate(-1)}
         >
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </Button>

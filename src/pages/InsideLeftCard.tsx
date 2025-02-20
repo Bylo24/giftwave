@@ -14,7 +14,7 @@ const InsideLeftCardContent = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
-  const { selectedThemeOption, handlePatternChange, setSelectedThemeOption } = useTheme();
+  const { selectedThemeOption, handlePatternChange } = useTheme();
   const {
     placedStickers,
     selectedSticker,
@@ -29,6 +29,7 @@ const InsideLeftCardContent = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
+  // Fetch the current gift design data with caching
   const { data: giftDesign } = useQuery({
     queryKey: ['gift-design', token],
     queryFn: async () => {
@@ -44,20 +45,28 @@ const InsideLeftCardContent = () => {
       return data;
     },
     enabled: !!token,
-    staleTime: Infinity,
-    gcTime: 1000 * 60 * 30
+    staleTime: Infinity, // Keep the data fresh indefinitely
+    gcTime: 1000 * 60 * 30 // Cache for 30 minutes before garbage collection
   });
 
-  // Update theme when gift design data is loaded
+  // Set video from URL when gift design data is loaded
   useEffect(() => {
-    if (giftDesign?.screen_bg_color) {
-      const newTheme = {
-        ...selectedThemeOption,
-        screenBgColor: giftDesign.screen_bg_color
-      };
-      setSelectedThemeOption(newTheme);
-    }
-  }, [giftDesign?.screen_bg_color, setSelectedThemeOption, selectedThemeOption]);
+    const fetchVideoFile = async () => {
+      if (giftDesign?.message_video_url) {
+        try {
+          const response = await fetch(giftDesign.message_video_url);
+          const blob = await response.blob();
+          const file = new File([blob], 'message_video.mp4', { type: 'video/mp4' });
+          setMessageVideo(file);
+        } catch (error) {
+          console.error('Error fetching video:', error);
+          toast.error('Failed to load saved video');
+        }
+      }
+    };
+
+    fetchVideoFile();
+  }, [giftDesign?.message_video_url]);
 
   const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -77,16 +86,19 @@ const InsideLeftCardContent = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${crypto.randomUUID()}.${fileExt}`;
       
+      // Upload video to Supabase Storage
       const { error: uploadError, data } = await supabase.storage
         .from('gift_videos')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
 
+      // Get the public URL for the uploaded video
       const { data: { publicUrl } } = supabase.storage
         .from('gift_videos')
         .getPublicUrl(fileName);
 
+      // Update the gift design with the video URL
       const { error: updateError } = await supabase
         .from('gift_designs')
         .update({ message_video_url: publicUrl })
@@ -94,6 +106,7 @@ const InsideLeftCardContent = () => {
 
       if (updateError) throw updateError;
 
+      // Update the query cache
       queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
         ...oldData,
         message_video_url: publicUrl
@@ -109,37 +122,25 @@ const InsideLeftCardContent = () => {
 
   return (
     <PageContainer>
-      <div 
-        className="min-h-screen relative transition-colors duration-300"
-        style={{ backgroundColor: selectedThemeOption.screenBgColor }}
-      >
-        <div className="absolute inset-0" 
-          style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 10%, transparent 11%)',
-            backgroundSize: '30px 30px',
-            backgroundPosition: '0 0, 15px 15px'
-          }}
-        />
-        <BlankCard
-          selectedThemeOption={selectedThemeOption}
-          messageVideo={messageVideo}
-          placedStickers={placedStickers}
-          selectedSticker={selectedSticker}
-          showStickers={showStickers}
-          stickerOptions={stickerOptions}
-          onBack={() => navigate('/frontcard')}
-          onNext={() => navigate('/insiderightcard')}
-          onPatternChange={handlePatternChange}
-          onShowStickers={setShowStickers}
-          onStickerClick={handleStickerClick}
-          onStickerTap={handleStickerTap}
-          onStickerDragEnd={handleStickerDragEnd}
-          onStickerRemove={handleStickerRemove}
-          onStickerRotate={handleStickerRotate}
-          onFileChange={handleFileChange}
-          setMessageVideo={setMessageVideo}
-        />
-      </div>
+      <BlankCard
+        selectedThemeOption={selectedThemeOption}
+        messageVideo={messageVideo}
+        placedStickers={placedStickers}
+        selectedSticker={selectedSticker}
+        showStickers={showStickers}
+        stickerOptions={stickerOptions}
+        onBack={() => navigate(-1)}
+        onNext={() => navigate('/insiderightcard')}
+        onPatternChange={handlePatternChange}
+        onShowStickers={setShowStickers}
+        onStickerClick={handleStickerClick}
+        onStickerTap={handleStickerTap}
+        onStickerDragEnd={handleStickerDragEnd}
+        onStickerRemove={handleStickerRemove}
+        onStickerRotate={handleStickerRotate}
+        onFileChange={handleFileChange}
+        setMessageVideo={setMessageVideo}
+      />
     </PageContainer>
   );
 };

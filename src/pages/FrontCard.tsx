@@ -46,7 +46,6 @@ interface GiftDesign {
   status: string | null;
   token: string | null;
   user_id: string | null;
-  screen_bg_color: string | null;
 }
 
 const isValidStickerObject = (value: any): value is { 
@@ -88,40 +87,12 @@ const FrontCardContent = () => {
 
   const token = localStorage.getItem('gift_draft_token');
 
-  const handleColorChange = async (color: string) => {
+  const handleColorChange = (color: string) => {
     const updatedTheme: ThemeOption = {
       ...selectedThemeOption,
       screenBgColor: color
     };
     setSelectedThemeOption(updatedTheme);
-
-    if (token && user) {
-      try {
-        const { error } = await supabase
-          .from('gift_designs')
-          .update({
-            theme: updatedTheme.text,
-            screen_bg_color: color,
-            last_edited_at: new Date().toISOString()
-          })
-          .eq('token', token)
-          .eq('user_id', user.id);
-
-        if (error) throw error;
-
-        queryClient.setQueryData(['gift-design', token], (oldData: GiftDesign | null) => ({
-          ...oldData!,
-          theme: updatedTheme.text,
-          screen_bg_color: color,
-          last_edited_at: new Date().toISOString()
-        }));
-
-        console.log('Background color saved successfully');
-      } catch (err) {
-        console.error('Error saving background color:', err);
-        toast.error('Failed to save background color');
-      }
-    }
   };
 
   const { data: giftDesign, isError } = useQuery({
@@ -145,34 +116,31 @@ const FrontCardContent = () => {
             { 
               token,
               status: 'draft',
-              user_id: user.id,
-              screen_bg_color: selectedThemeOption.screenBgColor
+              user_id: user.id
             }
           ])
           .select()
           .single();
 
         if (createError) throw createError;
-        return newGiftDesign as GiftDesign;
+        return newGiftDesign;
       }
 
-      return data as GiftDesign;
+      const processedData: GiftDesign = {
+        ...data,
+        front_card_pattern: isValidPatternType(data.front_card_pattern) ? data.front_card_pattern : null,
+        front_card_stickers: Array.isArray(data.front_card_stickers) 
+          ? data.front_card_stickers.filter(isValidSticker)
+          : null
+      };
+
+      return processedData;
     },
     enabled: !!token && !!user,
     staleTime: Infinity,
     gcTime: Infinity,
     retry: false
   });
-
-  useEffect(() => {
-    if (giftDesign?.screen_bg_color) {
-      const updatedTheme: ThemeOption = {
-        ...selectedThemeOption,
-        screenBgColor: giftDesign.screen_bg_color
-      };
-      setSelectedThemeOption(updatedTheme);
-    }
-  }, [giftDesign?.screen_bg_color, selectedThemeOption, setSelectedThemeOption]);
 
   useEffect(() => {
     if (isError) {
@@ -366,7 +334,7 @@ const FrontCardContent = () => {
           </div>
           
           <Button 
-            onClick={() => navigate('/insideleftcard')}
+            onClick={() => navigate('/insideleftscreen')}
             className="px-3 sm:px-6 py-1.5 sm:py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors text-sm sm:text-base flex-shrink-0"
           >
             Next
