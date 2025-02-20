@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -177,7 +176,7 @@ const RecipientGift = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300 bg-white"
       style={{ backgroundColor: giftDesign.screen_bg_color }}
     >
       {showConfetti && (

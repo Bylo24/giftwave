@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -71,7 +70,7 @@ const SelectAmountContent = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="bg-white">
       <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
         <Button
           variant="ghost"
