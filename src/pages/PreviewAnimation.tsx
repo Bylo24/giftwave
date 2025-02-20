@@ -304,12 +304,12 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-start px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Color palette selector - adjusted padding and margins */}
-      <div className="fixed top-0 left-1/2 -translate-x-1/2 w-full flex flex-col gap-4 z-50 px-4 pt-4 pb-8 bg-gradient-to-b from-white/10 to-transparent">
-        <div className="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 w-full max-w-[480px] mx-auto">
+      {/* Modernized color palette selector */}
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-4 z-50">
+        <div className="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 w-[90vw] max-w-[480px]">
           <h3 className="text-base font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
             Color Theme
           </h3>
@@ -368,8 +368,7 @@ const PreviewAnimation = () => {
         </div>
       )}
       
-      {/* Card container - adjusted margins and spacing */}
-      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto mt-[180px] md:mt-[200px]">
+      <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto mt-32">
         <PreviewNavigationButtons
           onPrevious={previousPage}
           onNext={nextPage}
