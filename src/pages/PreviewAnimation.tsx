@@ -269,30 +269,36 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6"
-      style={{ backgroundColor: bgColor }}
+      className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6 relative overflow-hidden"
+      style={{ 
+        background: `linear-gradient(135deg, ${bgColor}dd 0%, ${bgColor}99 100%)`
+      }}
     >
-      {/* Color pickers */}
-      <div className="fixed top-4 right-4 flex flex-col gap-4">
-        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-purple-500/10 blur-3xl" />
+        <div className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-pink-500/10 blur-3xl" />
+      </div>
+
+      <div className="fixed top-4 right-4 flex flex-col gap-4 z-50">
+        <div className="flex items-center gap-2 backdrop-blur-xl bg-white/70 p-4 rounded-2xl shadow-lg border border-white/20">
           <Input
             type="color"
             value={bgColor}
             onChange={handleColorChange}
-            className="w-12 h-12 p-1 cursor-pointer"
+            className="w-12 h-12 p-1 cursor-pointer rounded-xl"
           />
-          <span className="text-sm font-medium text-gray-600">
+          <span className="text-sm font-medium text-gray-700">
             Screen Color
           </span>
         </div>
-        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+        <div className="flex items-center gap-2 backdrop-blur-xl bg-white/70 p-4 rounded-2xl shadow-lg border border-white/20">
           <Input
             type="color"
             value={cardBgColor}
             onChange={handleCardColorChange}
-            className="w-12 h-12 p-1 cursor-pointer"
+            className="w-12 h-12 p-1 cursor-pointer rounded-xl"
           />
-          <span className="text-sm font-medium text-gray-600">
+          <span className="text-sm font-medium text-gray-700">
             Card Color
           </span>
         </div>
@@ -307,7 +313,8 @@ const PreviewAnimation = () => {
           height: '100%',
           opacity: confettiOpacity,
           transition: 'opacity 0.5s ease-out',
-          pointerEvents: 'none'
+          pointerEvents: 'none',
+          zIndex: 40
         }}>
           <Confetti
             width={window.innerWidth}
@@ -322,35 +329,40 @@ const PreviewAnimation = () => {
       )}
       
       <div className="w-full max-w-md relative">
-        <PreviewNavigationButtons
-          onPrevious={previousPage}
-          onNext={nextPage}
-          isFlipping={isFlipping}
-        />
+        <div className="absolute inset-0 -m-4 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-3xl blur-2xl" />
         
-        <PreviewContainer
-          currentPage={currentPage}
-          onClick={nextPage}
-        >
-          {[0, 1, 2, 3].map((pageIndex) => (
-            <div
-              key={`${pageIndex}-${giftDesign.id}`}
-              className="w-full h-full absolute rounded-xl shadow-xl"
-              style={{
-                transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
-                backfaceVisibility: "hidden",
-                backgroundColor: cardBgColor
-              }}
-            >
-              <PreviewCard
-                pageIndex={pageIndex}
-                themeOption={themeOption}
-                getPatternStyle={getPatternStyle}
-                giftDesign={giftDesign}
-              />
-            </div>
-          ))}
-        </PreviewContainer>
+        <div className="relative backdrop-blur-lg bg-white/30 p-8 rounded-3xl shadow-xl border border-white/20">
+          <PreviewNavigationButtons
+            onPrevious={previousPage}
+            onNext={nextPage}
+            isFlipping={isFlipping}
+          />
+          
+          <PreviewContainer
+            currentPage={currentPage}
+            onClick={nextPage}
+          >
+            {[0, 1, 2, 3].map((pageIndex) => (
+              <div
+                key={`${pageIndex}-${giftDesign.id}`}
+                className="w-full h-full absolute rounded-2xl shadow-xl backdrop-blur-sm"
+                style={{
+                  transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
+                  backfaceVisibility: "hidden",
+                  backgroundColor: `${cardBgColor}ee`,
+                  border: '1px solid rgba(255, 255, 255, 0.2)'
+                }}
+              >
+                <PreviewCard
+                  pageIndex={pageIndex}
+                  themeOption={themeOption}
+                  getPatternStyle={getPatternStyle}
+                  giftDesign={giftDesign}
+                />
+              </div>
+            ))}
+          </PreviewContainer>
+        </div>
       </div>
     </div>
   );
