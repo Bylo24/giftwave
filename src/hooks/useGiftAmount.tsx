@@ -62,17 +62,18 @@ export const useGiftAmount = (amount: string, onNext: () => Promise<void>) => {
         
         try {
           await onNext();
-          navigate(`/previewanimation?token=${data.token}`);
-          toast.success("Gift preview ready");
+          // Change this line to navigate to select-recipient instead of previewanimation
+          navigate(`/select-recipient?token=${data.token}`);
+          toast.success("Amount saved successfully");
         } catch (error) {
-          console.error("Error transitioning to preview:", error);
-          toast.error("Failed to prepare gift preview");
+          console.error("Error transitioning to recipient selection:", error);
+          toast.error("Failed to proceed to recipient selection");
         }
       }
     },
     onError: (error) => {
       console.error("Failed to update gift design:", error);
-      toast.error("Failed to create gift preview. Please try again.");
+      toast.error("Failed to save amount. Please try again.");
     }
   });
 
