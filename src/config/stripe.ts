@@ -1,6 +1,7 @@
+
 import { loadStripe } from '@stripe/stripe-js';
 
-const publishableKey = 'pk_test_51PLdMqKonEVXP26LiUmxei5KWe25M9hiA85KuoyBcnrFEVYAOFcim8AkJ3gOxLICzfWfctIjBazbW5oBXwkJLdzp00Ekin6r80';
+const publishableKey = 'pk_live_51PLdMqKonEVXP26LQFXVIgZFCK2Z7AW6NQLZ3W1xm0NcbSQjxXhLKPn53sIWm7Nlo9YoVYlX99rNEZM7pHNRQXRO00GwKiB1f0';
 
 if (!publishableKey) {
   throw new Error('Stripe publishable key is not set');
