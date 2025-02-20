@@ -42,6 +42,8 @@ serve(async (req) => {
     const platformFee = parseFloat((amount * 0.05).toFixed(2)); // 5% platform fee
     const totalAmount = amount + platformFee;
 
+    console.log('Creating checkout session with amount:', totalAmount);
+
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
