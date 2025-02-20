@@ -1,20 +1,18 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowLeft, Upload, Plus, Star } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { MemoryStage } from "@/components/gift/stages/MemoryStage";
 import { supabase } from "@/integrations/supabase/client";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
-import type { Memory } from "@/types/gift";
+import type { Memory, ThemeOption } from "@/types/gift";
 import { PageContainer } from "@/components/layout/PageContainer";
 
 const InsideRightCardContent = () => {
   const navigate = useNavigate();
-  const queryClient = useQueryClient();
   const [memories, setMemories] = useState<Memory[]>([]);
   const [caption, setCaption] = useState("");
   const [pendingImage, setPendingImage] = useState<string | undefined>();
@@ -43,12 +41,13 @@ const InsideRightCardContent = () => {
   // Update theme when gift design data is loaded
   useEffect(() => {
     if (giftDesign?.screen_bg_color) {
-      setSelectedThemeOption(prev => ({
-        ...prev,
+      const updatedTheme: ThemeOption = {
+        ...selectedThemeOption,
         screenBgColor: giftDesign.screen_bg_color
-      }));
+      };
+      setSelectedThemeOption(updatedTheme);
     }
-  }, [giftDesign?.screen_bg_color, setSelectedThemeOption]);
+  }, [giftDesign?.screen_bg_color, setSelectedThemeOption, selectedThemeOption]);
 
   const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -79,9 +78,11 @@ const InsideRightCardContent = () => {
       return;
     }
 
-    const newMemory = {
+    const newMemory: Memory = {
+      id: crypto.randomUUID(),
       imageUrl: pendingImage,
-      caption: caption.trim()
+      caption: caption.trim(),
+      date: new Date()
     };
 
     setMemories(prev => [...prev, newMemory]);
