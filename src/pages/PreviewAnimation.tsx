@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -303,26 +304,41 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
+      {/* Modernized color palette selector */}
       <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-4 z-50">
-        <div className="bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-2xl shadow-lg w-[90vw] max-w-[480px]">
-          <h3 className="text-base font-medium text-gray-700 mb-3 md:mb-4">Color Theme</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
+        <div className="bg-white/80 backdrop-blur-md p-6 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20 w-[90vw] max-w-[480px]">
+          <h3 className="text-base font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-4">
+            Color Theme
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
             {colorPalettes.map((palette, index) => (
               <button
                 key={palette.name}
                 onClick={() => handlePaletteChange(index)}
-                className={`flex items-center gap-2 p-2 rounded-xl transition-colors ${
-                  selectedPaletteIndex === index ? 'bg-purple-50' : 'hover:bg-gray-50'
+                className={`group flex items-center gap-2 p-3 rounded-2xl transition-all duration-300 ${
+                  selectedPaletteIndex === index 
+                    ? 'bg-purple-50 shadow-sm scale-[0.98]' 
+                    : 'hover:bg-gray-50/50 hover:scale-[1.02]'
                 }`}
               >
                 <div 
-                  className="w-6 h-6 md:w-8 md:h-8 rounded-full border border-gray-200"
+                  className={`w-8 h-8 rounded-xl border-2 transition-shadow duration-300 ${
+                    selectedPaletteIndex === index 
+                      ? 'border-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.35)]' 
+                      : 'border-gray-200 group-hover:border-purple-200'
+                  }`}
                   style={{ backgroundColor: palette.screenBg }}
                 />
-                <span className="text-xs md:text-sm text-gray-600">{palette.name}</span>
+                <span className={`text-sm transition-colors duration-300 ${
+                  selectedPaletteIndex === index 
+                    ? 'text-purple-700' 
+                    : 'text-gray-600 group-hover:text-gray-800'
+                }`}>
+                  {palette.name}
+                </span>
               </button>
             ))}
           </div>
@@ -366,7 +382,7 @@ const PreviewAnimation = () => {
           {[0, 1, 2, 3].map((pageIndex) => (
             <div
               key={`${pageIndex}-${giftDesign.id}`}
-              className="w-full h-full absolute rounded-xl shadow-xl"
+              className="w-full h-full absolute rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] transition-transform duration-500"
               style={{
                 transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
                 backfaceVisibility: "hidden",
