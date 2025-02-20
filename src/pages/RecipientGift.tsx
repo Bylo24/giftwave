@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -11,8 +12,6 @@ import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { colorPalettes } from "@/constants/colorPalettes";
-import { supabase } from "@/integrations/supabase/client";
-import { useQuery } from "@tanstack/react-query";
 
 const ANIMATION_DURATION = 500;
 const CONFETTI_DURATION = 1500;
@@ -34,23 +33,6 @@ const RecipientGift = () => {
   const animationTimeoutRef = useRef<NodeJS.Timeout>();
   const confettiTimeoutRef = useRef<NodeJS.Timeout[]>([]);
 
-  const { data: gift } = useQuery({
-    queryKey: ['gift', token],
-    queryFn: async () => {
-      if (!token) throw new Error('No token provided');
-      
-      const { data, error } = await supabase
-        .from('gifts')
-        .select('*')
-        .eq('token', token)
-        .single();
-
-      if (error) throw error;
-      return data;
-    },
-    enabled: !!token
-  });
-
   const { 
     giftDesign, 
     isLoading: isLoadingGift, 
@@ -58,35 +40,6 @@ const RecipientGift = () => {
     isPreviewMode,
     isFinalized
   } = useGiftDesign(token);
-
-  const handleRedeemGift = async () => {
-    if (!gift?.id) {
-      toast.error("Gift not found");
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.functions.invoke(
-        'redeem-gift',
-        {
-          body: { giftId: gift.id }
-        }
-      );
-
-      if (error) throw error;
-
-      toast.success("Gift redeemed successfully!");
-      setShowConfetti(true);
-      
-      // Redirect to wallet after successful redemption
-      setTimeout(() => {
-        navigate("/wallet");
-      }, CONFETTI_DURATION + 500);
-    } catch (error) {
-      console.error('Redemption error:', error);
-      toast.error("Failed to redeem gift");
-    }
-  };
 
   useEffect(() => {
     if (!token) {
@@ -222,10 +175,6 @@ const RecipientGift = () => {
     return <GiftNotFound />;
   }
 
-  const canRedeem = gift && 
-    gift.payment_status === 'paid' && 
-    !gift.redemption_date;
-
   return (
     <div 
       className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
@@ -293,17 +242,6 @@ const RecipientGift = () => {
             </div>
           ))}
         </PreviewContainer>
-
-        {canRedeem && (
-          <div className="mt-8">
-            <Button
-              onClick={handleRedeemGift}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
-            >
-              Collect Gift
-            </Button>
-          </div>
-        )}
       </div>
     </div>
   );
