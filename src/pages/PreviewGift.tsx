@@ -7,6 +7,8 @@ import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { useAuth } from "@/contexts/AuthContext";
+import { ThemeType } from "@/utils/giftThemes";
+import { Memory } from "@/types/gift";
 
 const PreviewGiftContent = () => {
   const navigate = useNavigate();
@@ -73,12 +75,32 @@ const PreviewGiftContent = () => {
     }
   };
 
+  // Transform the theme to ensure it's a valid ThemeType
+  const getValidTheme = (theme: string | null): ThemeType => {
+    const validThemes: ThemeType[] = ['birthday', 'wedding', 'holiday', 'celebration', 'achievement', 'custom'];
+    return (theme && validThemes.includes(theme as ThemeType)) 
+      ? theme as ThemeType 
+      : 'birthday';
+  };
+
+  // Transform memories data to match Memory type
+  const parseMemories = (memoriesData: any): Memory[] => {
+    if (!Array.isArray(memoriesData)) return [];
+    
+    return memoriesData.map(memory => ({
+      id: memory.id || crypto.randomUUID(),
+      imageUrl: memory.imageUrl || undefined,
+      caption: memory.caption || "",
+      date: new Date(memory.date || Date.now())
+    }));
+  };
+
   return (
     <PageContainer>
       <div className="min-h-screen bg-gradient-to-br from-purple-50 to-pink-50 p-4">
         <div className="max-w-md mx-auto">
           <PreviewStep 
-            theme={giftDesign?.theme || "birthday"}
+            theme={getValidTheme(giftDesign?.theme)}
             phoneNumber=""
             amount={giftDesign?.selected_amount?.toString() || ""}
             messageVideo={null}
@@ -86,7 +108,7 @@ const PreviewGiftContent = () => {
               caption: "",
               date: new Date()
             }}
-            memories={giftDesign?.memories || []}
+            memories={parseMemories(giftDesign?.memories)}
             onNext={handlePayment}
           />
         </div>
