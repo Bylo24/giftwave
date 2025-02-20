@@ -299,14 +299,14 @@ const PreviewAnimation = () => {
         return;
       }
 
-      if (!sessionData?.sessionUrl) {
+      if (!sessionData?.url) {
         console.error('No session URL received:', sessionData);
         toast.error("Invalid checkout response");
         return;
       }
 
-      console.log("Redirecting to checkout URL:", sessionData.sessionUrl);
-      window.location.href = sessionData.sessionUrl;
+      console.log("Redirecting to checkout URL:", sessionData.url);
+      window.location.href = sessionData.url;
 
     } catch (error) {
       console.error('Checkout error:', error);

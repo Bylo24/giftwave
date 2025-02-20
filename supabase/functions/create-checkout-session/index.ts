@@ -1,29 +1,38 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.39.3";
-import { stripe } from '../_shared/stripe.ts';
-import { corsHeaders } from '../_shared/cors.ts';
+import { createClient } from '@supabase/supabase-js';
+import { stripe } from '../_shared/stripe';
+import { corsHeaders } from '../_shared/cors';
 
-serve(async (req) => {
+const supabase = createClient(
+  Deno.env.get('SUPABASE_URL') ?? '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+);
+
+Deno.serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response(null, { headers: corsHeaders });
+  }
+
   try {
-    // Handle CORS preflight requests
-    if (req.method === 'OPTIONS') {
-      return new Response(null, { headers: corsHeaders });
-    }
-
-    // Get the request body
     const { giftId, amount, token } = await req.json();
+    console.log('Processing checkout for gift:', { giftId, amount, token });
 
     if (!giftId || !amount || !token) {
       throw new Error('Missing required parameters');
     }
 
-    console.log('Creating checkout session for:', { giftId, amount, token });
+    // Get gift details from database
+    const { data: giftData, error: giftError } = await supabase
+      .from('gift_designs')
+      .select('*')
+      .eq('id', giftId)
+      .single();
 
-    // Initialize Supabase client
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    if (giftError || !giftData) {
+      console.error('Error fetching gift:', giftError);
+      throw new Error('Gift not found');
+    }
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -33,33 +42,31 @@ serve(async (req) => {
           price_data: {
             currency: 'usd',
             product_data: {
-              name: 'Gift',
+              name: 'Gift Payment',
+              description: 'Gift payment through GiftWave'
             },
-            unit_amount: amount * 100, // Convert to cents
+            unit_amount: Math.round(amount * 100), // Convert to cents
           },
           quantity: 1,
         },
       ],
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}&gift_id=${giftId}&token=${token}`,
-      cancel_url: `${req.headers.get('origin')}/previewanimation?token=${token}`,
-      metadata: {
-        gift_id: giftId,
-        token: token
-      }
+      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}&token=${token}`,
+      cancel_url: `${req.headers.get('origin')}/preview?token=${token}`,
     });
+
+    console.log('Created checkout session:', session.id);
 
     // Return the session URL
     return new Response(
-      JSON.stringify({ sessionUrl: session.url }),
+      JSON.stringify({ url: session.url }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
     );
-
   } catch (error) {
-    console.error('Error creating checkout session:', error);
+    console.error('Checkout error:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       {
