@@ -306,10 +306,10 @@ const PreviewAnimation = () => {
       className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12"
       style={{ backgroundColor: bgColor }}
     >
-      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 md:bottom-auto md:left-4 md:top-1/2 md:-translate-x-0 md:-translate-y-1/2 flex flex-col gap-4 z-50">
-        <div className="bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-2xl shadow-lg max-w-[320px] md:max-w-none">
+      <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-4 z-50">
+        <div className="bg-white/90 backdrop-blur-sm p-4 md:p-6 rounded-2xl shadow-lg w-[90vw] max-w-[480px]">
           <h3 className="text-base font-medium text-gray-700 mb-3 md:mb-4">Color Theme</h3>
-          <div className="grid grid-cols-2 md:grid-cols-1 gap-2 md:gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
             {colorPalettes.map((palette, index) => (
               <button
                 key={palette.name}
