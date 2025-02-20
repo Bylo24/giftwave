@@ -1,6 +1,7 @@
+
 import React from "react";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import FrontCard from "./pages/FrontCard";
+import { FrontCard } from "./pages/FrontCard";
 import PreviewAnimation from "./pages/PreviewAnimation";
 import GiftToken from "./pages/GiftToken";
 
