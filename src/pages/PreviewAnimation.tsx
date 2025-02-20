@@ -274,6 +274,12 @@ const PreviewAnimation = () => {
     try {
       const loadingToast = toast.loading("Preparing checkout...");
 
+      console.log("Initiating checkout for gift:", {
+        giftId: giftDesign.id,
+        amount: giftDesign.selected_amount,
+        token
+      });
+
       const { data: sessionData, error: checkoutError } = await supabase.functions.invoke(
         'create-checkout-session',
         {
@@ -294,11 +300,12 @@ const PreviewAnimation = () => {
       }
 
       if (!sessionData?.sessionUrl) {
-        console.error('No session URL received');
+        console.error('No session URL received:', sessionData);
         toast.error("Invalid checkout response");
         return;
       }
 
+      console.log("Redirecting to checkout URL:", sessionData.sessionUrl);
       window.location.href = sessionData.sessionUrl;
 
     } catch (error) {
