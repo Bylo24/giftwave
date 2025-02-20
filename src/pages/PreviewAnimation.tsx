@@ -10,7 +10,7 @@ import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { colorPalettes } from "@/constants/colorPalettes";
 import { supabase } from "@/integrations/supabase/client";
 
 const ANIMATION_DURATION = 500;
@@ -26,8 +26,9 @@ const PreviewAnimation = () => {
   const [isFlipping, setIsFlipping] = useState(false);
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
-  const [bgColor, setBgColor] = useState("#f3e8ff");
-  const [cardBgColor, setCardBgColor] = useState("#ffffff");
+  const [selectedPaletteIndex, setSelectedPaletteIndex] = useState(0);
+  const [bgColor, setBgColor] = useState(colorPalettes[0].screenBg);
+  const [cardBgColor, setCardBgColor] = useState(colorPalettes[0].cardBg);
   
   const isAnimatingRef = useRef(false);
   const pendingUpdateRef = useRef(false);
@@ -43,6 +44,51 @@ const PreviewAnimation = () => {
     isFinalized,
     startEditing
   } = useGiftDesign(token);
+
+  useEffect(() => {
+    if (giftDesign?.screen_bg_color) {
+      const paletteIndex = colorPalettes.findIndex(p => 
+        p.screenBg.toLowerCase() === giftDesign.screen_bg_color.toLowerCase() &&
+        p.cardBg.toLowerCase() === giftDesign.card_bg_color.toLowerCase()
+      );
+      
+      if (paletteIndex !== -1) {
+        setSelectedPaletteIndex(paletteIndex);
+      }
+      
+      setBgColor(giftDesign.screen_bg_color);
+      setCardBgColor(giftDesign.card_bg_color);
+    }
+  }, [giftDesign?.screen_bg_color, giftDesign?.card_bg_color]);
+
+  const handlePaletteChange = async (index: number) => {
+    const newPalette = colorPalettes[index];
+    setSelectedPaletteIndex(index);
+    setBgColor(newPalette.screenBg);
+    setCardBgColor(newPalette.cardBg);
+
+    if (!token) return;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ 
+          screen_bg_color: newPalette.screenBg,
+          card_bg_color: newPalette.cardBg
+        })
+        .eq('token', token);
+
+      if (updateError) throw updateError;
+    } catch (err) {
+      console.error('Error updating colors:', err);
+      toast.error('Failed to save color palette');
+      
+      const prevPalette = colorPalettes[selectedPaletteIndex];
+      setBgColor(prevPalette.screenBg);
+      setCardBgColor(prevPalette.cardBg);
+      setSelectedPaletteIndex(selectedPaletteIndex);
+    }
+  };
 
   useEffect(() => {
     if (giftDesign?.screen_bg_color) {
@@ -223,12 +269,12 @@ const PreviewAnimation = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <p className="text-red-500 mb-4">No gift token provided</p>
-        <button 
+        <Button 
           onClick={() => navigate("/frontcard")}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
         >
           Start New Gift
-        </button>
+        </Button>
       </div>
     );
   }
@@ -245,56 +291,42 @@ const PreviewAnimation = () => {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <p className="text-amber-600 mb-4">This gift is still being edited</p>
-        <button 
+        <Button 
           onClick={() => navigate("/frontcard")}
           className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
         >
           Start New Gift
-        </button>
+        </Button>
       </div>
     );
   }
-
-  const themeOption = {
-    text: "Happy Birthday!",
-    emoji: "🎉",
-    bgColor: cardBgColor,
-    screenBgColor: bgColor,
-    textColors: ["text-purple-600"],
-    pattern: {
-      type: (giftDesign.front_card_pattern as PatternType) || "dots",
-      color: "rgba(147, 51, 234, 0.1)"
-    }
-  };
 
   return (
     <div 
       className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Color pickers */}
+      {/* Color palette selector */}
       <div className="fixed top-4 right-4 flex flex-col gap-4">
-        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
-          <Input
-            type="color"
-            value={bgColor}
-            onChange={handleColorChange}
-            className="w-12 h-12 p-1 cursor-pointer"
-          />
-          <span className="text-sm font-medium text-gray-600">
-            Screen Color
-          </span>
-        </div>
-        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
-          <Input
-            type="color"
-            value={cardBgColor}
-            onChange={handleCardColorChange}
-            className="w-12 h-12 p-1 cursor-pointer"
-          />
-          <span className="text-sm font-medium text-gray-600">
-            Card Color
-          </span>
+        <div className="bg-white p-4 rounded-xl shadow-lg">
+          <h3 className="text-sm font-medium text-gray-700 mb-3">Color Theme</h3>
+          <div className="grid grid-cols-1 gap-2">
+            {colorPalettes.map((palette, index) => (
+              <button
+                key={palette.name}
+                onClick={() => handlePaletteChange(index)}
+                className={`flex items-center gap-2 p-2 rounded-lg transition-colors ${
+                  selectedPaletteIndex === index ? 'bg-purple-50' : 'hover:bg-gray-50'
+                }`}
+              >
+                <div 
+                  className="w-8 h-8 rounded-full border border-gray-200"
+                  style={{ backgroundColor: palette.screenBg }}
+                />
+                <span className="text-sm text-gray-600">{palette.name}</span>
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
@@ -344,7 +376,17 @@ const PreviewAnimation = () => {
             >
               <PreviewCard
                 pageIndex={pageIndex}
-                themeOption={themeOption}
+                themeOption={{
+                  text: "Happy Birthday!",
+                  emoji: "🎉",
+                  bgColor: cardBgColor,
+                  screenBgColor: bgColor,
+                  textColors: ["text-purple-600"],
+                  pattern: {
+                    type: (giftDesign.front_card_pattern as PatternType) || "dots",
+                    color: "rgba(147, 51, 234, 0.1)"
+                  }
+                }}
                 getPatternStyle={getPatternStyle}
                 giftDesign={giftDesign}
               />
