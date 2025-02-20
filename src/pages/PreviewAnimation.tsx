@@ -219,14 +219,6 @@ const PreviewAnimation = () => {
     }
   };
 
-  const adjustColor = (color: string, amount: number) => {
-    const hex = color.replace('#', '');
-    const r = Math.max(Math.min(parseInt(hex.substring(0, 2), 16) + amount, 255), 0);
-    const g = Math.max(Math.min(parseInt(hex.substring(2, 4), 16) + amount, 255), 0);
-    const b = Math.max(Math.min(parseInt(hex.substring(4, 6), 16) + amount, 255), 0);
-    return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-  };
-
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -277,42 +269,30 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6 relative overflow-hidden"
-      style={{ 
-        background: `linear-gradient(135deg, ${bgColor} 0%, ${adjustColor(bgColor, -20)} 100%)`
-      }}
+      className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6"
+      style={{ backgroundColor: bgColor }}
     >
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-1/4 -left-1/4 w-1/2 h-1/2 rounded-full bg-purple-500/5 blur-3xl" />
-        <div className="absolute -bottom-1/4 -right-1/4 w-1/2 h-1/2 rounded-full bg-pink-500/5 blur-3xl" />
-      </div>
-
-      <div className="fixed top-4 right-4 flex flex-col gap-4 z-50">
-        <div className="flex items-center gap-3 backdrop-blur-xl bg-white/90 p-4 rounded-2xl shadow-lg border border-white/20">
-          <div className="relative group">
-            <Input
-              type="color"
-              value={bgColor}
-              onChange={handleColorChange}
-              className="w-12 h-12 p-1 cursor-pointer rounded-xl border-2 border-gray-200 transition-all hover:border-purple-300"
-            />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
-          </div>
-          <span className="text-sm font-medium text-gray-700">
+      {/* Color pickers */}
+      <div className="fixed top-4 right-4 flex flex-col gap-4">
+        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+          <Input
+            type="color"
+            value={bgColor}
+            onChange={handleColorChange}
+            className="w-12 h-12 p-1 cursor-pointer"
+          />
+          <span className="text-sm font-medium text-gray-600">
             Screen Color
           </span>
         </div>
-        <div className="flex items-center gap-3 backdrop-blur-xl bg-white/90 p-4 rounded-2xl shadow-lg border border-white/20">
-          <div className="relative group">
-            <Input
-              type="color"
-              value={cardBgColor}
-              onChange={handleCardColorChange}
-              className="w-12 h-12 p-1 cursor-pointer rounded-xl border-2 border-gray-200 transition-all hover:border-purple-300"
-            />
-            <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/20 to-transparent pointer-events-none" />
-          </div>
-          <span className="text-sm font-medium text-gray-700">
+        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+          <Input
+            type="color"
+            value={cardBgColor}
+            onChange={handleCardColorChange}
+            className="w-12 h-12 p-1 cursor-pointer"
+          />
+          <span className="text-sm font-medium text-gray-600">
             Card Color
           </span>
         </div>
@@ -327,8 +307,7 @@ const PreviewAnimation = () => {
           height: '100%',
           opacity: confettiOpacity,
           transition: 'opacity 0.5s ease-out',
-          pointerEvents: 'none',
-          zIndex: 40
+          pointerEvents: 'none'
         }}>
           <Confetti
             width={window.innerWidth}
@@ -343,40 +322,35 @@ const PreviewAnimation = () => {
       )}
       
       <div className="w-full max-w-md relative">
-        <div className="absolute inset-0 -m-4 bg-gradient-to-r from-purple-500/5 to-pink-500/5 rounded-3xl blur-2xl" />
+        <PreviewNavigationButtons
+          onPrevious={previousPage}
+          onNext={nextPage}
+          isFlipping={isFlipping}
+        />
         
-        <div className="relative backdrop-blur-lg bg-white/80 p-8 rounded-3xl shadow-xl border border-white/40">
-          <PreviewNavigationButtons
-            onPrevious={previousPage}
-            onNext={nextPage}
-            isFlipping={isFlipping}
-          />
-          
-          <PreviewContainer
-            currentPage={currentPage}
-            onClick={nextPage}
-          >
-            {[0, 1, 2, 3].map((pageIndex) => (
-              <div
-                key={`${pageIndex}-${giftDesign.id}`}
-                className="w-full h-full absolute rounded-2xl shadow-xl backdrop-blur-sm"
-                style={{
-                  transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
-                  backfaceVisibility: "hidden",
-                  backgroundColor: `${cardBgColor}`,
-                  border: '1px solid rgba(255, 255, 255, 0.4)'
-                }}
-              >
-                <PreviewCard
-                  pageIndex={pageIndex}
-                  themeOption={themeOption}
-                  getPatternStyle={getPatternStyle}
-                  giftDesign={giftDesign}
-                />
-              </div>
-            ))}
-          </PreviewContainer>
-        </div>
+        <PreviewContainer
+          currentPage={currentPage}
+          onClick={nextPage}
+        >
+          {[0, 1, 2, 3].map((pageIndex) => (
+            <div
+              key={`${pageIndex}-${giftDesign.id}`}
+              className="w-full h-full absolute rounded-xl shadow-xl"
+              style={{
+                transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
+                backfaceVisibility: "hidden",
+                backgroundColor: cardBgColor
+              }}
+            >
+              <PreviewCard
+                pageIndex={pageIndex}
+                themeOption={themeOption}
+                getPatternStyle={getPatternStyle}
+                giftDesign={giftDesign}
+              />
+            </div>
+          ))}
+        </PreviewContainer>
       </div>
     </div>
   );
