@@ -289,23 +289,23 @@ const FrontCardContent = () => {
       />
       
       <div className="relative z-10 min-h-screen flex flex-col">
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-2 sm:p-4 gap-2">
           <button 
             onClick={() => navigate('/home')}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
+            className="w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center bg-white rounded-full flex-shrink-0"
           >
-            <ArrowLeft className="h-5 w-5 text-gray-600" />
+            <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 text-gray-600" />
           </button>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 sm:gap-2 flex-1 justify-center">
             <Popover>
               <PopoverTrigger asChild>
-                <Button variant="outline" className="h-10 px-4 rounded-full">
+                <Button variant="outline" className="h-8 sm:h-10 px-2 sm:px-4 rounded-full text-sm sm:text-base">
                   <div 
-                    className="w-4 h-4 rounded-full mr-2"
+                    className="w-3 h-3 sm:w-4 sm:h-4 rounded-full mr-1 sm:mr-2"
                     style={{ backgroundColor: selectedThemeOption.screenBgColor }}
                   />
-                  Background
+                  <span className="hidden xs:inline">Background</span>
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-64 p-4">
@@ -335,7 +335,7 @@ const FrontCardContent = () => {
           
           <Button 
             onClick={() => navigate('/insideleftscreen')}
-            className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
+            className="px-3 sm:px-6 py-1.5 sm:py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors text-sm sm:text-base flex-shrink-0"
           >
             Next
           </Button>
