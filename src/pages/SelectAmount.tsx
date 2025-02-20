@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { RecipientStep } from "@/components/gift/RecipientStep";
+import { AmountStep } from "@/components/gift/AmountStep";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
@@ -12,8 +12,7 @@ import { PageContainer } from "@/components/layout/PageContainer";
 
 const SelectAmountContent = () => {
   const navigate = useNavigate();
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [recipientName, setRecipientName] = useState("");
+  const [amount, setAmount] = useState("");
   const draftToken = localStorage.getItem('gift_draft_token');
   
   const {
@@ -23,6 +22,12 @@ const SelectAmountContent = () => {
     setPreviewMode,
     isEditable
   } = useGiftDesign(draftToken);
+
+  useEffect(() => {
+    if (giftDesign?.selected_amount) {
+      setAmount(giftDesign.selected_amount.toString());
+    }
+  }, [giftDesign]);
 
   // Handle missing token
   if (!draftToken) {
@@ -65,10 +70,6 @@ const SelectAmountContent = () => {
     );
   }
 
-  const handleNext = () => {
-    setPreviewMode();
-  };
-
   return (
     <PageContainer>
       <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
@@ -83,12 +84,10 @@ const SelectAmountContent = () => {
       </div>
 
       <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto">
-        <RecipientStep 
-          phoneNumber={phoneNumber}
-          setPhoneNumber={setPhoneNumber}
-          recipientName={recipientName}
-          setRecipientName={setRecipientName}
-          onNext={handleNext}
+        <AmountStep 
+          amount={amount}
+          setAmount={setAmount}
+          onNext={setPreviewMode}
         />
       </div>
     </PageContainer>

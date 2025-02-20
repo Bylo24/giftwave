@@ -11,7 +11,6 @@ import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Gift } from "lucide-react";
 import { colorPalettes } from "@/constants/colorPalettes";
 
 const ANIMATION_DURATION = 500;
@@ -129,14 +128,6 @@ const RecipientGift = () => {
   const nextPage = () => handlePageChange('next');
   const previousPage = () => handlePageChange('previous');
 
-  const handleCollectGift = () => {
-    if (token) {
-      navigate(`/collect/${token}`);
-    } else {
-      toast.error("Gift token not found");
-    }
-  };
-
   const getPatternStyle = (pattern: { type: PatternType; color: string }) => {
     switch (pattern.type) {
       case 'dots':
@@ -251,16 +242,6 @@ const RecipientGift = () => {
             </div>
           ))}
         </PreviewContainer>
-
-        <div className="mt-8 flex justify-center">
-          <Button
-            onClick={handleCollectGift}
-            className="bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-6 rounded-full shadow-lg transform transition-all duration-200 hover:scale-105 flex items-center gap-2"
-          >
-            <Gift className="w-5 h-5" />
-            Collect Gift
-          </Button>
-        </div>
       </div>
     </div>
   );
