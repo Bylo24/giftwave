@@ -8,7 +8,7 @@ import { MemoryStage } from "@/components/gift/stages/MemoryStage";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
-import type { Memory, ThemeOption } from "@/types/gift";
+import type { Memory } from "@/types/gift";
 import { PageContainer } from "@/components/layout/PageContainer";
 
 const InsideRightCardContent = () => {
@@ -41,11 +41,11 @@ const InsideRightCardContent = () => {
   // Update theme when gift design data is loaded
   useEffect(() => {
     if (giftDesign?.screen_bg_color) {
-      const updatedTheme: ThemeOption = {
+      const newTheme = {
         ...selectedThemeOption,
         screenBgColor: giftDesign.screen_bg_color
       };
-      setSelectedThemeOption(updatedTheme);
+      setSelectedThemeOption(newTheme);
     }
   }, [giftDesign?.screen_bg_color, setSelectedThemeOption, selectedThemeOption]);
 
