@@ -1,21 +1,31 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { serve } from "https://deno.fresh.dev/std@v9.6.1/http/server.ts";
 import { stripe } from "../_shared/stripe.ts";
-import { corsHeaders } from "../_shared/cors.ts";
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.3';
+import { corsHeaders } from '../_shared/cors.ts';
 
-console.log("Loading create-checkout-session function...");
-
-serve(async (req: Request) => {
-  // Handle CORS preflight requests
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(async (req) => {
   try {
-    const { giftId, amount, token } = await req.json();
-    console.log("Creating checkout session for gift:", { giftId, amount, token });
+    // Handle CORS preflight requests
+    if (req.method === 'OPTIONS') {
+      return new Response(null, { headers: corsHeaders });
+    }
 
+    // Get the request body
+    const { giftId, amount, token } = await req.json();
+
+    if (!giftId || !amount || !token) {
+      throw new Error('Missing required parameters');
+    }
+
+    console.log('Creating checkout session for:', { giftId, amount, token });
+
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -24,7 +34,6 @@ serve(async (req: Request) => {
             currency: 'usd',
             product_data: {
               name: 'Gift',
-              description: 'Digital gift card',
             },
             unit_amount: amount * 100, // Convert to cents
           },
@@ -32,28 +41,31 @@ serve(async (req: Request) => {
         },
       ],
       mode: 'payment',
-      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}&token=${token}`,
+      success_url: `${req.headers.get('origin')}/payment-success?session_id={CHECKOUT_SESSION_ID}&gift_id=${giftId}&token=${token}`,
       cancel_url: `${req.headers.get('origin')}/previewanimation?token=${token}`,
+      metadata: {
+        gift_id: giftId,
+        token: token
+      }
     });
 
-    console.log("Checkout session created:", session.id);
-
+    // Return the session URL
     return new Response(
       JSON.stringify({ sessionUrl: session.url }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
-      },
+      }
     );
 
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    console.error('Error creating checkout session:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
-      { 
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
-      },
+      }
     );
   }
 });

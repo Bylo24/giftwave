@@ -1,10 +1,13 @@
-import Stripe from 'https://esm.sh/stripe@14.21.0'
 
-export const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
-  apiVersion: '2023-10-16',
-})
+import Stripe from "https://esm.sh/stripe@14.12.0?target=deno";
 
-export const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+// Use the restricted key from Supabase secrets
+const stripeKey = Deno.env.get('STRIPE_RESTRICTED_KEY');
+if (!stripeKey) {
+  throw new Error('Missing Stripe restricted key');
 }
+
+export const stripe = new Stripe(stripeKey, {
+  apiVersion: '2023-10-16',
+  httpClient: Stripe.createFetchHttpClient(),
+});
