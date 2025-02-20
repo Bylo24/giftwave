@@ -311,7 +311,7 @@ const PreviewAnimation = () => {
 
   return (
     <div 
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
+      className="min-h-screen flex flex-col items-center px-4 py-6 md:px-8 md:py-12 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
       <div className="fixed top-4 left-1/2 -translate-x-1/2 flex flex-col gap-2 z-50">
