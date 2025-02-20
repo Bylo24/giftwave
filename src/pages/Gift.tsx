@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
@@ -57,6 +58,7 @@ const GiftContent = () => {
     }
 
     setMessageVideo(file);
+    // Create a temporary URL for the video file
     const videoUrl = URL.createObjectURL(file);
     setMessageVideoUrl(videoUrl);
   };
@@ -75,7 +77,12 @@ const GiftContent = () => {
     }
   };
 
-  const goToNextStep = async (): Promise<void> => {
+  const handleNext = async (): Promise<void> => {
+    // Making this function async ensures it returns a Promise<void>
+    await Promise.resolve();
+  };
+
+  const goToNextStep = () => {
     if (currentStep === 'memory') {
       setPreviousSteps(prev => [...prev, currentStep]);
       setCurrentStep('reveal');
@@ -92,6 +99,7 @@ const GiftContent = () => {
     }
   };
 
+  // Clean up object URLs when component unmounts
   useEffect(() => {
     return () => {
       if (messageVideoUrl) {
@@ -102,7 +110,7 @@ const GiftContent = () => {
 
   if (currentStep === 'reveal') {
     return (
-      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
+      <PageContainer>
         <GiftRevealAnimation
           messageVideo={messageVideoUrl}
           amount={amount}
@@ -119,7 +127,7 @@ const GiftContent = () => {
 
   if (currentStep === 'memory') {
     return (
-      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
+      <PageContainer>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-full max-w-md">
             <MemoryReplayScreen
@@ -135,7 +143,7 @@ const GiftContent = () => {
 
   if (currentStep === 'amount') {
     return (
-      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
+      <PageContainer>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="w-full max-w-md">
             <AmountStep
@@ -151,7 +159,7 @@ const GiftContent = () => {
 
   if (currentPage === 'front') {
     return (
-      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
+      <PageContainer>
         <FrontCard
           selectedThemeOption={selectedThemeOption}
           placedStickers={placedStickers}
@@ -175,7 +183,7 @@ const GiftContent = () => {
 
   if (currentPage === 'blank') {
     return (
-      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
+      <PageContainer>
         <BlankCard
           selectedThemeOption={selectedThemeOption}
           messageVideo={messageVideo}
@@ -201,7 +209,7 @@ const GiftContent = () => {
 
   if (currentPage === 'inside-left') {
     return (
-      <PageContainer bgColor={selectedThemeOption.screenBgColor}>
+      <PageContainer>
         <InsideLeftCard
           selectedThemeOption={selectedThemeOption}
           onBack={() => setCurrentPage('blank')}

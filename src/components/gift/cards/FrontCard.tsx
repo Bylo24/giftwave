@@ -1,16 +1,12 @@
 
 import { useRef } from "react";
-import { ThemeOption, Sticker, PatternType } from "@/types/gift";
+import { useNavigate } from "react-router-dom";
+import { ThemeOption, Sticker } from "@/types/gift";
 import { StickerLayer } from "@/components/gift/StickerLayer";
 import { PatternSelector } from "@/components/gift/PatternSelector";
 import { ThemeSelector } from "@/components/gift/ThemeSelector";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 
 interface FrontCardProps {
   selectedThemeOption: ThemeOption;
@@ -20,7 +16,7 @@ interface FrontCardProps {
   stickerOptions: Array<{ emoji: string; name: string }>;
   onBack: () => void;
   onNext: () => void;
-  onPatternChange: (type: PatternType) => void;
+  onPatternChange: (type: 'dots' | 'grid' | 'waves' | 'none') => void;
   onThemeChange: (theme: ThemeOption) => void;
   onShowStickers: (show: boolean) => void;
   onStickerClick: (emoji: string) => void;
@@ -30,24 +26,12 @@ interface FrontCardProps {
   onStickerRotate: (stickerId: string, rotation: number) => void;
 }
 
-const colorOptions = [
-  { name: 'Soft Peach', value: '#FDE1D3' },
-  { name: 'Soft Orange', value: '#FEC6A1' },
-  { name: 'Soft Pink', value: '#FFDEE2' },
-  { name: 'Soft Purple', value: '#E5DEFF' },
-  { name: 'Soft Blue', value: '#D3E4FD' },
-  { name: 'Soft Green', value: '#F2FCE2' },
-  { name: 'Soft Yellow', value: '#FEF7CD' },
-  { name: 'Soft Gray', value: '#F1F0FB' },
-];
-
 export const FrontCard = ({
   selectedThemeOption,
   placedStickers,
   selectedSticker,
   showStickers,
   stickerOptions,
-  onBack,
   onNext,
   onPatternChange,
   onThemeChange,
@@ -58,13 +42,11 @@ export const FrontCard = ({
   onStickerRemove,
   onStickerRotate
 }: FrontCardProps) => {
+  const navigate = useNavigate();
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleColorChange = (color: string) => {
-    onThemeChange({
-      ...selectedThemeOption,
-      screenBgColor: color
-    });
+  const handleBackClick = () => {
+    navigate('/home');
   };
 
   const getPatternStyle = (pattern: ThemeOption['pattern']) => {
@@ -108,47 +90,17 @@ export const FrontCard = ({
       <div className="relative z-10 min-h-screen flex flex-col">
         <div className="flex items-center justify-between p-4">
           <button 
-            onClick={onBack}
+            onClick={handleBackClick}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
           
-          <div className="flex items-center gap-2">
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="h-10 px-4 rounded-full">
-                  <div 
-                    className="w-4 h-4 rounded-full mr-2"
-                    style={{ backgroundColor: selectedThemeOption.screenBgColor }}
-                  />
-                  Background
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-64 p-4">
-                <div className="grid grid-cols-4 gap-2">
-                  {colorOptions.map((color) => (
-                    <button
-                      key={color.value}
-                      className="w-12 h-12 rounded-lg border-2 transition-all hover:scale-105"
-                      style={{ 
-                        backgroundColor: color.value,
-                        borderColor: selectedThemeOption.screenBgColor === color.value ? '#000' : 'transparent'
-                      }}
-                      onClick={() => handleColorChange(color.value)}
-                      title={color.name}
-                    />
-                  ))}
-                </div>
-              </PopoverContent>
-            </Popover>
-
-            <ThemeSelector
-              themes={[selectedThemeOption]}
-              selectedTheme={selectedThemeOption}
-              onThemeChange={onThemeChange}
-            />
-          </div>
+          <ThemeSelector
+            themes={[selectedThemeOption]}
+            selectedTheme={selectedThemeOption}
+            onThemeChange={onThemeChange}
+          />
           
           <Button 
             onClick={onNext}
