@@ -366,7 +366,7 @@ const FrontCardContent = () => {
           </div>
           
           <Button 
-            onClick={() => navigate('/insideleftscreen')}
+            onClick={() => navigate('/insideleftcard')}
             className="px-3 sm:px-6 py-1.5 sm:py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors text-sm sm:text-base flex-shrink-0"
           >
             Next
