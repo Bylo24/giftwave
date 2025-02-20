@@ -27,6 +27,7 @@ const PreviewAnimation = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [confettiOpacity, setConfettiOpacity] = useState(1);
   const [bgColor, setBgColor] = useState("#f3e8ff");
+  const [cardBgColor, setCardBgColor] = useState("#ffffff");
   
   const isAnimatingRef = useRef(false);
   const pendingUpdateRef = useRef(false);
@@ -48,7 +49,11 @@ const PreviewAnimation = () => {
       console.log('Updating background color to:', giftDesign.screen_bg_color);
       setBgColor(giftDesign.screen_bg_color);
     }
-  }, [giftDesign?.screen_bg_color]);
+    if (giftDesign?.card_bg_color) {
+      console.log('Updating card background color to:', giftDesign.card_bg_color);
+      setCardBgColor(giftDesign.card_bg_color);
+    }
+  }, [giftDesign?.screen_bg_color, giftDesign?.card_bg_color]);
 
   useEffect(() => {
     if (giftDesign && !isPreviewMode && !isFinalized && giftDesign.status === 'draft') {
@@ -115,6 +120,52 @@ const PreviewAnimation = () => {
     }
   }, [showConfetti]);
 
+  const handleColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    console.log('Changing screen color to:', newColor);
+    setBgColor(newColor);
+
+    if (!token) return;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ screen_bg_color: newColor })
+        .eq('token', token);
+
+      if (updateError) throw updateError;
+    } catch (err) {
+      console.error('Error updating background color:', err);
+      toast.error('Failed to save background color');
+      if (giftDesign?.screen_bg_color) {
+        setBgColor(giftDesign.screen_bg_color);
+      }
+    }
+  };
+
+  const handleCardColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newColor = e.target.value;
+    console.log('Changing card color to:', newColor);
+    setCardBgColor(newColor);
+
+    if (!token) return;
+
+    try {
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ card_bg_color: newColor })
+        .eq('token', token);
+
+      if (updateError) throw updateError;
+    } catch (err) {
+      console.error('Error updating card background color:', err);
+      toast.error('Failed to save card background color');
+      if (giftDesign?.card_bg_color) {
+        setCardBgColor(giftDesign.card_bg_color);
+      }
+    }
+  };
+
   const handlePageChange = (direction: 'next' | 'previous') => {
     if (isFlipping) return;
     
@@ -138,29 +189,6 @@ const PreviewAnimation = () => {
         isAnimatingRef.current = false;
       }
     }, ANIMATION_DURATION);
-  };
-
-  const handleColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
-    console.log('Changing color to:', newColor);
-    setBgColor(newColor);
-
-    if (!token) return;
-
-    try {
-      const { error: updateError } = await supabase
-        .from('gift_designs')
-        .update({ screen_bg_color: newColor })
-        .eq('token', token);
-
-      if (updateError) throw updateError;
-    } catch (err) {
-      console.error('Error updating background color:', err);
-      toast.error('Failed to save background color');
-      if (giftDesign?.screen_bg_color) {
-        setBgColor(giftDesign.screen_bg_color);
-      }
-    }
   };
 
   const nextPage = () => handlePageChange('next');
@@ -230,7 +258,7 @@ const PreviewAnimation = () => {
   const themeOption = {
     text: "Happy Birthday!",
     emoji: "🎉",
-    bgColor: "bg-purple-100",
+    bgColor: cardBgColor,
     screenBgColor: bgColor,
     textColors: ["text-purple-600"],
     pattern: {
@@ -244,17 +272,30 @@ const PreviewAnimation = () => {
       className="min-h-screen flex flex-col items-center justify-center px-8 py-12 sm:p-6"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Color picker */}
-      <div className="fixed top-4 right-4 flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg z-50">
-        <Input
-          type="color"
-          value={bgColor}
-          onChange={handleColorChange}
-          className="w-12 h-12 p-1 cursor-pointer"
-        />
-        <span className="text-sm font-medium text-gray-600">
-          Background Color
-        </span>
+      {/* Color pickers */}
+      <div className="fixed top-4 right-4 flex flex-col gap-4">
+        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+          <Input
+            type="color"
+            value={bgColor}
+            onChange={handleColorChange}
+            className="w-12 h-12 p-1 cursor-pointer"
+          />
+          <span className="text-sm font-medium text-gray-600">
+            Screen Color
+          </span>
+        </div>
+        <div className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-lg">
+          <Input
+            type="color"
+            value={cardBgColor}
+            onChange={handleCardColorChange}
+            className="w-12 h-12 p-1 cursor-pointer"
+          />
+          <span className="text-sm font-medium text-gray-600">
+            Card Color
+          </span>
+        </div>
       </div>
 
       {showConfetti && (
@@ -294,10 +335,11 @@ const PreviewAnimation = () => {
           {[0, 1, 2, 3].map((pageIndex) => (
             <div
               key={`${pageIndex}-${giftDesign.id}`}
-              className="w-full h-full absolute bg-white rounded-xl shadow-xl"
+              className="w-full h-full absolute rounded-xl shadow-xl"
               style={{
                 transform: `rotateY(${pageIndex * 90}deg) translateZ(200px)`,
-                backfaceVisibility: "hidden"
+                backfaceVisibility: "hidden",
+                backgroundColor: cardBgColor
               }}
             >
               <PreviewCard
