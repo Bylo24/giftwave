@@ -39,17 +39,11 @@ export const useGiftDesign = (token: string | null) => {
     queryFn: async () => {
       if (!token) throw new Error('No token provided');
       
-      let query = supabase
+      const { data, error } = await supabase
         .from('gift_designs')
         .select('*')
-        .eq('token', token);
-
-      // If user is logged in, also check user_id
-      if (user) {
-        query = query.eq('user_id', user.id);
-      }
-
-      const { data, error } = await query.maybeSingle();
+        .eq('token', token)
+        .single();
 
       if (error) {
         console.error('Error fetching gift design:', error);
@@ -105,6 +99,11 @@ export const useGiftDesign = (token: string | null) => {
   // Use realtime data if available, otherwise use initial data
   const giftDesign = realtimeGiftDesign || initialGiftDesign;
 
+  // Update isEditable to include preview status since we're still in the gift creation flow
+  const isEditable = giftDesign?.status === 'draft' || 
+                    giftDesign?.status === 'editing' || 
+                    giftDesign?.status === 'preview';
+
   return {
     giftDesign,
     isLoading,
@@ -112,7 +111,7 @@ export const useGiftDesign = (token: string | null) => {
     startEditing,
     finalizeGiftDesign,
     setPreviewMode,
-    isEditable: giftDesign?.status === 'draft' || giftDesign?.status === 'editing',
+    isEditable,
     isPreviewMode: giftDesign?.status === 'preview',
     isFinalized: giftDesign?.status === 'finalized' || giftDesign?.status === 'sent'
   };
