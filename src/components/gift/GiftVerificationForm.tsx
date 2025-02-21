@@ -1,36 +1,78 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 interface GiftVerificationFormProps {
   className?: string;
+  giftToken: string;
 }
 
-export const GiftVerificationForm = ({ className }: GiftVerificationFormProps) => {
+export const GiftVerificationForm = ({ className, giftToken }: GiftVerificationFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
   const [showVerification, setShowVerification] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handlePhoneSubmit = (e: React.FormEvent) => {
+  const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Verification code sent",
-      description: "Please check your phone for the code",
-    });
-    setShowVerification(true);
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('verify-recipient', {
+        body: { giftToken, phoneNumber }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Verification code sent",
+        description: "Please check your phone for the code",
+      });
+      setShowVerification(true);
+    } catch (error) {
+      console.error('Verification error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to send verification code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  const handleCodeSubmit = (e: React.FormEvent) => {
+  const handleCodeSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Gift collected!",
-      description: "The money has been added to your wallet",
-    });
-    navigate("/wallet");
+    setIsLoading(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('complete-collection', {
+        body: { giftToken, verificationCode }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Success!",
+        description: "The money has been added to your wallet",
+      });
+      navigate("/wallet");
+    } catch (error) {
+      console.error('Collection error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to verify code",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -51,10 +93,11 @@ export const GiftVerificationForm = ({ className }: GiftVerificationFormProps) =
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full">
-            Send Verification Code
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Sending..." : "Send Verification Code"}
           </Button>
         </form>
       ) : (
@@ -67,10 +110,11 @@ export const GiftVerificationForm = ({ className }: GiftVerificationFormProps) =
               onChange={(e) => setVerificationCode(e.target.value)}
               maxLength={6}
               required
+              disabled={isLoading}
             />
           </div>
-          <Button type="submit" className="w-full">
-            Verify and Collect Gift
+          <Button type="submit" className="w-full" disabled={isLoading}>
+            {isLoading ? "Verifying..." : "Verify and Collect Gift"}
           </Button>
         </form>
       )}
