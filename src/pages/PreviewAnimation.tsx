@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -220,13 +219,12 @@ const PreviewAnimation = () => {
     }
   };
 
-  const handleContinue = async () => {
+  const handleProceedToPayment = async () => {
     if (!token || !giftDesign) {
       toast.error("Gift details not found");
       return;
     }
 
-    // Check if we have a valid amount
     if (!giftDesign.selected_amount || giftDesign.selected_amount <= 0) {
       toast.error("Please select a gift amount first");
       navigate(`/select-amount?token=${token}`);
@@ -241,32 +239,39 @@ const PreviewAnimation = () => {
         {
           body: { 
             giftId: giftDesign.id,
+            token: token,
             amount: giftDesign.selected_amount,
-            token: token
+            returnUrl: `${window.location.origin}/payment-success`
           }
         }
       );
 
       toast.dismiss(loadingToast);
 
-      if (checkoutError || !sessionData) {
+      if (checkoutError || !sessionData?.url) {
         console.error('Checkout error:', checkoutError);
         toast.error("Failed to create checkout session");
         return;
       }
 
-      const checkoutUrl = sessionData.url;
-      if (!checkoutUrl) {
-        console.error('No URL in session data:', sessionData);
-        toast.error("Invalid checkout response");
+      const { error: updateError } = await supabase
+        .from('gift_designs')
+        .update({ 
+          status: 'preview',
+          stripe_session_id: sessionData.sessionId
+        })
+        .eq('token', token);
+
+      if (updateError) {
+        console.error('Status update error:', updateError);
+        toast.error("Failed to update gift status");
         return;
       }
 
-      // Redirect to Stripe Checkout
-      window.location.href = checkoutUrl;
+      window.location.href = sessionData.url;
 
     } catch (error) {
-      console.error('Checkout error:', error);
+      console.error('Payment initiation error:', error);
       toast.error("Failed to start checkout process");
     }
   };
@@ -312,7 +317,6 @@ const PreviewAnimation = () => {
       className="min-h-screen flex flex-col items-center px-4 pb-8 pt-8 md:px-8 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
-      {/* Color palette selector */}
       <div className="mb-8 w-[85vw] max-w-[360px]">
         <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20">
           <h3 className="text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
@@ -373,7 +377,6 @@ const PreviewAnimation = () => {
         </div>
       )}
       
-      {/* Main content container */}
       <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto">
         <PreviewNavigationButtons
           onPrevious={previousPage}
@@ -415,13 +418,12 @@ const PreviewAnimation = () => {
         </PreviewContainer>
       </div>
 
-      {/* Continue button */}
       <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-auto pt-12">
         <Button
-          onClick={handleContinue}
+          onClick={handleProceedToPayment}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
         >
-          Continue to Payment
+          Proceed to Payment
         </Button>
       </div>
     </div>
