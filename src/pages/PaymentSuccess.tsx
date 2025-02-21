@@ -1,48 +1,57 @@
 
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { ContentCard } from "@/components/layout/ContentCard";
+import { useGiftDesign } from "@/hooks/useGiftDesign";
+import { useGiftPayment } from "@/hooks/useGiftPayment";
+import { Loader2 } from "lucide-react";
 
 const PaymentSuccess = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const sessionId = searchParams.get("session_id");
   const token = searchParams.get("token");
+  
+  const { giftDesign } = useGiftDesign(token);
+  const { usePaymentStatus } = useGiftPayment();
+  const { data: paymentStatus, isLoading } = usePaymentStatus(giftDesign?.id);
 
   useEffect(() => {
-    const handlePaymentSuccess = async () => {
-      if (!sessionId || !token) {
-        toast.error("Missing payment information");
-        navigate("/");
-        return;
-      }
+    if (!token) {
+      toast.error("Missing payment information");
+      navigate("/");
+      return;
+    }
 
-      try {
-        const { data, error } = await supabase.functions.invoke(
-          "handle-payment-success",
-          {
-            body: { sessionId, token },
-          }
-        );
+    if (paymentStatus?.status === 'failed') {
+      toast.error("Payment failed. Please try again.");
+      navigate("/");
+      return;
+    }
 
-        if (error) throw error;
+    if (paymentStatus?.status === 'succeeded') {
+      toast.success("Payment successful! Your gift is now active.");
+    }
+  }, [token, paymentStatus, navigate]);
 
-        toast.success("Payment successful! Your gift is now active.");
-        navigate("/my-gifts");
-      } catch (error) {
-        console.error("Payment confirmation error:", error);
-        toast.error("Failed to confirm payment");
-        navigate("/");
-      }
-    };
-
-    handlePaymentSuccess();
-  }, [sessionId, token, navigate]);
+  if (isLoading || !paymentStatus || paymentStatus.status === 'processing') {
+    return (
+      <PageContainer>
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <ContentCard>
+            <div className="text-center space-y-4">
+              <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-600" />
+              <h2 className="text-xl font-semibold">Processing Payment...</h2>
+              <p className="text-gray-600">Please wait while we confirm your payment.</p>
+            </div>
+          </ContentCard>
+        </div>
+      </PageContainer>
+    );
+  }
 
   return (
     <PageContainer>
