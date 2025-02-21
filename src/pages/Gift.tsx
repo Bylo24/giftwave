@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
 import { ThemeType } from "@/utils/giftThemes";
 import InsideLeftCard from "@/components/gift/InsideLeftCard";
 import { AmountStep } from "@/components/gift/AmountStep";
@@ -9,17 +8,13 @@ import { BlankCard } from "@/components/gift/cards/BlankCard";
 import { useStickerManager } from "@/hooks/useStickerManager";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
 import { stickerOptions } from "@/constants/giftOptions";
-import { toast } from "sonner";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { useGiftNavigation, GiftStep, GiftPage } from "@/components/gift/stages/GiftNavigationManager";
+import { RecipientStage } from "@/components/gift/stages/RecipientStage";
 
 const GiftContent = () => {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [currentPage, setCurrentPage] = useState<'front' | 'blank' | 'inside-left'>('front');
-  const [currentStep, setCurrentStep] = useState<'recipient' | 'message' | 'amount' | 'memory' | 'reveal' | 'preview' | 'payment'>('recipient');
-  const [previousSteps, setPreviousSteps] = useState<Array<'recipient' | 'message' | 'amount' | 'memory' | 'reveal' | 'preview' | 'payment'>>([]);
   const [selectedTheme] = useState<ThemeType>('holiday');
   const [phoneNumber, setPhoneNumber] = useState('');
   const [messageVideo, setMessageVideo] = useState<File | null>(null);
@@ -40,6 +35,13 @@ const GiftContent = () => {
     handleStickerRotate
   } = useStickerManager();
 
+  const {
+    currentPage,
+    currentStep,
+    goToPreviousStep,
+    goToNextStep
+  } = useGiftNavigation();
+
   const handleAddMemory = (memory: Omit<{ id: string; imageUrl?: string; caption: string; date: Date }, "id">) => {
     const newMemory = {
       ...memory,
@@ -58,44 +60,10 @@ const GiftContent = () => {
     }
 
     setMessageVideo(file);
-    // Create a temporary URL for the video file
     const videoUrl = URL.createObjectURL(file);
     setMessageVideoUrl(videoUrl);
   };
 
-  const goToPreviousStep = () => {
-    if (currentPage === 'inside-left') {
-      setCurrentPage('blank');
-    } else if (currentPage === 'blank') {
-      setCurrentPage('front');
-    } else if (previousSteps.length > 0) {
-      const prevStep = previousSteps[previousSteps.length - 1];
-      setCurrentStep(prevStep);
-      setPreviousSteps(prev => prev.slice(0, -1));
-    } else {
-      navigate('/');
-    }
-  };
-
-  const goToNextStep = async () => {
-    if (currentStep === 'memory') {
-      setPreviousSteps(prev => [...prev, currentStep]);
-      setCurrentStep('reveal');
-      return Promise.resolve();
-    }
-
-    if (currentPage === 'front') {
-      setCurrentPage('blank');
-    } else if (currentPage === 'blank') {
-      navigate('/insideleftscreen');
-    } else {
-      setPreviousSteps(prev => [...prev, currentStep]);
-      setCurrentStep('memory');
-    }
-    return Promise.resolve();
-  };
-
-  // Clean up object URLs when component unmounts
   useEffect(() => {
     return () => {
       if (messageVideoUrl) {
@@ -215,7 +183,14 @@ const GiftContent = () => {
     );
   }
 
-  return null;
+  return (
+    <RecipientStage
+      phoneNumber={phoneNumber}
+      setPhoneNumber={setPhoneNumber}
+      onNext={goToNextStep}
+      onBack={goToPreviousStep}
+    />
+  );
 };
 
 const Gift = () => {

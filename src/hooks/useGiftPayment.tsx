@@ -78,8 +78,8 @@ export const useGiftPayment = () => {
         return data as PaymentEvent;
       },
       enabled: !!giftDesignId,
-      refetchInterval: (data: PaymentEvent | undefined) => {
-        // Refetch every 5 seconds until we get a final status
+      refetchInterval: (query) => {
+        const data = query.state.data as PaymentEvent | undefined;
         if (!data || ['pending', 'processing'].includes(data.status)) {
           return 5000;
         }
