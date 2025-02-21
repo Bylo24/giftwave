@@ -1,13 +1,15 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
-import Confetti from 'react-confetti';
 import { PreviewNavigationButtons } from "@/components/gift/preview/PreviewNavigationButtons";
 import { PreviewCard } from "@/components/gift/preview/PreviewCard";
 import { PreviewContainer } from "@/components/gift/preview/PreviewContainer";
+import { ColorPaletteSelector } from "@/components/gift/preview/ColorPaletteSelector";
+import { ConfettiOverlay } from "@/components/gift/preview/ConfettiOverlay";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { useGiftDesign } from "@/hooks/useGiftDesign";
+import { useGiftPayment } from "@/hooks/useGiftPayment";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { colorPalettes } from "@/constants/colorPalettes";
@@ -45,21 +47,7 @@ const PreviewAnimation = () => {
     startEditing
   } = useGiftDesign(token);
 
-  useEffect(() => {
-    if (giftDesign?.screen_bg_color) {
-      const paletteIndex = colorPalettes.findIndex(p => 
-        p.screenBg.toLowerCase() === giftDesign.screen_bg_color.toLowerCase() &&
-        p.cardBg.toLowerCase() === giftDesign.card_bg_color.toLowerCase()
-      );
-      
-      if (paletteIndex !== -1) {
-        setSelectedPaletteIndex(paletteIndex);
-      }
-      
-      setBgColor(giftDesign.screen_bg_color);
-      setCardBgColor(giftDesign.card_bg_color);
-    }
-  }, [giftDesign?.screen_bg_color, giftDesign?.card_bg_color]);
+  const { handleProceedToPayment } = useGiftPayment();
 
   const handlePaletteChange = async (index: number) => {
     const newPalette = colorPalettes[index];
@@ -89,6 +77,22 @@ const PreviewAnimation = () => {
       setSelectedPaletteIndex(selectedPaletteIndex);
     }
   };
+
+  useEffect(() => {
+    if (giftDesign?.screen_bg_color) {
+      const paletteIndex = colorPalettes.findIndex(p => 
+        p.screenBg.toLowerCase() === giftDesign.screen_bg_color.toLowerCase() &&
+        p.cardBg.toLowerCase() === giftDesign.card_bg_color.toLowerCase()
+      );
+      
+      if (paletteIndex !== -1) {
+        setSelectedPaletteIndex(paletteIndex);
+      }
+      
+      setBgColor(giftDesign.screen_bg_color);
+      setCardBgColor(giftDesign.card_bg_color);
+    }
+  }, [giftDesign?.screen_bg_color, giftDesign?.card_bg_color]);
 
   useEffect(() => {
     if (giftDesign?.screen_bg_color) {
@@ -219,63 +223,6 @@ const PreviewAnimation = () => {
     }
   };
 
-  const handleProceedToPayment = async () => {
-    if (!token || !giftDesign) {
-      toast.error("Gift details not found");
-      return;
-    }
-
-    if (!giftDesign.selected_amount || giftDesign.selected_amount <= 0) {
-      toast.error("Please select a gift amount first");
-      navigate(`/select-amount?token=${token}`);
-      return;
-    }
-
-    try {
-      const loadingToast = toast.loading("Preparing checkout...");
-
-      const { data: sessionData, error: checkoutError } = await supabase.functions.invoke(
-        'create-checkout-session',
-        {
-          body: { 
-            giftId: giftDesign.id,
-            token: token,
-            amount: giftDesign.selected_amount,
-            returnUrl: `${window.location.origin}/payment-success`
-          }
-        }
-      );
-
-      toast.dismiss(loadingToast);
-
-      if (checkoutError || !sessionData?.url) {
-        console.error('Checkout error:', checkoutError);
-        toast.error("Failed to create checkout session");
-        return;
-      }
-
-      const { error: updateError } = await supabase
-        .from('gift_designs')
-        .update({ 
-          status: 'preview',
-          stripe_session_id: sessionData.sessionId
-        })
-        .eq('token', token);
-
-      if (updateError) {
-        console.error('Status update error:', updateError);
-        toast.error("Failed to update gift status");
-        return;
-      }
-
-      window.location.href = sessionData.url;
-
-    } catch (error) {
-      console.error('Payment initiation error:', error);
-      toast.error("Failed to start checkout process");
-    }
-  };
-
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -317,65 +264,15 @@ const PreviewAnimation = () => {
       className="min-h-screen flex flex-col items-center px-4 pb-8 pt-8 md:px-8 transition-colors duration-300"
       style={{ backgroundColor: bgColor }}
     >
-      <div className="mb-8 w-[85vw] max-w-[360px]">
-        <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20">
-          <h3 className="text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
-            Color Theme
-          </h3>
-          <div className="grid grid-cols-2 gap-2">
-            {colorPalettes.map((palette, index) => (
-              <button
-                key={palette.name}
-                onClick={() => handlePaletteChange(index)}
-                className={`group flex items-center gap-2 p-2 rounded-xl transition-all duration-300 ${
-                  selectedPaletteIndex === index 
-                    ? 'bg-purple-50 shadow-sm scale-[0.98]' 
-                    : 'hover:bg-gray-50/50 hover:scale-[1.02]'
-                }`}
-              >
-                <div 
-                  className={`w-6 h-6 rounded-lg border-2 transition-shadow duration-300 ${
-                    selectedPaletteIndex === index 
-                      ? 'border-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.35)]' 
-                      : 'border-gray-200 group-hover:border-purple-200'
-                  }`}
-                  style={{ backgroundColor: palette.screenBg }}
-                />
-                <span className={`text-xs transition-colors duration-300 ${
-                  selectedPaletteIndex === index 
-                    ? 'text-purple-700' 
-                    : 'text-gray-600 group-hover:text-gray-800'
-                }`}>
-                  {palette.name}
-                </span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+      <ColorPaletteSelector
+        selectedPaletteIndex={selectedPaletteIndex}
+        onPaletteChange={handlePaletteChange}
+      />
 
-      {showConfetti && (
-        <div style={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%',
-          opacity: confettiOpacity,
-          transition: 'opacity 0.5s ease-out',
-          pointerEvents: 'none'
-        }}>
-          <Confetti
-            width={window.innerWidth}
-            height={window.innerHeight}
-            recycle={false}
-            numberOfPieces={150}
-            gravity={0.5}
-            initialVelocityY={15}
-            colors={['#FF69B4', '#9370DB', '#4B0082', '#FF1493', '#8A2BE2']}
-          />
-        </div>
-      )}
+      <ConfettiOverlay
+        show={showConfetti}
+        opacity={confettiOpacity}
+      />
       
       <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md relative mx-auto">
         <PreviewNavigationButtons
@@ -420,7 +317,7 @@ const PreviewAnimation = () => {
 
       <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-auto pt-12">
         <Button
-          onClick={handleProceedToPayment}
+          onClick={() => handleProceedToPayment(token, giftDesign)}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
         >
           Proceed to Payment
