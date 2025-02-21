@@ -63,18 +63,33 @@ export const GiftVerificationForm = ({ className, giftToken }: GiftVerificationF
 
       // Update user's wallet balance
       if (user) {
-        const { data: gift } = await supabase
+        // First get the gift amount
+        const { data: gift, error: giftError } = await supabase
           .from('gifts')
           .select('amount')
           .eq('token', giftToken)
           .single();
 
+        if (giftError) throw giftError;
+
         if (gift) {
+          // Get current profile balance
+          const { data: profile, error: profileError } = await supabase
+            .from('profiles')
+            .select('wallet_balance')
+            .eq('id', user.id)
+            .single();
+
+          if (profileError) throw profileError;
+
+          // Calculate new balance
+          const currentBalance = profile?.wallet_balance || 0;
+          const newBalance = currentBalance + gift.amount;
+
+          // Update the balance
           const { error: updateError } = await supabase
             .from('profiles')
-            .update({
-              wallet_balance: supabase.rpc('increment_balance', { amount: gift.amount })
-            })
+            .update({ wallet_balance: newBalance })
             .eq('id', user.id);
 
           if (updateError) throw updateError;
