@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { GiftDesign } from "./useGiftDesign";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, Query } from "@tanstack/react-query";
 import { Database } from "@/integrations/supabase/types";
 
 type PaymentEvent = Database["public"]["Tables"]["payment_events"]["Row"];
