@@ -47,10 +47,10 @@ serve(async (req) => {
 
   try {
     const { giftId, amount, token, returnUrl } = await req.json();
-    console.log('Processing checkout for gift:', { giftId, amount, token });
+    console.log('Processing checkout for gift:', { giftId, amount, token, returnUrl });
 
-    if (!giftId || !amount || amount <= 0 || !token) {
-      throw new Error('Invalid parameters: Amount must be greater than 0');
+    if (!giftId || !amount || amount <= 0 || !token || !returnUrl) {
+      throw new Error('Invalid parameters: Missing required fields');
     }
 
     // Verify gift exists and amount matches
@@ -114,8 +114,7 @@ serve(async (req) => {
       .from('gift_designs')
       .update({ 
         stripe_session_id: session.id,
-        platform_fee: platformFee,
-        status: 'preview'
+        platform_fee: platformFee
       })
       .eq('id', giftId);
 
