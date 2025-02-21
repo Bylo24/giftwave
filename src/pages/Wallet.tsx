@@ -1,18 +1,33 @@
 
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Wallet as WalletIcon, Plus, Download } from "lucide-react";
 import { Link } from "react-router-dom";
 import { AddCard } from "@/components/wallet/AddCard";
 import { SavedCards } from "@/components/wallet/SavedCards";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 const Wallet = () => {
   const { session, user } = useAuth();
   const [firstName, setFirstName] = useState<string>('there');
+  const [balance, setBalance] = useState<number>(0);
+  const [profile, setProfile] = useState<any>(null);
+  const [isWithdrawDialogOpen, setIsWithdrawDialogOpen] = useState(false);
+  const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -21,52 +36,95 @@ const Wallet = () => {
       try {
         const { data, error } = await supabase
           .from('profiles')
-          .select('full_name')
+          .select('*, withdrawals(*)')
           .eq('id', user.id)
-          .maybeSingle();
+          .single();
 
         if (error) throw error;
 
-        if (data?.full_name) {
-          // Get the first word from full_name
-          const firstWord = data.full_name.split(' ')[0];
+        if (data) {
+          const firstWord = data.full_name?.split(' ')[0] || 'there';
           setFirstName(firstWord);
+          setProfile(data);
+          setBalance(data.wallet_balance || 0);
+          setWithdrawals(data.withdrawals || []);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
+        toast.error('Failed to load wallet information');
       }
     };
 
     fetchProfile();
   }, [user]);
 
-  useEffect(() => {
-    const ensureStripeCustomer = async () => {
-      if (!session?.access_token) {
-        console.error('No auth session available');
-        return;
-      }
+  const handleCreateConnectAccount = async () => {
+    if (!session?.access_token) return;
+    
+    try {
+      setIsLoading(true);
+      const { data, error } = await supabase.functions.invoke('create-connect-account', {
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
 
-      try {
-        const { error } = await supabase.functions.invoke(
-          'ensure-stripe-customer',
-          {
-            headers: {
-              Authorization: `Bearer ${session.access_token}`
-            }
-          }
-        );
-        if (error) throw error;
-      } catch (error) {
-        console.error('Error ensuring Stripe customer:', error);
-        toast.error('Failed to initialize payment system');
+      if (error) throw error;
+      
+      if (data.url) {
+        window.location.href = data.url;
       }
-    };
-
-    if (user && session?.access_token) {
-      ensureStripeCustomer();
+    } catch (error) {
+      console.error('Error creating connect account:', error);
+      toast.error('Failed to set up withdrawal account');
+    } finally {
+      setIsLoading(false);
     }
-  }, [user, session]);
+  };
+
+  const handleWithdraw = async () => {
+    if (!session?.access_token || !withdrawAmount) return;
+
+    try {
+      setIsLoading(true);
+      const amount = parseFloat(withdrawAmount);
+
+      if (isNaN(amount) || amount <= 0) {
+        throw new Error('Please enter a valid amount');
+      }
+
+      if (amount > balance) {
+        throw new Error('Insufficient balance');
+      }
+
+      const { data, error } = await supabase.functions.invoke('process-withdrawal', {
+        body: { amount },
+        headers: { Authorization: `Bearer ${session.access_token}` }
+      });
+
+      if (error) throw error;
+
+      toast.success('Withdrawal processed successfully');
+      setIsWithdrawDialogOpen(false);
+      setWithdrawAmount("");
+      
+      // Refresh profile to get updated balance
+      const { data: updatedProfile } = await supabase
+        .from('profiles')
+        .select('*, withdrawals(*)')
+        .eq('id', user.id)
+        .single();
+
+      if (updatedProfile) {
+        setProfile(updatedProfile);
+        setBalance(updatedProfile.wallet_balance || 0);
+        setWithdrawals(updatedProfile.withdrawals || []);
+      }
+    } catch (error) {
+      console.error('Error processing withdrawal:', error);
+      toast.error(error.message || 'Failed to process withdrawal');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   if (!session?.access_token) {
     return (
@@ -97,7 +155,7 @@ const Wallet = () => {
             <h2 className="text-lg font-semibold">Your Balance</h2>
           </div>
           <div className="space-y-1">
-            <p className="text-3xl font-bold">$0.00</p>
+            <p className="text-3xl font-bold">${balance.toFixed(2)}</p>
             <p className="text-sm opacity-80">Available balance</p>
           </div>
         </Card>
@@ -113,10 +171,18 @@ const Wallet = () => {
 
           <Card 
             className="p-4 text-center cursor-pointer hover:bg-white/80 transition-colors backdrop-blur-lg border border-gray-200/20 shadow-lg"
-            onClick={() => {/* Deposit handler */}}
+            onClick={() => {
+              if (!profile?.stripe_connect_account_id) {
+                handleCreateConnectAccount();
+              } else {
+                setIsWithdrawDialogOpen(true);
+              }
+            }}
           >
             <Download className="h-6 w-6 mx-auto mb-2 text-primary" />
-            <p className="font-medium">Deposit</p>
+            <p className="font-medium">
+              {!profile?.stripe_connect_account_id ? 'Set Up Withdrawals' : 'Withdraw'}
+            </p>
           </Card>
         </div>
 
@@ -130,11 +196,63 @@ const Wallet = () => {
 
         <div className="space-y-4">
           <h3 className="text-lg font-semibold">Recent Activity</h3>
-          <Card className="p-4 backdrop-blur-lg border border-gray-200/20 shadow-lg">
-            <p className="text-center text-gray-500">No recent transactions</p>
+          <Card className="divide-y divide-gray-100 backdrop-blur-lg border border-gray-200/20 shadow-lg">
+            {withdrawals.length > 0 ? (
+              withdrawals.map((withdrawal) => (
+                <div key={withdrawal.id} className="p-4">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <p className="font-medium">Withdrawal</p>
+                      <p className="text-sm text-gray-500">
+                        {new Date(withdrawal.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
+                    <p className={`font-medium ${withdrawal.status === 'completed' ? 'text-green-600' : 'text-amber-600'}`}>
+                      -${withdrawal.amount.toFixed(2)}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="p-4">
+                <p className="text-center text-gray-500">No recent transactions</p>
+              </div>
+            )}
           </Card>
         </div>
       </div>
+
+      <Dialog open={isWithdrawDialogOpen} onOpenChange={setIsWithdrawDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Withdraw Funds</DialogTitle>
+            <DialogDescription>
+              Enter the amount you wish to withdraw to your bank account.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Amount</label>
+              <Input
+                type="number"
+                value={withdrawAmount}
+                onChange={(e) => setWithdrawAmount(e.target.value)}
+                placeholder="Enter amount"
+                min="0"
+                step="0.01"
+                max={balance}
+              />
+            </div>
+            <Button 
+              className="w-full"
+              onClick={handleWithdraw}
+              disabled={isLoading || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > balance}
+            >
+              {isLoading ? 'Processing...' : 'Withdraw Funds'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <BottomNav />
     </div>

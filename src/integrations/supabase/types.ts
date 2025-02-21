@@ -420,9 +420,12 @@ export type Database = {
           last_verification_attempt: string | null
           phone_number: string | null
           phone_verified: boolean | null
+          stripe_connect_account_id: string | null
+          stripe_connect_account_status: string | null
           updated_at: string
           username: string | null
           verification_attempts: number | null
+          wallet_balance: number | null
         }
         Insert: {
           avatar_url?: string | null
@@ -432,9 +435,12 @@ export type Database = {
           last_verification_attempt?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
+          stripe_connect_account_id?: string | null
+          stripe_connect_account_status?: string | null
           updated_at?: string
           username?: string | null
           verification_attempts?: number | null
+          wallet_balance?: number | null
         }
         Update: {
           avatar_url?: string | null
@@ -444,9 +450,12 @@ export type Database = {
           last_verification_attempt?: string | null
           phone_number?: string | null
           phone_verified?: boolean | null
+          stripe_connect_account_id?: string | null
+          stripe_connect_account_status?: string | null
           updated_at?: string
           username?: string | null
           verification_attempts?: number | null
+          wallet_balance?: number | null
         }
         Relationships: []
       }
@@ -511,6 +520,47 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      withdrawals: {
+        Row: {
+          amount: number
+          created_at: string
+          error_message: string | null
+          id: string
+          status: string | null
+          stripe_payout_id: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string | null
+          stripe_payout_id?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          error_message?: string | null
+          id?: string
+          status?: string | null
+          stripe_payout_id?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "withdrawals_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

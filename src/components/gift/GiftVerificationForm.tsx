@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface GiftVerificationFormProps {
   className?: string;
@@ -14,6 +15,7 @@ interface GiftVerificationFormProps {
 export const GiftVerificationForm = ({ className, giftToken }: GiftVerificationFormProps) => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
   const [showVerification, setShowVerification] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState("");
   const [verificationCode, setVerificationCode] = useState("");
@@ -52,11 +54,32 @@ export const GiftVerificationForm = ({ className, giftToken }: GiftVerificationF
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.functions.invoke('complete-collection', {
+      // Complete the gift collection
+      const { data: collectionData, error: collectionError } = await supabase.functions.invoke('complete-collection', {
         body: { giftToken, verificationCode }
       });
 
-      if (error) throw error;
+      if (collectionError) throw collectionError;
+
+      // Update user's wallet balance
+      if (user) {
+        const { data: gift } = await supabase
+          .from('gifts')
+          .select('amount')
+          .eq('token', giftToken)
+          .single();
+
+        if (gift) {
+          const { error: updateError } = await supabase
+            .from('profiles')
+            .update({
+              wallet_balance: supabase.rpc('increment_balance', { amount: gift.amount })
+            })
+            .eq('id', user.id);
+
+          if (updateError) throw updateError;
+        }
+      }
 
       toast({
         title: "Success!",
