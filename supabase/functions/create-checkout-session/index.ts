@@ -8,7 +8,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Initialize Stripe
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
@@ -19,7 +18,6 @@ const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 serve(async (req) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -28,15 +26,16 @@ serve(async (req) => {
     const { giftId, amount, token } = await req.json();
     console.log('Processing checkout for gift:', { giftId, amount, token });
 
-    if (!giftId || !amount || !token) {
-      throw new Error('Missing required parameters');
+    if (!giftId || !amount || amount <= 0 || !token) {
+      throw new Error('Invalid parameters: Amount must be greater than 0');
     }
 
-    // Get gift details from database
+    // Verify gift exists and amount matches
     const { data: giftData, error: giftError } = await supabase
       .from('gift_designs')
       .select('*')
       .eq('id', giftId)
+      .eq('token', token)
       .single();
 
     if (giftError || !giftData) {
@@ -44,7 +43,11 @@ serve(async (req) => {
       throw new Error('Gift not found');
     }
 
-    // Create Stripe checkout session
+    if (giftData.selected_amount !== amount) {
+      console.error('Amount mismatch:', { stored: giftData.selected_amount, requested: amount });
+      throw new Error('Amount mismatch');
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -66,7 +69,6 @@ serve(async (req) => {
     });
 
     console.log('Created checkout session:', session.id);
-    console.log('Returning URL:', session.url);
 
     return new Response(
       JSON.stringify({ url: session.url }),

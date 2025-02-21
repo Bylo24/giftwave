@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -271,6 +272,13 @@ const PreviewAnimation = () => {
       return;
     }
 
+    // Check if we have a valid amount
+    if (!giftDesign.selected_amount || giftDesign.selected_amount <= 0) {
+      toast.error("Please select a gift amount first");
+      navigate(`/select-amount?token=${token}`);
+      return;
+    }
+
     try {
       const loadingToast = toast.loading("Preparing checkout...");
 
@@ -279,15 +287,13 @@ const PreviewAnimation = () => {
         {
           body: { 
             giftId: giftDesign.id,
-            amount: giftDesign.selected_amount || 0,
+            amount: giftDesign.selected_amount,
             token: token
           }
         }
       );
 
       toast.dismiss(loadingToast);
-
-      console.log('Received session data:', sessionData);
 
       if (checkoutError || !sessionData) {
         console.error('Checkout error:', checkoutError);
@@ -302,7 +308,6 @@ const PreviewAnimation = () => {
         return;
       }
 
-      console.log("Redirecting to checkout URL:", checkoutUrl);
       window.location.href = checkoutUrl;
 
     } catch (error) {
