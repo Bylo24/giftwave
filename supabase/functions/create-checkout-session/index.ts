@@ -8,12 +8,7 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-if (!stripeKey) {
-  throw new Error('STRIPE_SECRET_KEY is not set');
-}
-
-const stripe = new Stripe(stripeKey, {
+const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
 });
@@ -51,21 +46,14 @@ serve(async (req) => {
   }
 
   try {
-    console.log('Starting checkout process...');
     const { giftId, amount, token, returnUrl } = await req.json();
-    console.log('Received parameters:', { giftId, amount, token, returnUrl });
+    console.log('Processing checkout for gift:', { giftId, amount, token, returnUrl });
 
     if (!giftId || !amount || amount <= 0 || !token || !returnUrl) {
-      const missingParams = [];
-      if (!giftId) missingParams.push('giftId');
-      if (!amount) missingParams.push('amount');
-      if (!token) missingParams.push('token');
-      if (!returnUrl) missingParams.push('returnUrl');
-      throw new Error(`Invalid parameters: Missing ${missingParams.join(', ')}`);
+      throw new Error('Invalid parameters: Missing required fields');
     }
 
     // Verify gift exists and amount matches
-    console.log('Fetching gift design...');
     const { data: giftData, error: giftError } = await supabase
       .from('gift_designs')
       .select('*')
@@ -73,85 +61,75 @@ serve(async (req) => {
       .eq('token', token)
       .single();
 
-    if (giftError) {
+    if (giftError || !giftData) {
       console.error('Error fetching gift:', giftError);
-      throw new Error(`Gift not found: ${giftError.message}`);
-    }
-
-    if (!giftData) {
       throw new Error('Gift not found');
     }
 
     if (giftData.selected_amount !== amount) {
       console.error('Amount mismatch:', { stored: giftData.selected_amount, requested: amount });
-      throw new Error(`Amount mismatch: stored=${giftData.selected_amount}, requested=${amount}`);
+      throw new Error('Amount mismatch');
     }
 
     // Calculate platform fee
     const platformFee = calculatePlatformFee(amount);
     console.log('Calculated platform fee:', platformFee);
 
-    try {
-      console.log('Creating Stripe checkout session...');
-      const session = await stripe.checkout.sessions.create({
-        payment_method_types: ['card'],
-        line_items: [
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: 'Gift Amount',
-                description: 'Gift payment through GiftWave'
-              },
-              unit_amount: Math.round(amount * 100), // Convert to cents
-            },
-            quantity: 1,
-          },
-          {
-            price_data: {
-              currency: 'usd',
-              product_data: {
-                name: 'Platform Fee',
-                description: 'GiftWave service fee'
-              },
-              unit_amount: Math.round(platformFee * 100), // Convert to cents
-            },
-            quantity: 1,
-          }
-        ],
-        mode: 'payment',
-        success_url: `${returnUrl}?session_id={CHECKOUT_SESSION_ID}&token=${token}`,
-        cancel_url: `${req.headers.get('origin')}/previewanimation?token=${token}`,
-      });
-
-      console.log('Successfully created checkout session:', session.id);
-
-      // Update gift design with session ID and platform fee
-      console.log('Updating gift design...');
-      const { error: updateError } = await supabase
-        .from('gift_designs')
-        .update({ 
-          stripe_session_id: session.id,
-          platform_fee: platformFee
-        })
-        .eq('id', giftId);
-
-      if (updateError) {
-        console.error('Error updating gift design:', updateError);
-        // Continue anyway as this is not critical
-      }
-
-      return new Response(
-        JSON.stringify({ url: session.url }),
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
         {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 200,
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Gift Amount',
+              description: 'Gift payment through GiftWave'
+            },
+            unit_amount: Math.round(amount * 100), // Convert to cents
+          },
+          quantity: 1,
+        },
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: 'Platform Fee',
+              description: 'GiftWave service fee'
+            },
+            unit_amount: Math.round(platformFee * 100), // Convert to cents
+          },
+          quantity: 1,
         }
-      );
-    } catch (stripeError) {
-      console.error('Stripe error:', stripeError);
-      throw new Error(`Stripe error: ${stripeError.message}`);
+      ],
+      mode: 'payment',
+      success_url: `${returnUrl}?session_id={CHECKOUT_SESSION_ID}&token=${token}`,
+      cancel_url: `${req.headers.get('origin')}/previewanimation?token=${token}`,
+    });
+
+    console.log('Created checkout session:', session.id);
+
+    // Update gift design with session ID and platform fee
+    const { error: updateError } = await supabase
+      .from('gift_designs')
+      .update({ 
+        stripe_session_id: session.id,
+        platform_fee: platformFee
+      })
+      .eq('id', giftId);
+
+    if (updateError) {
+      console.error('Error updating gift design:', updateError);
+      // Continue anyway as this is not critical
     }
+
+    return new Response(
+      JSON.stringify({ url: session.url }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
   } catch (error) {
     console.error('Checkout error:', error);
     return new Response(
