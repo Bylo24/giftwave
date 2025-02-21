@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -266,7 +265,7 @@ const PreviewAnimation = () => {
     }
   };
 
-  const handleCheckout = async () => {
+  const handleContinue = () => {
     if (!token || !giftDesign) {
       toast.error("Gift details not found");
       return;
@@ -279,41 +278,8 @@ const PreviewAnimation = () => {
       return;
     }
 
-    try {
-      const loadingToast = toast.loading("Preparing checkout...");
-
-      const { data: sessionData, error: checkoutError } = await supabase.functions.invoke(
-        'create-checkout-session',
-        {
-          body: { 
-            giftId: giftDesign.id,
-            amount: giftDesign.selected_amount,
-            token: token
-          }
-        }
-      );
-
-      toast.dismiss(loadingToast);
-
-      if (checkoutError || !sessionData) {
-        console.error('Checkout error:', checkoutError);
-        toast.error("Failed to create checkout session");
-        return;
-      }
-
-      const checkoutUrl = sessionData.url;
-      if (!checkoutUrl) {
-        console.error('No URL in session data:', sessionData);
-        toast.error("Invalid checkout response");
-        return;
-      }
-
-      window.location.href = checkoutUrl;
-
-    } catch (error) {
-      console.error('Checkout error:', error);
-      toast.error("Failed to start checkout process");
-    }
+    // For now, just navigate to a success page
+    navigate('/gift-success');
   };
 
   if (!token) {
@@ -464,13 +430,13 @@ const PreviewAnimation = () => {
         </PreviewContainer>
       </div>
 
-      {/* Choose a Person button - pushed to bottom */}
+      {/* Continue button */}
       <div className="w-full max-w-[280px] xs:max-w-[320px] sm:max-w-md mx-auto mt-auto pt-12">
         <Button
-          onClick={handleCheckout}
+          onClick={handleContinue}
           className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 rounded-lg shadow-lg transform transition-all duration-200 hover:scale-[1.02]"
         >
-          Continue to Cart
+          Continue
         </Button>
       </div>
     </div>
