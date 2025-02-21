@@ -14,7 +14,6 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { colorPalettes } from "@/constants/colorPalettes";
 import { supabase } from "@/integrations/supabase/client";
-import { PaymentModal } from "@/components/gift/preview/PaymentModal";
 
 const ANIMATION_DURATION = 500;
 const CONFETTI_DURATION = 1500;
@@ -48,13 +47,7 @@ const PreviewAnimation = () => {
     startEditing
   } = useGiftDesign(token);
 
-  const { 
-    handleProceedToPayment,
-    isPaymentModalOpen,
-    clientSecret,
-    handlePaymentSuccess,
-    handleClosePaymentModal
-  } = useGiftPayment();
+  const { handleProceedToPayment } = useGiftPayment();
 
   const handlePaletteChange = async (index: number) => {
     const newPalette = colorPalettes[index];
@@ -330,13 +323,6 @@ const PreviewAnimation = () => {
           Proceed to Payment
         </Button>
       </div>
-
-      <PaymentModal
-        isOpen={isPaymentModalOpen}
-        onClose={handleClosePaymentModal}
-        clientSecret={clientSecret}
-        onSuccess={handlePaymentSuccess}
-      />
     </div>
   );
 };

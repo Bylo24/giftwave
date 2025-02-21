@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,8 +6,6 @@ import { GiftDesign } from "./useGiftDesign";
 
 export const useGiftPayment = () => {
   const navigate = useNavigate();
-  const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
-  const [clientSecret, setClientSecret] = useState<string | null>(null);
 
   const handleProceedToPayment = async (token: string | null, giftDesign: GiftDesign | null) => {
     if (!token || !giftDesign) {
@@ -23,50 +20,36 @@ export const useGiftPayment = () => {
     }
 
     try {
-      const loadingToast = toast.loading("Preparing payment...");
+      const loadingToast = toast.loading("Preparing checkout...");
 
-      const { data: response, error: paymentError } = await supabase.functions.invoke(
-        'create-payment-intent',
+      const { data: response, error: checkoutError } = await supabase.functions.invoke(
+        'create-checkout-session',
         {
           body: { 
             giftId: giftDesign.id,
             token: token,
             amount: giftDesign.selected_amount,
+            returnUrl: `${window.location.origin}/payment-success`
           }
         }
       );
 
       toast.dismiss(loadingToast);
 
-      if (paymentError || !response?.clientSecret) {
-        console.error('Payment error:', paymentError, response);
-        toast.error("Failed to initialize payment");
+      if (checkoutError || !response?.url) {
+        console.error('Checkout error:', checkoutError, response);
+        toast.error("Failed to create checkout session");
         return;
       }
 
-      setClientSecret(response.clientSecret);
-      setIsPaymentModalOpen(true);
+      // Redirect to Stripe checkout
+      window.location.href = response.url;
 
     } catch (error) {
       console.error('Payment initiation error:', error);
-      toast.error("Failed to start payment process");
+      toast.error("Failed to start checkout process");
     }
   };
 
-  const handlePaymentSuccess = () => {
-    setIsPaymentModalOpen(false);
-    navigate('/payment-success');
-  };
-
-  const handleClosePaymentModal = () => {
-    setIsPaymentModalOpen(false);
-  };
-
-  return {
-    handleProceedToPayment,
-    isPaymentModalOpen,
-    clientSecret,
-    handlePaymentSuccess,
-    handleClosePaymentModal
-  };
+  return { handleProceedToPayment };
 };
