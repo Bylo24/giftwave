@@ -152,17 +152,21 @@ export type Database = {
         Row: {
           card_bg_color: string | null
           created_at: string
+          dispute_status: string | null
           editing_session_id: string | null
           editing_user_id: string | null
           front_card_pattern: string | null
           front_card_stickers: Json | null
           id: string
           last_edited_at: string | null
+          last_webhook_event_id: string | null
           memories: Json | null
           message_video_url: string | null
           paid_at: string | null
+          payment_failure_reason: string | null
           payment_status: string | null
           platform_fee: number | null
+          refund_status: string | null
           screen_bg_color: string | null
           selected_amount: number | null
           status: string | null
@@ -174,17 +178,21 @@ export type Database = {
         Insert: {
           card_bg_color?: string | null
           created_at?: string
+          dispute_status?: string | null
           editing_session_id?: string | null
           editing_user_id?: string | null
           front_card_pattern?: string | null
           front_card_stickers?: Json | null
           id?: string
           last_edited_at?: string | null
+          last_webhook_event_id?: string | null
           memories?: Json | null
           message_video_url?: string | null
           paid_at?: string | null
+          payment_failure_reason?: string | null
           payment_status?: string | null
           platform_fee?: number | null
+          refund_status?: string | null
           screen_bg_color?: string | null
           selected_amount?: number | null
           status?: string | null
@@ -196,17 +204,21 @@ export type Database = {
         Update: {
           card_bg_color?: string | null
           created_at?: string
+          dispute_status?: string | null
           editing_session_id?: string | null
           editing_user_id?: string | null
           front_card_pattern?: string | null
           front_card_stickers?: Json | null
           id?: string
           last_edited_at?: string | null
+          last_webhook_event_id?: string | null
           memories?: Json | null
           message_video_url?: string | null
           paid_at?: string | null
+          payment_failure_reason?: string | null
           payment_status?: string | null
           platform_fee?: number | null
+          refund_status?: string | null
           screen_bg_color?: string | null
           selected_amount?: number | null
           status?: string | null
@@ -343,6 +355,53 @@ export type Database = {
           },
         ]
       }
+      payment_events: {
+        Row: {
+          amount: number | null
+          created_at: string
+          event_type: string
+          fee_amount: number | null
+          gift_design_id: string | null
+          id: string
+          metadata: Json | null
+          processed_at: string
+          status: Database["public"]["Enums"]["payment_event_status"]
+          stripe_event_id: string
+        }
+        Insert: {
+          amount?: number | null
+          created_at?: string
+          event_type: string
+          fee_amount?: number | null
+          gift_design_id?: string | null
+          id?: string
+          metadata?: Json | null
+          processed_at?: string
+          status: Database["public"]["Enums"]["payment_event_status"]
+          stripe_event_id: string
+        }
+        Update: {
+          amount?: number | null
+          created_at?: string
+          event_type?: string
+          fee_amount?: number | null
+          gift_design_id?: string | null
+          id?: string
+          metadata?: Json | null
+          processed_at?: string
+          status?: Database["public"]["Enums"]["payment_event_status"]
+          stripe_event_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payment_events_gift_design_id_fkey"
+            columns: ["gift_design_id"]
+            isOneToOne: false
+            referencedRelation: "gift_designs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -415,6 +474,14 @@ export type Database = {
     }
     Enums: {
       card_page_type: "front" | "inside_left" | "inside_right" | "back"
+      payment_event_status:
+        | "pending"
+        | "processing"
+        | "succeeded"
+        | "failed"
+        | "refunded"
+        | "disputed"
+        | "expired"
     }
     CompositeTypes: {
       [_ in never]: never
