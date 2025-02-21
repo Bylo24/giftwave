@@ -1,8 +1,8 @@
 
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
-import Stripe from 'https://esm.sh/stripe@14.12.0?target=deno';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.38.4";
+import Stripe from "https://esm.sh/stripe@14.12.0?target=deno";
 
-// Define CORS headers
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -14,13 +14,12 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') ?? '', {
   httpClient: Stripe.createFetchHttpClient(),
 });
 
-// Initialize Supabase client
-const supabaseUrl = Deno.env.get('SUPABASE_URL');
-const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? '';
+const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-const supabase = createClient(supabaseUrl!, supabaseKey!);
-
-Deno.serve(async (req) => {
+serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -33,6 +32,19 @@ Deno.serve(async (req) => {
       throw new Error('Missing required parameters');
     }
 
+    // Get gift details from database
+    const { data: giftData, error: giftError } = await supabase
+      .from('gift_designs')
+      .select('*')
+      .eq('id', giftId)
+      .single();
+
+    if (giftError || !giftData) {
+      console.error('Error fetching gift:', giftError);
+      throw new Error('Gift not found');
+    }
+
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -43,7 +55,7 @@ Deno.serve(async (req) => {
               name: 'Gift Payment',
               description: 'Gift payment through GiftWave'
             },
-            unit_amount: Math.round(amount * 100),
+            unit_amount: Math.round(amount * 100), // Convert to cents
           },
           quantity: 1,
         },
