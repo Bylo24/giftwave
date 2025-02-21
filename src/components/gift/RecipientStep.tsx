@@ -17,14 +17,16 @@ interface RecipientStepProps {
   recipientName: string;
   setRecipientName: (value: string) => void;
   onNext: () => void;
+  onBack: () => void;
 }
 
 export const RecipientStep = ({ 
   phoneNumber, 
-  setPhoneNumber, 
+  setPhoneNumber,
   recipientName,
   setRecipientName,
-  onNext 
+  onNext,
+  onBack
 }: RecipientStepProps) => {
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // Only allow numbers
@@ -176,13 +178,23 @@ export const RecipientStep = ({
         </div>
       </div>
 
-      <Button 
-        className="w-full bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity"
-        onClick={onNext}
-        disabled={!phoneNumber || phoneNumber.length < 10 || !recipientName.trim()}
-      >
-        Continue to Preview
-      </Button>
+      <div className="flex flex-col gap-2">
+        <Button 
+          className="w-full bg-gradient-to-r from-primary to-purple-600 hover:opacity-90 transition-opacity"
+          onClick={onNext}
+          disabled={!phoneNumber || phoneNumber.length < 10 || !recipientName.trim()}
+        >
+          Continue to Preview
+        </Button>
+
+        <Button 
+          variant="outline"
+          className="w-full"
+          onClick={onBack}
+        >
+          Go Back
+        </Button>
+      </div>
 
       <p className="text-sm text-gray-500 text-center">
         We'll send them a special notification when their gift is ready!

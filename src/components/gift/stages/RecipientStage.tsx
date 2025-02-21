@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { PageContainer } from "@/components/layout/PageContainer";
 import { motion } from "framer-motion";
 import { RecipientStep } from "@/components/gift/RecipientStep";
@@ -17,6 +17,8 @@ export const RecipientStage: React.FC<RecipientStageProps> = ({
   onNext,
   onBack
 }) => {
+  const [recipientName, setRecipientName] = useState('');
+
   return (
     <PageContainer>
       <div className="min-h-screen flex items-center justify-center p-4">
@@ -28,6 +30,8 @@ export const RecipientStage: React.FC<RecipientStageProps> = ({
           <RecipientStep
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
+            recipientName={recipientName}
+            setRecipientName={setRecipientName}
             onNext={onNext}
             onBack={onBack}
           />
