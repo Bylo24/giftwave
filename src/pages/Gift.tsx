@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from "react";
+import { toast } from "sonner";
 import { ThemeType } from "@/utils/giftThemes";
 import InsideLeftCard from "@/components/gift/InsideLeftCard";
 import { AmountStep } from "@/components/gift/AmountStep";
@@ -11,7 +12,7 @@ import { stickerOptions } from "@/constants/giftOptions";
 import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { MemoryReplayScreen } from "@/components/gift/MemoryReplayScreen";
 import { PageContainer } from "@/components/layout/PageContainer";
-import { useGiftNavigation, GiftStep, GiftPage } from "@/components/gift/stages/GiftNavigationManager";
+import { useGiftNavigation } from "@/components/gift/stages/GiftNavigationManager";
 import { RecipientStage } from "@/components/gift/stages/RecipientStage";
 
 const GiftContent = () => {
@@ -80,10 +81,7 @@ const GiftContent = () => {
           amount={amount}
           memories={memories}
           memory={null}
-          onComplete={() => {
-            setPreviousSteps(prev => [...prev, 'reveal']);
-            setCurrentStep('preview');
-          }}
+          onComplete={goToNextStep}
         />
       </PageContainer>
     );
@@ -176,7 +174,7 @@ const GiftContent = () => {
       <PageContainer>
         <InsideLeftCard
           selectedThemeOption={selectedThemeOption}
-          onBack={() => setCurrentPage('blank')}
+          onBack={goToPreviousStep}
           onNext={goToNextStep}
         />
       </PageContainer>

@@ -2,6 +2,7 @@
 import React from 'react';
 import { PageContainer } from "@/components/layout/PageContainer";
 import { motion } from "framer-motion";
+import { RecipientStep } from "@/components/gift/RecipientStep";
 
 interface RecipientStageProps {
   phoneNumber: string;
@@ -24,7 +25,6 @@ export const RecipientStage: React.FC<RecipientStageProps> = ({
           animate={{ opacity: 1, y: 0 }}
           className="w-full max-w-md"
         >
-          {/* RecipientStep component already exists, reuse it */}
           <RecipientStep
             phoneNumber={phoneNumber}
             setPhoneNumber={setPhoneNumber}
