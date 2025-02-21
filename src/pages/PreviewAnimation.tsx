@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -166,52 +167,6 @@ const PreviewAnimation = () => {
     }
   }, [showConfetti]);
 
-  const handleColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
-    console.log('Changing screen color to:', newColor);
-    setBgColor(newColor);
-
-    if (!token) return;
-
-    try {
-      const { error: updateError } = await supabase
-        .from('gift_designs')
-        .update({ screen_bg_color: newColor })
-        .eq('token', token);
-
-      if (updateError) throw updateError;
-    } catch (err) {
-      console.error('Error updating background color:', err);
-      toast.error('Failed to save background color');
-      if (giftDesign?.screen_bg_color) {
-        setBgColor(giftDesign.screen_bg_color);
-      }
-    }
-  };
-
-  const handleCardColorChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newColor = e.target.value;
-    console.log('Changing card color to:', newColor);
-    setCardBgColor(newColor);
-
-    if (!token) return;
-
-    try {
-      const { error: updateError } = await supabase
-        .from('gift_designs')
-        .update({ card_bg_color: newColor })
-        .eq('token', token);
-
-      if (updateError) throw updateError;
-    } catch (err) {
-      console.error('Error updating card background color:', err);
-      toast.error('Failed to save card background color');
-      if (giftDesign?.card_bg_color) {
-        setCardBgColor(giftDesign.card_bg_color);
-      }
-    }
-  };
-
   const handlePageChange = (direction: 'next' | 'previous') => {
     if (isFlipping) return;
     
@@ -265,7 +220,7 @@ const PreviewAnimation = () => {
     }
   };
 
-  const handleContinue = () => {
+  const handleContinue = async () => {
     if (!token || !giftDesign) {
       toast.error("Gift details not found");
       return;
@@ -351,10 +306,6 @@ const PreviewAnimation = () => {
       </div>
     );
   }
-
-  const handleChoosePerson = () => {
-    navigate('/choose-person');
-  };
 
   return (
     <div 
