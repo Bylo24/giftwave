@@ -4,6 +4,9 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { GiftDesign } from "./useGiftDesign";
 import { useQuery } from "@tanstack/react-query";
+import { Database } from "@/integrations/supabase/types";
+
+type PaymentEvent = Database["public"]["Tables"]["payment_events"]["Row"];
 
 export const useGiftPayment = () => {
   const navigate = useNavigate();
@@ -72,10 +75,10 @@ export const useGiftPayment = () => {
           .single();
 
         if (error) throw error;
-        return data;
+        return data as PaymentEvent;
       },
       enabled: !!giftDesignId,
-      refetchInterval: (data) => {
+      refetchInterval: (data: PaymentEvent | undefined) => {
         // Refetch every 5 seconds until we get a final status
         if (!data || ['pending', 'processing'].includes(data.status)) {
           return 5000;
