@@ -267,6 +267,9 @@ export type Database = {
       gifts: {
         Row: {
           amount: number
+          collected_at: string | null
+          collection_status: string | null
+          collector_id: string | null
           created_at: string
           id: string
           message_video_url: string | null
@@ -284,6 +287,9 @@ export type Database = {
         }
         Insert: {
           amount: number
+          collected_at?: string | null
+          collection_status?: string | null
+          collector_id?: string | null
           created_at?: string
           id?: string
           message_video_url?: string | null
@@ -301,6 +307,9 @@ export type Database = {
         }
         Update: {
           amount?: number
+          collected_at?: string | null
+          collection_status?: string | null
+          collector_id?: string | null
           created_at?: string
           id?: string
           message_video_url?: string | null
@@ -440,6 +449,47 @@ export type Database = {
           verification_attempts?: number | null
         }
         Relationships: []
+      }
+      recipient_verifications: {
+        Row: {
+          attempts: number | null
+          created_at: string
+          expires_at: string
+          gift_id: string
+          id: string
+          phone_number: string
+          verification_code: string
+          verified_at: string | null
+        }
+        Insert: {
+          attempts?: number | null
+          created_at?: string
+          expires_at: string
+          gift_id: string
+          id?: string
+          phone_number: string
+          verification_code: string
+          verified_at?: string | null
+        }
+        Update: {
+          attempts?: number | null
+          created_at?: string
+          expires_at?: string
+          gift_id?: string
+          id?: string
+          phone_number?: string
+          verification_code?: string
+          verified_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "recipient_verifications_gift_id_fkey"
+            columns: ["gift_id"]
+            isOneToOne: false
+            referencedRelation: "gifts"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       stripe_customers: {
         Row: {
