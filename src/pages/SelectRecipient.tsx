@@ -72,6 +72,10 @@ const SelectRecipientContent = () => {
     }
   };
 
+  const handleBack = () => {
+    navigate(-1);
+  };
+
   return (
     <PageContainer>
       <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
@@ -79,7 +83,7 @@ const SelectRecipientContent = () => {
           variant="ghost"
           size="icon"
           className="rounded-full w-10 h-10 hover:bg-gray-100"
-          onClick={() => navigate(-1)}
+          onClick={handleBack}
         >
           <ArrowLeft className="h-5 w-5 text-gray-600" />
         </Button>
@@ -92,6 +96,7 @@ const SelectRecipientContent = () => {
           recipientName={recipientName}
           setRecipientName={setRecipientName}
           onNext={handleNext}
+          onBack={handleBack}
         />
       </div>
     </PageContainer>
