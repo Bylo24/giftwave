@@ -9,19 +9,15 @@ export const useGiftPayment = () => {
 
   const handleProceedToPayment = async (token: string | null, giftDesign: GiftDesign | null) => {
     if (!token || !giftDesign) {
-      toast.error("Gift details not found");
       return;
     }
 
     if (!giftDesign.selected_amount || giftDesign.selected_amount <= 0) {
-      toast.error("Please select a gift amount first");
       navigate(`/select-amount?token=${token}`);
       return;
     }
 
     try {
-      const loadingToast = toast.loading("Preparing checkout...");
-
       const { data: response, error: checkoutError } = await supabase.functions.invoke(
         'create-checkout-session',
         {
@@ -33,8 +29,6 @@ export const useGiftPayment = () => {
           }
         }
       );
-
-      toast.dismiss(loadingToast);
 
       if (checkoutError || !response?.url) {
         console.error('Checkout error:', checkoutError, response);
