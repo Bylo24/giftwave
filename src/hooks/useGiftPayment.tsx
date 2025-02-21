@@ -38,7 +38,6 @@ export const useGiftPayment = () => {
 
       if (checkoutError || !response?.url) {
         console.error('Checkout error:', checkoutError, response);
-        toast.error("Failed to create checkout session");
         return;
       }
 
@@ -47,7 +46,6 @@ export const useGiftPayment = () => {
 
     } catch (error) {
       console.error('Payment initiation error:', error);
-      toast.error("Failed to start checkout process");
     }
   };
 
