@@ -22,7 +22,7 @@ export const useGiftPayment = () => {
     try {
       const loadingToast = toast.loading("Preparing checkout...");
 
-      const { data: sessionData, error: checkoutError } = await supabase.functions.invoke(
+      const { data: response, error: checkoutError } = await supabase.functions.invoke(
         'create-checkout-session',
         {
           body: { 
@@ -36,27 +36,14 @@ export const useGiftPayment = () => {
 
       toast.dismiss(loadingToast);
 
-      if (checkoutError || !sessionData?.url) {
-        console.error('Checkout error:', checkoutError);
+      if (checkoutError || !response?.url) {
+        console.error('Checkout error:', checkoutError, response);
         toast.error("Failed to create checkout session");
         return;
       }
 
-      const { error: updateError } = await supabase
-        .from('gift_designs')
-        .update({ 
-          status: 'preview',
-          stripe_session_id: sessionData.sessionId
-        })
-        .eq('token', token);
-
-      if (updateError) {
-        console.error('Status update error:', updateError);
-        toast.error("Failed to update gift status");
-        return;
-      }
-
-      window.location.href = sessionData.url;
+      // Redirect to Stripe checkout
+      window.location.href = response.url;
 
     } catch (error) {
       console.error('Payment initiation error:', error);
