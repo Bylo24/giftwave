@@ -21,4 +21,8 @@ export interface Withdrawal {
   paypal_details?: PayPalDetails;
   card_details?: CardDetails;
   currency: string;
+  instant_payout?: boolean;
+  estimated_arrival?: string;
+  stripe_transfer_id?: string;
 }
+

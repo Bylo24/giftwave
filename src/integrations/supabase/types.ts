@@ -500,6 +500,39 @@ export type Database = {
           },
         ]
       }
+      stripe_connect_accounts: {
+        Row: {
+          account_id: string
+          account_status: string
+          account_type: string
+          created_at: string
+          id: string
+          instant_payouts_enabled: boolean | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          account_status?: string
+          account_type: string
+          created_at?: string
+          id?: string
+          instant_payouts_enabled?: boolean | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          account_status?: string
+          account_type?: string
+          created_at?: string
+          id?: string
+          instant_payouts_enabled?: boolean | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       stripe_customers: {
         Row: {
           created_at: string
@@ -527,10 +560,13 @@ export type Database = {
           bank_details: Json | null
           created_at: string
           error_message: string | null
+          estimated_arrival: string | null
           id: string
+          instant_payout: boolean | null
           method: string | null
           status: string | null
           stripe_payout_id: string | null
+          stripe_transfer_id: string | null
           updated_at: string
           user_id: string
         }
@@ -539,10 +575,13 @@ export type Database = {
           bank_details?: Json | null
           created_at?: string
           error_message?: string | null
+          estimated_arrival?: string | null
           id?: string
+          instant_payout?: boolean | null
           method?: string | null
           status?: string | null
           stripe_payout_id?: string | null
+          stripe_transfer_id?: string | null
           updated_at?: string
           user_id: string
         }
@@ -551,10 +590,13 @@ export type Database = {
           bank_details?: Json | null
           created_at?: string
           error_message?: string | null
+          estimated_arrival?: string | null
           id?: string
+          instant_payout?: boolean | null
           method?: string | null
           status?: string | null
           stripe_payout_id?: string | null
+          stripe_transfer_id?: string | null
           updated_at?: string
           user_id?: string
         }

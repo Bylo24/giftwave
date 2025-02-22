@@ -1,4 +1,3 @@
-
 import { Mail, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,6 +20,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Switch } from "@/components/ui/switch";
 
 interface WithdrawalDialogProps {
   isOpen: boolean;
@@ -48,16 +48,32 @@ export const WithdrawalDialog = ({
   const [paypalEmail, setPaypalEmail] = useState("");
   const [isVerifyingPayPal, setIsVerifyingPayPal] = useState(false);
   const [selectedCard, setSelectedCard] = useState<string>("");
+  const [useInstantPayout, setUseInstantPayout] = useState(false);
 
-  const { data: paymentMethods } = useQuery({
-    queryKey: ['payment-methods'],
+  const { data: connectAccount } = useQuery({
+    queryKey: ['connect-account'],
     queryFn: async () => {
-      const { data: { paymentMethods }, error } = await supabase.functions.invoke('list-payment-methods');
+      const { data, error } = await supabase
+        .from('stripe_connect_accounts')
+        .select('*')
+        .single();
       if (error) throw error;
-      return paymentMethods;
+      return data;
     },
     enabled: isOpen && withdrawalMethod === 'card'
   });
+
+  const handleCreateConnectAccount = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-connect-account');
+      if (error) throw error;
+      
+      // Redirect to Stripe Connect onboarding
+      window.location.href = data.url;
+    } catch (error) {
+      toast.error("Failed to create Connect account");
+    }
+  };
 
   const handlePayPalVerification = async () => {
     setIsVerifyingPayPal(true);
@@ -73,6 +89,19 @@ export const WithdrawalDialog = ({
 
   const renderCardForm = () => {
     if (withdrawalMethod !== 'card') return null;
+
+    if (!connectAccount) {
+      return (
+        <div className="space-y-4">
+          <p className="text-sm text-gray-600">
+            To receive payments to your card, you need to set up a Stripe Connect account.
+          </p>
+          <Button onClick={handleCreateConnectAccount} className="w-full">
+            Set up Card Payments
+          </Button>
+        </div>
+      );
+    }
 
     return (
       <div className="space-y-4">
@@ -94,9 +123,25 @@ export const WithdrawalDialog = ({
             </SelectContent>
           </Select>
         </div>
+
+        {connectAccount?.instant_payouts_enabled && (
+          <div className="flex items-center space-x-2">
+            <Switch
+              checked={useInstantPayout}
+              onCheckedChange={setUseInstantPayout}
+              id="instant-payout"
+            />
+            <label htmlFor="instant-payout" className="text-sm text-gray-600">
+              Instant payout (available within 30 minutes)
+            </label>
+          </div>
+        )}
+
         <div className="mt-4 p-4 bg-blue-50 rounded-lg">
           <p className="text-sm text-blue-700">
-            Card withdrawals are typically processed within 1-3 business days. Standard processing fees may apply.
+            {useInstantPayout
+              ? "Card withdrawals will be processed instantly for a small fee."
+              : "Card withdrawals are typically processed within 1-3 business days."}
           </p>
         </div>
       </div>
