@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card } from "@/components/ui/card";
-import { Gift, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -51,7 +51,11 @@ const CollectSignup = () => {
       <Card className="w-full max-w-md p-6 space-y-8 bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl">
         <div className="text-center space-y-2">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
-            <Gift className="h-8 w-8 text-white" />
+            <img 
+              src="/giftwave-icon.svg" 
+              alt="GiftWave" 
+              className="h-8 w-8"
+            />
           </div>
           <h1 className="text-2xl font-bold text-gray-900">Collect Your Gift</h1>
           <p className="text-gray-600">Create an account to receive your gift in your GiftWave wallet</p>
