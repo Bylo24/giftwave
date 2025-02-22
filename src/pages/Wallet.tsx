@@ -58,28 +58,6 @@ const Wallet = () => {
     fetchProfile();
   }, [user]);
 
-  const handleCreateConnectAccount = async () => {
-    if (!session?.access_token) return;
-    
-    try {
-      setIsLoading(true);
-      const { data, error } = await supabase.functions.invoke('create-connect-account', {
-        headers: { Authorization: `Bearer ${session.access_token}` }
-      });
-
-      if (error) throw error;
-      
-      if (data.url) {
-        window.location.href = data.url;
-      }
-    } catch (error) {
-      console.error('Error creating connect account:', error);
-      toast.error('Failed to set up withdrawal account');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const handleWithdraw = async () => {
     if (!session?.access_token || !withdrawAmount) return;
 
@@ -102,7 +80,7 @@ const Wallet = () => {
 
       if (error) throw error;
 
-      toast.success('Withdrawal processed successfully');
+      toast.success('Withdrawal processed successfully. The money will be sent to your PayPal account.');
       setIsWithdrawDialogOpen(false);
       setWithdrawAmount("");
       
@@ -171,18 +149,10 @@ const Wallet = () => {
 
           <Card 
             className="p-4 text-center cursor-pointer hover:bg-white/80 transition-colors backdrop-blur-lg border border-gray-200/20 shadow-lg"
-            onClick={() => {
-              if (!profile?.stripe_connect_account_id) {
-                handleCreateConnectAccount();
-              } else {
-                setIsWithdrawDialogOpen(true);
-              }
-            }}
+            onClick={() => setIsWithdrawDialogOpen(true)}
           >
             <Download className="h-6 w-6 mx-auto mb-2 text-primary" />
-            <p className="font-medium">
-              {!profile?.stripe_connect_account_id ? 'Set Up Withdrawals' : 'Withdraw'}
-            </p>
+            <p className="font-medium">Withdraw to PayPal</p>
           </Card>
         </div>
 
@@ -202,7 +172,7 @@ const Wallet = () => {
                 <div key={withdrawal.id} className="p-4">
                   <div className="flex justify-between items-center">
                     <div>
-                      <p className="font-medium">Withdrawal</p>
+                      <p className="font-medium">PayPal Withdrawal</p>
                       <p className="text-sm text-gray-500">
                         {new Date(withdrawal.created_at).toLocaleDateString()}
                       </p>
@@ -225,9 +195,9 @@ const Wallet = () => {
       <Dialog open={isWithdrawDialogOpen} onOpenChange={setIsWithdrawDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Withdraw Funds</DialogTitle>
+            <DialogTitle>Withdraw to PayPal</DialogTitle>
             <DialogDescription>
-              Enter the amount you wish to withdraw to your bank account.
+              Enter the amount you wish to withdraw to your PayPal account. The money will be sent to your registered email address.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4">
@@ -248,7 +218,7 @@ const Wallet = () => {
               onClick={handleWithdraw}
               disabled={isLoading || !withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > balance}
             >
-              {isLoading ? 'Processing...' : 'Withdraw Funds'}
+              {isLoading ? 'Processing...' : 'Withdraw to PayPal'}
             </Button>
           </div>
         </DialogContent>
