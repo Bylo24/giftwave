@@ -16,7 +16,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { BankDetails, WithdrawalMethod, PayPalDetails } from "@/types/wallet";
+import { 
+  BankDetails, 
+  WithdrawalMethod, 
+  PayPalDetails,
+  USBankDetails,
+  UKBankDetails,
+  AUBankDetails,
+  EUBankDetails 
+} from "@/types/wallet";
 import { useState } from "react";
 import { toast } from "sonner";
 

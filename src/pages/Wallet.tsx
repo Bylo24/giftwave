@@ -12,7 +12,7 @@ import { WalletBalance } from "@/components/wallet/WalletBalance";
 import { WalletActions } from "@/components/wallet/WalletActions";
 import { WithdrawalDialog } from "@/components/wallet/WithdrawalDialog";
 import { TransactionsList } from "@/components/wallet/TransactionsList";
-import { BankDetails, WithdrawalMethod, Withdrawal } from "@/types/wallet";
+import { BankDetails, WithdrawalMethod, Withdrawal, USBankDetails } from "@/types/wallet";
 
 const Wallet = () => {
   const { session, user } = useAuth();
@@ -28,8 +28,11 @@ const Wallet = () => {
     accountHolderName: '',
     accountNumber: '',
     routingNumber: '',
-    accountType: 'checking'
-  });
+    accountType: 'checking',
+    country: 'US',
+    bankName: '',
+    currency: 'USD'
+  } as USBankDetails);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -49,7 +52,13 @@ const Wallet = () => {
           setFirstName(firstWord);
           setProfile(data);
           setBalance(data.wallet_balance || 0);
-          setWithdrawals(data.withdrawals || []);
+          
+          // Transform withdrawals data to include currency
+          const transformedWithdrawals: Withdrawal[] = (data.withdrawals || []).map((w: any) => ({
+            ...w,
+            currency: w.bank_details?.currency || 'USD' // Default to USD if not specified
+          }));
+          setWithdrawals(transformedWithdrawals);
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -93,8 +102,11 @@ const Wallet = () => {
         accountHolderName: '',
         accountNumber: '',
         routingNumber: '',
-        accountType: 'checking'
-      });
+        accountType: 'checking',
+        country: 'US',
+        bankName: '',
+        currency: 'USD'
+      } as USBankDetails);
       
       const { data: updatedProfile } = await supabase
         .from('profiles')
@@ -105,7 +117,12 @@ const Wallet = () => {
       if (updatedProfile) {
         setProfile(updatedProfile);
         setBalance(updatedProfile.wallet_balance || 0);
-        setWithdrawals(updatedProfile.withdrawals || []);
+        // Transform withdrawals data to include currency
+        const transformedWithdrawals: Withdrawal[] = (updatedProfile.withdrawals || []).map((w: any) => ({
+          ...w,
+          currency: w.bank_details?.currency || 'USD' // Default to USD if not specified
+        }));
+        setWithdrawals(transformedWithdrawals);
       }
     } catch (error) {
       console.error('Error processing withdrawal:', error);
