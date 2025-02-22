@@ -9,8 +9,7 @@ const corsHeaders = {
 
 interface WithdrawalRequest {
   amount: number;
-  method: 'bank' | 'paypal' | 'card';
-  bankDetails?: any;
+  method: 'paypal' | 'card';
   paypalDetails?: { email: string };
   cardDetails?: { paymentMethodId: string };
 }
@@ -39,7 +38,7 @@ serve(async (req) => {
       throw userError || new Error('User not found')
     }
 
-    const { amount, method, bankDetails, paypalDetails, cardDetails }: WithdrawalRequest = await req.json()
+    const { amount, method, paypalDetails, cardDetails }: WithdrawalRequest = await req.json()
 
     // Get user's profile
     const { data: profile, error: profileError } = await supabaseClient
@@ -57,10 +56,6 @@ serve(async (req) => {
     }
 
     // Validate withdrawal details based on method
-    if (method === 'bank' && !bankDetails) {
-      throw new Error('Bank details are required for bank transfers')
-    }
-
     if (method === 'paypal' && !paypalDetails?.email) {
       throw new Error('PayPal email is required for PayPal withdrawals')
     }
@@ -76,7 +71,6 @@ serve(async (req) => {
         user_id: user.id,
         amount,
         method,
-        bank_details: method === 'bank' ? bankDetails : null,
         paypal_details: method === 'paypal' ? paypalDetails : null,
         card_details: method === 'card' ? cardDetails : null,
         status: 'pending'
@@ -104,17 +98,11 @@ serve(async (req) => {
     console.log('Processing withdrawal:', {
       method,
       amount,
-      details: method === 'bank' ? bankDetails : 
-               method === 'paypal' ? paypalDetails : cardDetails
+      details: method === 'paypal' ? paypalDetails : cardDetails
     });
 
-    const processingTime = method === 'paypal' ? '24 hours' : 
-                          method === 'card' ? '1-3 business days' :
-                          '2-5 business days';
-
-    const message = method === 'bank' 
-      ? `Withdrawal initiated. Funds will be transferred to your ${bankDetails.country} bank account within ${processingTime}.`
-      : method === 'card'
+    const processingTime = method === 'paypal' ? '24 hours' : '1-3 business days';
+    const message = method === 'card'
       ? `Withdrawal initiated. Funds will be sent to your card within ${processingTime}.`
       : `Withdrawal initiated. Funds will be sent to your PayPal account (${paypalDetails?.email}) within ${processingTime}.`;
 

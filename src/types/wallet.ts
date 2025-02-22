@@ -1,41 +1,5 @@
 
-export type WithdrawalMethod = 'bank' | 'paypal' | 'card';
-
-export type BankAccountType = 'checking' | 'savings' | 'current' | 'savings_deposit';
-
-export interface BaseBankDetails {
-  accountHolderName: string;
-  bankName: string;
-  accountType: BankAccountType;
-  country: string;
-  currency: string;
-}
-
-export interface USBankDetails extends BaseBankDetails {
-  country: 'US';
-  routingNumber: string;
-  accountNumber: string;
-}
-
-export interface EUBankDetails extends BaseBankDetails {
-  country: string;
-  iban: string;
-  swiftCode: string;
-}
-
-export interface UKBankDetails extends BaseBankDetails {
-  country: 'GB';
-  sortCode: string;
-  accountNumber: string;
-}
-
-export interface AUBankDetails extends BaseBankDetails {
-  country: 'AU';
-  bsb: string;
-  accountNumber: string;
-}
-
-export type BankDetails = USBankDetails | EUBankDetails | UKBankDetails | AUBankDetails;
+export type WithdrawalMethod = 'paypal' | 'card';
 
 export interface PayPalDetails {
   email: string;
@@ -54,7 +18,6 @@ export interface Withdrawal {
   method: WithdrawalMethod;
   status: 'pending' | 'completed' | 'failed';
   created_at: string;
-  bank_details?: BankDetails;
   paypal_details?: PayPalDetails;
   card_details?: CardDetails;
   currency: string;
