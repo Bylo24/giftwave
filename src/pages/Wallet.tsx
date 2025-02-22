@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { BottomNav } from "@/components/ui/bottom-nav";
@@ -107,11 +106,7 @@ const Wallet = () => {
 
       if (error) throw error;
 
-      const successMessage = withdrawalMethod === 'bank' 
-        ? 'Withdrawal processed successfully. The money will be sent to your bank account within 2-3 business days.'
-        : 'Withdrawal processed successfully. The money will be sent to your PayPal account.';
-
-      toast.success(successMessage);
+      toast.success(data.message);
       setIsWithdrawDialogOpen(false);
       setWithdrawAmount("");
       setBankDetails({
@@ -121,7 +116,6 @@ const Wallet = () => {
         accountType: 'checking'
       });
       
-      // Refresh profile to get updated balance
       const { data: updatedProfile } = await supabase
         .from('profiles')
         .select('*, withdrawals(*)')

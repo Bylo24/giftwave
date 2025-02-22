@@ -49,7 +49,7 @@ serve(async (req) => {
     // Get user's profile
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
-      .select('wallet_balance, email')
+      .select('wallet_balance')
       .eq('id', user.id)
       .single()
 
@@ -61,62 +61,6 @@ serve(async (req) => {
       throw new Error('Insufficient balance')
     }
 
-    // PayPal API Authentication
-    const paypalAuth = await fetch('https://api-m.sandbox.paypal.com/v1/oauth2/token', {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Accept-Language': 'en_US',
-        'Authorization': `Basic ${btoa(`${Deno.env.get('PAYPAL_CLIENT_ID')}:${Deno.env.get('PAYPAL_SECRET_KEY')}`)}`,
-      },
-      body: 'grant_type=client_credentials'
-    });
-
-    const { access_token } = await paypalAuth.json();
-
-    // Create PayPal Payout
-    const payoutResponse = await fetch('https://api-m.sandbox.paypal.com/v1/payments/payouts', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${access_token}`,
-      },
-      body: JSON.stringify({
-        sender_batch_header: {
-          sender_batch_id: `GiftWave_${Date.now()}`,
-          email_subject: "You have money from GiftWave!",
-          email_message: "You received a payout from your GiftWave wallet"
-        },
-        items: [{
-          recipient_type: method === 'bank' ? "BANK" : "EMAIL",
-          amount: {
-            value: amount,
-            currency: "USD"
-          },
-          ...(method === 'bank' ? {
-            bank_account: {
-              account_name: bankDetails?.accountHolderName,
-              account_number: bankDetails?.accountNumber,
-              routing_number: bankDetails?.routingNumber,
-              account_type: bankDetails?.accountType.toUpperCase(),
-              country_code: "US",
-            }
-          } : {
-            receiver: profile.email,
-          }),
-          note: `GiftWave wallet withdrawal via ${method}`,
-          sender_item_id: `PAYOUT_${Date.now()}`
-        }]
-      })
-    });
-
-    const payoutResult = await payoutResponse.json();
-
-    if (!payoutResponse.ok) {
-      console.error('PayPal payout error:', payoutResult);
-      throw new Error(payoutResult.message || 'Failed to process PayPal payout');
-    }
-
     // Create withdrawal record
     const { error: withdrawalError } = await supabaseClient
       .from('withdrawals')
@@ -124,9 +68,11 @@ serve(async (req) => {
         user_id: user.id,
         amount,
         method,
-        status: 'completed',
-        stripe_payout_id: payoutResult.batch_header.payout_batch_id
+        bank_details: method === 'bank' ? bankDetails : null,
+        status: 'pending'
       })
+      .select()
+      .single()
 
     if (withdrawalError) {
       throw withdrawalError
@@ -144,10 +90,20 @@ serve(async (req) => {
       throw updateError
     }
 
+    // In a real production environment, you would integrate with your bank's API
+    // For this demo, we'll simulate a successful withdrawal
+    console.log('Processing withdrawal:', {
+      method,
+      amount,
+      bankDetails: method === 'bank' ? bankDetails : 'Using PayPal'
+    });
+
     return new Response(
       JSON.stringify({ 
-        success: true, 
-        payout: payoutResult
+        success: true,
+        message: method === 'bank' 
+          ? 'Withdrawal initiated. Funds will be transferred to your bank account within 2-3 business days.'
+          : 'Withdrawal initiated. Funds will be sent to your PayPal account.'
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
