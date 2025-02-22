@@ -7,17 +7,49 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface BankDetails {
+interface BaseBankDetails {
   accountHolderName: string;
-  accountNumber: string;
+  bankName: string;
+  accountType: string;
+  country: string;
+  currency: string;
+}
+
+interface USBankDetails extends BaseBankDetails {
+  country: 'US';
   routingNumber: string;
-  accountType: 'checking' | 'savings';
+  accountNumber: string;
+}
+
+interface EUBankDetails extends BaseBankDetails {
+  country: string;
+  iban: string;
+  swiftCode: string;
+}
+
+interface UKBankDetails extends BaseBankDetails {
+  country: 'GB';
+  sortCode: string;
+  accountNumber: string;
+}
+
+interface AUBankDetails extends BaseBankDetails {
+  country: 'AU';
+  bsb: string;
+  accountNumber: string;
+}
+
+type BankDetails = USBankDetails | EUBankDetails | UKBankDetails | AUBankDetails;
+
+interface PayPalDetails {
+  email: string;
 }
 
 interface WithdrawalRequest {
   amount: number;
   method: 'bank' | 'paypal';
   bankDetails?: BankDetails;
+  paypalDetails?: PayPalDetails;
 }
 
 serve(async (req) => {
@@ -44,7 +76,7 @@ serve(async (req) => {
       throw userError || new Error('User not found')
     }
 
-    const { amount, method, bankDetails }: WithdrawalRequest = await req.json()
+    const { amount, method, bankDetails, paypalDetails }: WithdrawalRequest = await req.json()
 
     // Get user's profile
     const { data: profile, error: profileError } = await supabaseClient
@@ -61,6 +93,15 @@ serve(async (req) => {
       throw new Error('Insufficient balance')
     }
 
+    // Validate withdrawal details based on method
+    if (method === 'bank' && !bankDetails) {
+      throw new Error('Bank details are required for bank transfers')
+    }
+
+    if (method === 'paypal' && !paypalDetails?.email) {
+      throw new Error('PayPal email is required for PayPal withdrawals')
+    }
+
     // Create withdrawal record
     const { error: withdrawalError } = await supabaseClient
       .from('withdrawals')
@@ -69,6 +110,7 @@ serve(async (req) => {
         amount,
         method,
         bank_details: method === 'bank' ? bankDetails : null,
+        paypal_details: method === 'paypal' ? paypalDetails : null,
         status: 'pending'
       })
       .select()
@@ -90,20 +132,22 @@ serve(async (req) => {
       throw updateError
     }
 
-    // In a real production environment, you would integrate with your bank's API
-    // For this demo, we'll simulate a successful withdrawal
+    // Log withdrawal details for processing
     console.log('Processing withdrawal:', {
       method,
       amount,
-      bankDetails: method === 'bank' ? bankDetails : 'Using PayPal'
+      details: method === 'bank' ? bankDetails : paypalDetails
     });
+
+    const processingTime = method === 'paypal' ? '24 hours' : '2-5 business days';
+    const message = method === 'bank' 
+      ? `Withdrawal initiated. Funds will be transferred to your ${bankDetails?.country} bank account within ${processingTime}.`
+      : `Withdrawal initiated. Funds will be sent to your PayPal account (${paypalDetails?.email}) within ${processingTime}.`;
 
     return new Response(
       JSON.stringify({ 
         success: true,
-        message: method === 'bank' 
-          ? 'Withdrawal initiated. Funds will be transferred to your bank account within 2-3 business days.'
-          : 'Withdrawal initiated. Funds will be sent to your PayPal account.'
+        message
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
