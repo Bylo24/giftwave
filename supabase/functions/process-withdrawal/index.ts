@@ -7,49 +7,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface BaseBankDetails {
-  accountHolderName: string;
-  bankName: string;
-  accountType: string;
-  country: string;
-  currency: string;
-}
-
-interface USBankDetails extends BaseBankDetails {
-  country: 'US';
-  routingNumber: string;
-  accountNumber: string;
-}
-
-interface EUBankDetails extends BaseBankDetails {
-  country: string;
-  iban: string;
-  swiftCode: string;
-}
-
-interface UKBankDetails extends BaseBankDetails {
-  country: 'GB';
-  sortCode: string;
-  accountNumber: string;
-}
-
-interface AUBankDetails extends BaseBankDetails {
-  country: 'AU';
-  bsb: string;
-  accountNumber: string;
-}
-
-type BankDetails = USBankDetails | EUBankDetails | UKBankDetails | AUBankDetails;
-
-interface PayPalDetails {
-  email: string;
-}
-
 interface WithdrawalRequest {
   amount: number;
-  method: 'bank' | 'paypal';
-  bankDetails?: BankDetails;
-  paypalDetails?: PayPalDetails;
+  method: 'bank' | 'paypal' | 'card';
+  bankDetails?: any;
+  paypalDetails?: { email: string };
+  cardDetails?: { paymentMethodId: string };
 }
 
 serve(async (req) => {
@@ -76,7 +39,7 @@ serve(async (req) => {
       throw userError || new Error('User not found')
     }
 
-    const { amount, method, bankDetails, paypalDetails }: WithdrawalRequest = await req.json()
+    const { amount, method, bankDetails, paypalDetails, cardDetails }: WithdrawalRequest = await req.json()
 
     // Get user's profile
     const { data: profile, error: profileError } = await supabaseClient
@@ -102,6 +65,10 @@ serve(async (req) => {
       throw new Error('PayPal email is required for PayPal withdrawals')
     }
 
+    if (method === 'card' && !cardDetails?.paymentMethodId) {
+      throw new Error('Card details are required for card withdrawals')
+    }
+
     // Create withdrawal record
     const { error: withdrawalError } = await supabaseClient
       .from('withdrawals')
@@ -111,6 +78,7 @@ serve(async (req) => {
         method,
         bank_details: method === 'bank' ? bankDetails : null,
         paypal_details: method === 'paypal' ? paypalDetails : null,
+        card_details: method === 'card' ? cardDetails : null,
         status: 'pending'
       })
       .select()
@@ -132,16 +100,22 @@ serve(async (req) => {
       throw updateError
     }
 
-    // Log withdrawal details for processing
+    // Log withdrawal details
     console.log('Processing withdrawal:', {
       method,
       amount,
-      details: method === 'bank' ? bankDetails : paypalDetails
+      details: method === 'bank' ? bankDetails : 
+               method === 'paypal' ? paypalDetails : cardDetails
     });
 
-    const processingTime = method === 'paypal' ? '24 hours' : '2-5 business days';
+    const processingTime = method === 'paypal' ? '24 hours' : 
+                          method === 'card' ? '1-3 business days' :
+                          '2-5 business days';
+
     const message = method === 'bank' 
-      ? `Withdrawal initiated. Funds will be transferred to your ${bankDetails?.country} bank account within ${processingTime}.`
+      ? `Withdrawal initiated. Funds will be transferred to your ${bankDetails.country} bank account within ${processingTime}.`
+      : method === 'card'
+      ? `Withdrawal initiated. Funds will be sent to your card within ${processingTime}.`
       : `Withdrawal initiated. Funds will be sent to your PayPal account (${paypalDetails?.email}) within ${processingTime}.`;
 
     return new Response(

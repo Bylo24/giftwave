@@ -1,5 +1,4 @@
-
-import { Building2, Mail } from "lucide-react";
+import { Building2, Mail, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -23,9 +22,12 @@ import {
   USBankDetails,
   UKBankDetails,
   AUBankDetails,
-  EUBankDetails 
+  EUBankDetails,
+  CardDetails 
 } from "@/types/wallet";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
 interface WithdrawalDialogProps {
@@ -67,11 +69,21 @@ export const WithdrawalDialog = ({
 }: WithdrawalDialogProps) => {
   const [paypalEmail, setPaypalEmail] = useState("");
   const [isVerifyingPayPal, setIsVerifyingPayPal] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<string>("");
+
+  const { data: paymentMethods } = useQuery({
+    queryKey: ['payment-methods'],
+    queryFn: async () => {
+      const { data: { paymentMethods }, error } = await supabase.functions.invoke('list-payment-methods');
+      if (error) throw error;
+      return paymentMethods;
+    },
+    enabled: isOpen && withdrawalMethod === 'card'
+  });
 
   const handlePayPalVerification = async () => {
     setIsVerifyingPayPal(true);
     try {
-      // In a real implementation, this would call your PayPal verification endpoint
       await new Promise(resolve => setTimeout(resolve, 1500));
       toast.success("PayPal account verified successfully");
     } catch (error) {
@@ -79,6 +91,38 @@ export const WithdrawalDialog = ({
     } finally {
       setIsVerifyingPayPal(false);
     }
+  };
+
+  const renderCardForm = () => {
+    if (withdrawalMethod !== 'card') return null;
+
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <label className="text-sm font-medium text-gray-700">Select Card</label>
+          <Select
+            value={selectedCard}
+            onValueChange={setSelectedCard}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Select a card" />
+            </SelectTrigger>
+            <SelectContent>
+              {paymentMethods?.map((method: any) => (
+                <SelectItem key={method.id} value={method.id}>
+                  {method.card.brand} •••• {method.card.last4}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div className="mt-4 p-4 bg-blue-50 rounded-lg">
+          <p className="text-sm text-blue-700">
+            Card withdrawals are typically processed within 1-3 business days. Standard processing fees may apply.
+          </p>
+        </div>
+      </div>
+    );
   };
 
   const renderBankForm = () => {
@@ -284,12 +328,21 @@ export const WithdrawalDialog = ({
             <label className="text-sm font-medium text-gray-700">Withdrawal Method</label>
             <Select
               value={withdrawalMethod}
-              onValueChange={(value: WithdrawalMethod) => setWithdrawalMethod(value)}
+              onValueChange={(value: WithdrawalMethod) => {
+                setWithdrawalMethod(value);
+                setSelectedCard("");
+              }}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select withdrawal method" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="card">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="h-4 w-4" />
+                    <span>Credit/Debit Card</span>
+                  </div>
+                </SelectItem>
                 <SelectItem value="bank">
                   <div className="flex items-center gap-2">
                     <Building2 className="h-4 w-4" />
@@ -319,6 +372,7 @@ export const WithdrawalDialog = ({
             />
           </div>
 
+          {renderCardForm()}
           {renderBankForm()}
           {renderPayPalForm()}
 
@@ -330,6 +384,7 @@ export const WithdrawalDialog = ({
               !withdrawAmount || 
               parseFloat(withdrawAmount) <= 0 || 
               parseFloat(withdrawAmount) > balance ||
+              (withdrawalMethod === 'card' && !selectedCard) ||
               (withdrawalMethod === 'bank' && (
                 !bankDetails.accountHolderName ||
                 !bankDetails.bankName ||

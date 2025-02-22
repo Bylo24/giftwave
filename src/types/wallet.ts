@@ -1,5 +1,5 @@
 
-export type WithdrawalMethod = 'bank' | 'paypal';
+export type WithdrawalMethod = 'bank' | 'paypal' | 'card';
 
 export type BankAccountType = 'checking' | 'savings' | 'current' | 'savings_deposit';
 
@@ -42,6 +42,12 @@ export interface PayPalDetails {
   verified: boolean;
 }
 
+export interface CardDetails {
+  paymentMethodId: string;
+  last4: string;
+  brand: string;
+}
+
 export interface Withdrawal {
   id: string;
   amount: number;
@@ -50,5 +56,6 @@ export interface Withdrawal {
   created_at: string;
   bank_details?: BankDetails;
   paypal_details?: PayPalDetails;
+  card_details?: CardDetails;
   currency: string;
 }
