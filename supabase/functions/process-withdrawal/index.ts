@@ -7,6 +7,19 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+interface BankDetails {
+  accountHolderName: string;
+  accountNumber: string;
+  routingNumber: string;
+  accountType: 'checking' | 'savings';
+}
+
+interface WithdrawalRequest {
+  amount: number;
+  method: 'bank' | 'paypal';
+  bankDetails?: BankDetails;
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -31,7 +44,7 @@ serve(async (req) => {
       throw userError || new Error('User not found')
     }
 
-    const { amount } = await req.json()
+    const { amount, method, bankDetails }: WithdrawalRequest = await req.json()
 
     // Get user's profile
     const { data: profile, error: profileError } = await supabaseClient
@@ -75,13 +88,23 @@ serve(async (req) => {
           email_message: "You received a payout from your GiftWave wallet"
         },
         items: [{
-          recipient_type: "EMAIL",
+          recipient_type: method === 'bank' ? "BANK" : "EMAIL",
           amount: {
             value: amount,
             currency: "USD"
           },
-          receiver: profile.email,
-          note: "GiftWave wallet withdrawal",
+          ...(method === 'bank' ? {
+            bank_account: {
+              account_name: bankDetails?.accountHolderName,
+              account_number: bankDetails?.accountNumber,
+              routing_number: bankDetails?.routingNumber,
+              account_type: bankDetails?.accountType.toUpperCase(),
+              country_code: "US",
+            }
+          } : {
+            receiver: profile.email,
+          }),
+          note: `GiftWave wallet withdrawal via ${method}`,
           sender_item_id: `PAYOUT_${Date.now()}`
         }]
       })
@@ -100,6 +123,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         amount,
+        method,
         status: 'completed',
         stripe_payout_id: payoutResult.batch_header.payout_batch_id
       })
