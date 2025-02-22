@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -36,6 +35,8 @@ import InsideLeftCard from "./pages/InsideLeftCard";
 import InsideRightCard from "./pages/InsideRightCard";
 import PreviewAnimation from "./pages/PreviewAnimation";
 import RecipientGift from "./pages/RecipientGift";
+import CollectSignup from "./pages/CollectSignup";
+import AppDownload from "./pages/AppDownload";
 
 function App() {
   const queryClient = new QueryClient();
@@ -59,9 +60,10 @@ function App() {
                 <Route path="/update-phone" element={<UpdatePhone />} />
                 <Route path="/previewanimation" element={<PreviewAnimation />} />
                 <Route path="/gifttoken" element={<RecipientGift />} />
+                <Route path="/collect-signup" element={<CollectSignup />} />
+                <Route path="/download-app" element={<AppDownload />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 
-                {/* Protected Routes */}
                 <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
                 <Route path="/wallet" element={<RequireAuth><Wallet /></RequireAuth>} />
                 <Route path="/search" element={<RequireAuth><SearchResults /></RequireAuth>} />

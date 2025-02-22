@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { PatternType } from "@/types/gift";
@@ -12,6 +11,7 @@ import { useGiftDesign } from "@/hooks/useGiftDesign";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { colorPalettes } from "@/constants/colorPalettes";
+import { Gift } from "lucide-react";
 
 const ANIMATION_DURATION = 500;
 const CONFETTI_DURATION = 1500;
@@ -153,6 +153,13 @@ const RecipientGift = () => {
     }
   };
 
+  const handleCollectGift = () => {
+    if (token) {
+      sessionStorage.setItem('giftToken', token);
+      navigate('/collect-signup');
+    }
+  };
+
   if (!token) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -242,6 +249,16 @@ const RecipientGift = () => {
             </div>
           ))}
         </PreviewContainer>
+
+        <div className="mt-8 w-full">
+          <Button
+            onClick={handleCollectGift}
+            className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-4 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
+          >
+            <Gift className="mr-2 h-5 w-5" />
+            Collect ${giftDesign.amount || '0'} Gift
+          </Button>
+        </div>
       </div>
     </div>
   );
