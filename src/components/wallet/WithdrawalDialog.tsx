@@ -1,3 +1,4 @@
+
 import { Mail, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +60,15 @@ export const WithdrawalDialog = ({
         .single();
       if (error) throw error;
       return data;
+    },
+    enabled: isOpen && withdrawalMethod === 'card'
+  });
+
+  const { data: paymentMethods } = useQuery({
+    queryKey: ['payment-methods'],
+    queryFn: async () => {
+      const { data } = await supabase.functions.invoke('list-payment-methods');
+      return data?.payment_methods || [];
     },
     enabled: isOpen && withdrawalMethod === 'card'
   });

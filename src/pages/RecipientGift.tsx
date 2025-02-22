@@ -256,7 +256,7 @@ const RecipientGift = () => {
             className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-medium py-4 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-[1.02] active:scale-[0.98]"
           >
             <Gift className="mr-2 h-5 w-5" />
-            Collect ${giftDesign.amount || '0'} Gift
+            Collect ${giftDesign.selected_amount || '0'} Gift
           </Button>
         </div>
       </div>
