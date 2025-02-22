@@ -17,7 +17,7 @@ export const TransactionsList = ({ withdrawals }: TransactionsListProps) => {
               <div className="flex justify-between items-center">
                 <div>
                   <p className="font-medium">
-                    {withdrawal.method === 'bank' ? 'Bank Transfer' : 'PayPal'} Withdrawal
+                    {withdrawal.method === 'paypal' ? 'PayPal' : 'Card'} Withdrawal
                   </p>
                   <p className="text-sm text-gray-500">
                     {new Date(withdrawal.created_at).toLocaleDateString()}

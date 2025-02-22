@@ -12,7 +12,7 @@ import { WalletBalance } from "@/components/wallet/WalletBalance";
 import { WalletActions } from "@/components/wallet/WalletActions";
 import { WithdrawalDialog } from "@/components/wallet/WithdrawalDialog";
 import { TransactionsList } from "@/components/wallet/TransactionsList";
-import { BankDetails, WithdrawalMethod, Withdrawal, USBankDetails } from "@/types/wallet";
+import { WithdrawalMethod, Withdrawal } from "@/types/wallet";
 
 const Wallet = () => {
   const { session, user } = useAuth();
@@ -23,16 +23,7 @@ const Wallet = () => {
   const [withdrawAmount, setWithdrawAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
-  const [withdrawalMethod, setWithdrawalMethod] = useState<WithdrawalMethod>('bank');
-  const [bankDetails, setBankDetails] = useState<BankDetails>({
-    accountHolderName: '',
-    accountNumber: '',
-    routingNumber: '',
-    accountType: 'checking',
-    country: 'US',
-    bankName: '',
-    currency: 'USD'
-  } as USBankDetails);
+  const [withdrawalMethod, setWithdrawalMethod] = useState<WithdrawalMethod>('card');
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -56,7 +47,7 @@ const Wallet = () => {
           // Transform withdrawals data to include currency
           const transformedWithdrawals: Withdrawal[] = (data.withdrawals || []).map((w: any) => ({
             ...w,
-            currency: w.bank_details?.currency || 'USD' // Default to USD if not specified
+            currency: w.card_details?.currency || w.paypal_details?.currency || 'USD' // Default to USD if not specified
           }));
           setWithdrawals(transformedWithdrawals);
         }
@@ -88,7 +79,8 @@ const Wallet = () => {
         body: { 
           amount,
           method: withdrawalMethod,
-          ...(withdrawalMethod === 'bank' && { bankDetails })
+          ...(withdrawalMethod === 'paypal' ? { paypalDetails: { email: profile.paypal_email } } : null),
+          ...(withdrawalMethod === 'card' ? { cardDetails: { paymentMethodId: profile.card_id } } : null)
         },
         headers: { Authorization: `Bearer ${session.access_token}` }
       });
@@ -98,15 +90,6 @@ const Wallet = () => {
       toast.success(data.message);
       setIsWithdrawDialogOpen(false);
       setWithdrawAmount("");
-      setBankDetails({
-        accountHolderName: '',
-        accountNumber: '',
-        routingNumber: '',
-        accountType: 'checking',
-        country: 'US',
-        bankName: '',
-        currency: 'USD'
-      } as USBankDetails);
       
       const { data: updatedProfile } = await supabase
         .from('profiles')
@@ -117,10 +100,9 @@ const Wallet = () => {
       if (updatedProfile) {
         setProfile(updatedProfile);
         setBalance(updatedProfile.wallet_balance || 0);
-        // Transform withdrawals data to include currency
         const transformedWithdrawals: Withdrawal[] = (updatedProfile.withdrawals || []).map((w: any) => ({
           ...w,
-          currency: w.bank_details?.currency || 'USD' // Default to USD if not specified
+          currency: w.card_details?.currency || w.paypal_details?.currency || 'USD'
         }));
         setWithdrawals(transformedWithdrawals);
       }
@@ -176,8 +158,6 @@ const Wallet = () => {
         setWithdrawAmount={setWithdrawAmount}
         withdrawalMethod={withdrawalMethod}
         setWithdrawalMethod={setWithdrawalMethod}
-        bankDetails={bankDetails}
-        setBankDetails={setBankDetails}
         onWithdraw={handleWithdraw}
         isLoading={isLoading}
         balance={balance}
