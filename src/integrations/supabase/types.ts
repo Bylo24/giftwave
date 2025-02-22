@@ -524,9 +524,11 @@ export type Database = {
       withdrawals: {
         Row: {
           amount: number
+          bank_details: Json | null
           created_at: string
           error_message: string | null
           id: string
+          method: string | null
           status: string | null
           stripe_payout_id: string | null
           updated_at: string
@@ -534,9 +536,11 @@ export type Database = {
         }
         Insert: {
           amount: number
+          bank_details?: Json | null
           created_at?: string
           error_message?: string | null
           id?: string
+          method?: string | null
           status?: string | null
           stripe_payout_id?: string | null
           updated_at?: string
@@ -544,9 +548,11 @@ export type Database = {
         }
         Update: {
           amount?: number
+          bank_details?: Json | null
           created_at?: string
           error_message?: string | null
           id?: string
+          method?: string | null
           status?: string | null
           stripe_payout_id?: string | null
           updated_at?: string
