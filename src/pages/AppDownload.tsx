@@ -1,12 +1,14 @@
+
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Smartphone, ArrowRight } from "lucide-react";
+
 const AppDownload = () => {
   return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 p-4">
       <Card className="w-full max-w-md p-6 space-y-8 bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl text-center">
         <div className="space-y-4">
-          <div className="">
-            <img src="/lovable-uploads/0662fd11-2030-457c-97dd-b8529e27cfce.png" alt="GiftWave" className="h-10 w-10" onError={e => {
+          <div className="flex justify-center">
+            <img src="/lovable-uploads/0662fd11-2030-457c-97dd-b8529e27cfce.png" alt="GiftWave" className="h-24 w-24" onError={e => {
             e.currentTarget.onerror = null; // Prevent infinite loop
             e.currentTarget.style.display = 'none';
             // Show Smartphone icon as fallback
@@ -53,4 +55,5 @@ const AppDownload = () => {
       </Card>
     </div>;
 };
+
 export default AppDownload;
