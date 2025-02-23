@@ -7,7 +7,7 @@ export const LoginHeader = ({ isSignUp }: LoginHeaderProps) => {
   return (
     <div className="flex flex-col items-center space-y-6 mb-8">
       <img 
-        src="/lovable-uploads/d0eaee07-4183-4bee-82ec-c2b979790c51.png"
+        src="/lovable-uploads/c34b64be-de23-45c2-9684-b5755b69dd4c.png"
         alt="GiftWave Logo"
         className="h-16 w-auto drop-shadow-lg"
       />
