@@ -1,3 +1,4 @@
+
 import { createContext, useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -29,24 +30,90 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const navigate = useNavigate();
 
+  const handlePendingGiftCollection = async (userId: string) => {
+    const giftToken = sessionStorage.getItem('giftToken');
+    if (!giftToken) return;
+
+    try {
+      // Check if gift is valid and uncollected
+      const { data: gift, error: giftError } = await supabase
+        .from('gifts')
+        .select('amount, status')
+        .eq('token', giftToken)
+        .single();
+
+      if (giftError || !gift || gift.status !== 'pending') {
+        sessionStorage.removeItem('giftToken');
+        return;
+      }
+
+      // Get current wallet balance
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('wallet_balance')
+        .eq('id', userId)
+        .single();
+
+      const currentBalance = profile?.wallet_balance || 0;
+      const newBalance = currentBalance + gift.amount;
+
+      // Update gift status
+      const { error: updateGiftError } = await supabase
+        .from('gifts')
+        .update({
+          status: 'collected',
+          collector_id: userId,
+          collected_at: new Date().toISOString(),
+          collection_status: 'completed'
+        })
+        .eq('token', giftToken)
+        .eq('status', 'pending');
+
+      if (updateGiftError) throw updateGiftError;
+
+      // Update wallet balance
+      const { error: balanceError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: userId,
+          wallet_balance: newBalance
+        });
+
+      if (balanceError) throw balanceError;
+
+      toast.success("Gift collected successfully!");
+      sessionStorage.removeItem('giftToken');
+      navigate('/download-app');
+    } catch (error: any) {
+      console.error('Error collecting gift:', error);
+      toast.error("Failed to collect gift. Please try again.");
+    }
+  };
+
   useEffect(() => {
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
+      if (session?.user) {
+        handlePendingGiftCollection(session.user.id);
+      }
     });
 
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       
-      if (session) {
+      if (session?.user) {
+        await handlePendingGiftCollection(session.user.id);
         // If user is logged in and on login page, redirect to home
         if (window.location.pathname === "/login") {
-          navigate("/home");
+          const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/home';
+          sessionStorage.removeItem('redirectAfterLogin');
+          navigate(redirectPath);
         }
       } else {
         // If user is logged out and not on login page, redirect to login

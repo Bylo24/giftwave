@@ -8,7 +8,7 @@ import { LoginHeader } from "./LoginHeader";
 
 export const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(true);
+  const [isSignUp, setIsSignUp] = useState(false); // Default to sign in since this is login form
 
   return (
     <LoginContainer>

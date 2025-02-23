@@ -1,6 +1,7 @@
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useNavigate } from "react-router-dom";
@@ -46,7 +47,6 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
         });
         if (error) throw error;
         toast.success("Account created successfully! You can now sign in.");
-        navigate("/home");
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -59,7 +59,6 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
           throw error;
         }
         toast.success("Successfully logged in!");
-        navigate("/home");
       }
     } catch (error: any) {
       toast.error(error.message);
