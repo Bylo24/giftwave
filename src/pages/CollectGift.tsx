@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +6,7 @@ import { GiftRevealAnimation } from "@/components/gift/GiftRevealAnimation";
 import { GiftVerificationForm } from "@/components/gift/GiftVerificationForm";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
+import { toast } from "sonner";
 
 const CollectGift = () => {
   const { giftId } = useParams();
