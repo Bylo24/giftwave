@@ -27,20 +27,62 @@ const CollectSignup = () => {
     setIsLoading(true);
 
     try {
-      const { data, error } = await supabase.auth.signUp({
+      const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
       });
 
-      if (error) throw error;
+      if (authError) throw authError;
+
+      if (!giftToken) throw new Error("Gift token not found");
 
       // First show success message
       toast.success("Account created successfully!");
+      
+      // Get the gift details
+      const { data: gift, error: giftError } = await supabase
+        .from('gifts')
+        .select('amount, status')
+        .eq('token', giftToken)
+        .single();
+
+      if (giftError) throw giftError;
+
+      if (gift.status !== 'pending') {
+        throw new Error("This gift has already been collected");
+      }
+
+      // Update the gift status and collector
+      const { error: updateError } = await supabase
+        .from('gifts')
+        .update({
+          status: 'collected',
+          collector_id: authData.user?.id,
+          collected_at: new Date().toISOString(),
+          collection_status: 'completed'
+        })
+        .eq('token', giftToken);
+
+      if (updateError) throw updateError;
+
+      // Update the recipient's wallet balance
+      const { error: balanceError } = await supabase
+        .from('profiles')
+        .upsert({
+          id: authData.user?.id,
+          wallet_balance: gift.amount
+        });
+
+      if (balanceError) throw balanceError;
+
+      // Clear the gift token from session storage
+      sessionStorage.removeItem('giftToken');
       
       // Then navigate to download app page
       navigate('/download-app');
       
     } catch (error: any) {
+      console.error('Error during signup:', error);
       toast.error(error.message);
     } finally {
       setIsLoading(false);
