@@ -27,66 +27,97 @@ const CollectSignup = () => {
     setIsLoading(true);
 
     try {
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (authError) throw authError;
-
-      if (!giftToken) throw new Error("Gift token not found");
-
-      // First show success message
-      toast.success("Account created successfully!");
-      
-      // Get the gift details
+      // First check if the gift is valid and uncollected
       const { data: gift, error: giftError } = await supabase
         .from('gifts')
         .select('amount, status')
         .eq('token', giftToken)
         .single();
 
-      if (giftError) throw giftError;
-
-      if (gift.status !== 'pending') {
-        throw new Error("This gift has already been collected");
+      if (giftError) {
+        toast.error("Invalid or expired gift");
+        return;
       }
 
-      // Update the gift status and collector
-      const { error: updateError } = await supabase
+      if (gift.status !== 'pending') {
+        toast.error("This gift has already been collected");
+        return;
+      }
+
+      if (gift.amount <= 0) {
+        toast.error("Invalid gift amount");
+        return;
+      }
+
+      // Try to sign up the user
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+
+      if (authError) {
+        if (authError.message.includes('already exists')) {
+          toast.error("An account with this email already exists. Please sign in instead.");
+          return;
+        }
+        throw authError;
+      }
+
+      if (!authData.user) throw new Error("Signup failed");
+
+      // Get the current wallet balance if it exists
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('wallet_balance')
+        .eq('id', authData.user.id)
+        .single();
+
+      const currentBalance = profile?.wallet_balance || 0;
+      const newBalance = currentBalance + gift.amount;
+
+      // Begin the gift collection process
+      const { error: updateGiftError } = await supabase
         .from('gifts')
         .update({
           status: 'collected',
-          collector_id: authData.user?.id,
+          collector_id: authData.user.id,
           collected_at: new Date().toISOString(),
           collection_status: 'completed'
         })
-        .eq('token', giftToken);
+        .eq('token', giftToken)
+        .eq('status', 'pending'); // Extra check to prevent race conditions
 
-      if (updateError) throw updateError;
+      if (updateGiftError) throw updateGiftError;
 
-      // Update the recipient's wallet balance
+      // Update the wallet balance
       const { error: balanceError } = await supabase
         .from('profiles')
         .upsert({
-          id: authData.user?.id,
-          wallet_balance: gift.amount
+          id: authData.user.id,
+          wallet_balance: newBalance
         });
 
       if (balanceError) throw balanceError;
 
-      // Clear the gift token from session storage
+      // Show success message and clean up
+      toast.success("Gift collected successfully!");
       sessionStorage.removeItem('giftToken');
       
-      // Then navigate to download app page
+      // Navigate to download app page
       navigate('/download-app');
       
     } catch (error: any) {
       console.error('Error during signup:', error);
-      toast.error(error.message);
+      toast.error(error.message || "Failed to collect gift. Please try again.");
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleLogin = () => {
+    // Store current route in session storage to redirect back after login
+    sessionStorage.setItem('redirectAfterLogin', '/collect-signup');
+    navigate("/login");
   };
 
   return (
@@ -112,6 +143,7 @@ const CollectSignup = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={isLoading}
             />
           </div>
           <div className="space-y-2">
@@ -122,6 +154,7 @@ const CollectSignup = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
               minLength={6}
+              disabled={isLoading}
             />
           </div>
           <Button
@@ -138,7 +171,8 @@ const CollectSignup = () => {
           <Button
             variant="link"
             className="p-0 h-auto font-semibold"
-            onClick={() => navigate("/login")}
+            onClick={handleLogin}
+            disabled={isLoading}
           >
             Sign in
           </Button>
