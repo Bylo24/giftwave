@@ -5,10 +5,25 @@ import { GoogleAuthButton } from "./GoogleAuthButton";
 import { AuthToggle } from "./AuthToggle";
 import { LoginContainer } from "./LoginContainer";
 import { LoginHeader } from "./LoginHeader";
+import { supabase } from "@/integrations/supabase/client";
 
 export const LoginForm = () => {
   const [isLoading, setIsLoading] = useState(false);
-  const [isSignUp, setIsSignUp] = useState(false); // Default to sign in since this is login form
+  const [isSignUp, setIsSignUp] = useState(false);
+
+  // If we have a gift token, ensure we're signed out before showing the form
+  const ensureSignedOut = async () => {
+    const giftToken = sessionStorage.getItem('giftToken');
+    if (giftToken) {
+      // Sign out current user if any to allow new sign in
+      await supabase.auth.signOut();
+    }
+  };
+
+  // Call this when component mounts
+  useState(() => {
+    ensureSignedOut();
+  }, []);
 
   return (
     <LoginContainer>

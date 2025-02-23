@@ -37,6 +37,8 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
     setIsLoading(true);
 
     try {
+      const giftToken = sessionStorage.getItem('giftToken');
+      
       if (isSignUp) {
         const { error } = await supabase.auth.signUp({
           email,
@@ -46,7 +48,13 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
           },
         });
         if (error) throw error;
-        toast.success("Account created successfully! You can now sign in.");
+        
+        if (giftToken) {
+          // After signup with gift token, redirect to collect-signup
+          navigate('/collect-signup');
+        } else {
+          toast.success("Account created successfully! You can now sign in.");
+        }
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
@@ -58,7 +66,13 @@ export const EmailAuthForm = ({ isSignUp, isLoading, setIsLoading }: EmailAuthFo
           }
           throw error;
         }
-        toast.success("Successfully logged in!");
+
+        if (giftToken) {
+          // After login with gift token, redirect to collect-signup
+          navigate('/collect-signup');
+        } else {
+          toast.success("Successfully logged in!");
+        }
       }
     } catch (error: any) {
       toast.error(error.message);
