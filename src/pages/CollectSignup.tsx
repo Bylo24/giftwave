@@ -27,18 +27,19 @@ const CollectSignup = () => {
     setIsLoading(true);
 
     try {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/download-app`,
-        },
       });
 
       if (error) throw error;
 
+      // First show success message
       toast.success("Account created successfully!");
+      
+      // Then navigate to download app page
       navigate('/download-app');
+      
     } catch (error: any) {
       toast.error(error.message);
     } finally {
