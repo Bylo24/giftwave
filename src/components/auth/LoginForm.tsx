@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EmailAuthForm } from "./EmailAuthForm";
 import { GoogleAuthButton } from "./GoogleAuthButton";
 import { AuthToggle } from "./AuthToggle";
@@ -21,7 +21,7 @@ export const LoginForm = () => {
   };
 
   // Call this when component mounts
-  useState(() => {
+  useEffect(() => {
     ensureSignedOut();
   }, []);
 
