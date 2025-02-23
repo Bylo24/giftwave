@@ -34,22 +34,6 @@ const AppDownload = () => {
             <Button className="w-full bg-black text-white hover:bg-gray-900" onClick={() => window.open('https://play.google.com/store/apps/details?id=app.giftwave', '_blank')}>
               Get it on Google Play
             </Button>
-
-            <div className="relative my-4">
-              <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t border-gray-300/50" />
-              </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-white/70 backdrop-blur-sm px-2 text-gray-500">
-                  Or
-                </span>
-              </div>
-            </div>
-
-            <Button variant="outline" onClick={() => window.location.href = '/wallet'} className="text-gray-600">
-              Continue on Web
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </div>
         </div>
       </Card>
