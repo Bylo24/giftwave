@@ -53,6 +53,7 @@ function App() {
               <PullToRefresh />
               <Routes>
                 <Route path="/" element={<Navigate to="/wallet" replace />} />
+                <Route path="/download-app" element={<AppDownload />} />
                 <Route path="/home" element={<Home />} />
                 <Route path="/login" element={<LoginForm />} />
                 <Route path="/verify" element={<PhoneVerification />} />
@@ -62,7 +63,6 @@ function App() {
                 <Route path="/previewanimation" element={<PreviewAnimation />} />
                 <Route path="/gifttoken" element={<RecipientGift />} />
                 <Route path="/collect-signup" element={<CollectSignup />} />
-                <Route path="/download-app" element={<AppDownload />} />
                 <Route path="/payment-success" element={<PaymentSuccess />} />
                 
                 <Route path="/promo" element={<RequireAuth><PromoCode /></RequireAuth>} />
