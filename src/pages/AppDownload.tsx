@@ -10,7 +10,7 @@ const AppDownload = () => {
         <div className="space-y-4">
           <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-gradient-to-r from-purple-600 to-blue-600">
             <img 
-              src="/giftwave-icon.svg" 
+              src="/lovable-uploads/0662fd11-2030-457c-97dd-b8529e27cfce.png" 
               alt="GiftWave" 
               className="h-10 w-10"
               onError={(e) => {
