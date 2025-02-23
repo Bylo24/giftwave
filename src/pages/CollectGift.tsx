@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -59,9 +59,58 @@ const CollectGift = () => {
     },
   });
 
-  const handleAnimationComplete = () => {
+  const handleAnimationComplete = async () => {
     if (isReplay) {
       navigate('/my-gifts');
+      return;
+    }
+
+    // Check if there's a pending collector ID
+    const pendingCollectorId = sessionStorage.getItem('pendingCollectorId');
+    if (pendingCollectorId && gift) {
+      try {
+        // Get current wallet balance
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('wallet_balance')
+          .eq('id', pendingCollectorId)
+          .single();
+
+        const currentBalance = profile?.wallet_balance || 0;
+        const newBalance = currentBalance + gift.amount;
+
+        // Update gift status
+        const { error: updateGiftError } = await supabase
+          .from('gifts')
+          .update({
+            status: 'collected',
+            collector_id: pendingCollectorId,
+            collected_at: new Date().toISOString(),
+            collection_status: 'completed'
+          })
+          .eq('id', gift.id)
+          .eq('status', 'pending');
+
+        if (updateGiftError) throw updateGiftError;
+
+        // Update wallet balance
+        const { error: balanceError } = await supabase
+          .from('profiles')
+          .upsert({
+            id: pendingCollectorId,
+            wallet_balance: newBalance
+          });
+
+        if (balanceError) throw balanceError;
+
+        toast.success("Gift collected successfully!");
+        sessionStorage.removeItem('pendingCollectorId');
+        navigate('/download-app');
+      } catch (error: any) {
+        console.error('Error collecting gift:', error);
+        toast.error("Failed to collect gift. Please try again.");
+        setIsAnimationComplete(true); // Show verification form as fallback
+      }
     } else {
       setIsAnimationComplete(true);
     }

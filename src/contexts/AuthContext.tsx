@@ -35,10 +35,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     if (!giftToken) return;
 
     try {
-      // Check if gift is valid and uncollected
+      // First, fetch full gift details including memories and sender info
       const { data: gift, error: giftError } = await supabase
         .from('gifts')
-        .select('amount, status')
+        .select(`
+          *,
+          sender:profiles(full_name)
+        `)
         .eq('token', giftToken)
         .single();
 
@@ -47,46 +50,31 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         return;
       }
 
-      // Get current wallet balance
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('wallet_balance')
-        .eq('id', userId)
-        .single();
+      // Fetch associated memories
+      const { data: memoriesData, error: memoriesError } = await supabase
+        .from('gift_memories')
+        .select('*')
+        .eq('gift_id', gift.id);
 
-      const currentBalance = profile?.wallet_balance || 0;
-      const newBalance = currentBalance + gift.amount;
+      if (memoriesError) throw memoriesError;
 
-      // Update gift status
-      const { error: updateGiftError } = await supabase
-        .from('gifts')
-        .update({
-          status: 'collected',
-          collector_id: userId,
-          collected_at: new Date().toISOString(),
-          collection_status: 'completed'
-        })
-        .eq('token', giftToken)
-        .eq('status', 'pending');
+      // Navigate to gift reveal with all data
+      navigate(`/collect-gift/${gift.id}`, { 
+        state: { 
+          gift: {
+            ...gift,
+            memories: memoriesData
+          }
+        }
+      });
 
-      if (updateGiftError) throw updateGiftError;
+      // After successful navigation, store collector ID to complete collection after reveal
+      sessionStorage.setItem('pendingCollectorId', userId);
+      sessionStorage.removeItem('giftToken'); // Clear the token as we'll use the gift ID now
 
-      // Update wallet balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: userId,
-          wallet_balance: newBalance
-        });
-
-      if (balanceError) throw balanceError;
-
-      toast.success("Gift collected successfully!");
-      sessionStorage.removeItem('giftToken');
-      navigate('/download-app');
     } catch (error: any) {
-      console.error('Error collecting gift:', error);
-      toast.error("Failed to collect gift. Please try again.");
+      console.error('Error processing gift:', error);
+      toast.error("Failed to process gift. Please try again.");
     }
   };
 
