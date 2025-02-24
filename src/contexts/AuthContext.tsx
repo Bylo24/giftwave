@@ -97,15 +97,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       
       if (session?.user) {
         await handlePendingGiftCollection(session.user.id);
-        // If user is logged in and on login page, redirect to home
-        if (window.location.pathname === "/login") {
+        
+        // Only redirect to home if we're on the login page and there's no gift token
+        if (window.location.pathname === "/login" && !sessionStorage.getItem('giftToken')) {
           const redirectPath = sessionStorage.getItem('redirectAfterLogin') || '/home';
           sessionStorage.removeItem('redirectAfterLogin');
           navigate(redirectPath);
         }
       } else {
-        // If user is logged out and not on login page, redirect to login
-        if (window.location.pathname !== "/login") {
+        // If user is logged out and not on login or collect-signup page, redirect to login
+        if (!["/login", "/collect-signup"].includes(window.location.pathname)) {
           navigate("/login");
         }
       }

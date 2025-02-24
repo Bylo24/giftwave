@@ -13,6 +13,7 @@ const CollectSignup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoginMode, setIsLoginMode] = useState(false);
   const giftToken = sessionStorage.getItem('giftToken');
 
   useEffect(() => {
@@ -22,120 +23,69 @@ const CollectSignup = () => {
     }
   }, [giftToken, navigate]);
 
-  const handleSignup = async (e: React.FormEvent) => {
+  const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // First check if the gift is valid and uncollected
-      const { data: gift, error: giftError } = await supabase
-        .from('gifts')
-        .select('amount, status')
-        .eq('token', giftToken)
-        .single();
-
-      if (giftError) {
-        toast.error("Invalid or expired gift");
-        return;
-      }
-
-      if (gift.status !== 'pending') {
-        toast.error("This gift has already been collected");
-        return;
-      }
-
-      if (gift.amount <= 0) {
-        toast.error("Invalid gift amount");
-        return;
-      }
-
-      // Try to sign up the user
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email,
-        password,
-      });
-
-      if (authError) {
-        if (authError.message.includes('already exists')) {
-          toast.error("An account with this email already exists. Please sign in instead.");
-          return;
-        }
-        throw authError;
-      }
-
-      if (!authData.user) throw new Error("Signup failed");
-
-      // Get the current wallet balance if it exists
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('wallet_balance')
-        .eq('id', authData.user.id)
-        .single();
-
-      const currentBalance = profile?.wallet_balance || 0;
-      const newBalance = currentBalance + gift.amount;
-
-      // Begin the gift collection process
-      const { error: updateGiftError } = await supabase
-        .from('gifts')
-        .update({
-          status: 'collected',
-          collector_id: authData.user.id,
-          collected_at: new Date().toISOString(),
-          collection_status: 'completed'
-        })
-        .eq('token', giftToken)
-        .eq('status', 'pending'); // Extra check to prevent race conditions
-
-      if (updateGiftError) throw updateGiftError;
-
-      // Update the wallet balance
-      const { error: balanceError } = await supabase
-        .from('profiles')
-        .upsert({
-          id: authData.user.id,
-          wallet_balance: newBalance
+      if (isLoginMode) {
+        // Handle login
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
         });
+        if (error) throw error;
 
-      if (balanceError) throw balanceError;
-
-      // Show success message and clean up
-      toast.success("Gift collected successfully!");
-      sessionStorage.removeItem('giftToken');
-      
-      // Navigate to download app page
-      navigate('/download-app');
-      
+        // After successful login, redirect to collect-signup (the page will handle the gift collection)
+        navigate('/download-app');
+      } else {
+        // Handle signup
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/verify`,
+          },
+        });
+        if (error) throw error;
+        
+        // After successful signup, redirect to download app
+        navigate('/download-app');
+      }
     } catch (error: any) {
-      console.error('Error during signup:', error);
-      toast.error(error.message || "Failed to collect gift. Please try again.");
+      if (error.message.includes('already exists')) {
+        toast.error("An account with this email already exists. Please sign in instead.");
+      } else {
+        toast.error(error.message || "Authentication failed. Please try again.");
+      }
+      console.error("Auth error:", error);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleLogin = () => {
-    // Store current route in session storage to redirect back after login
-    sessionStorage.setItem('redirectAfterLogin', '/collect-signup');
-    navigate("/login");
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-purple-50 to-blue-50 p-4">
       <Card className="w-full max-w-md p-6 space-y-8 bg-white/80 backdrop-blur-lg shadow-xl rounded-2xl">
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-r from-purple-600 to-blue-600 mb-4">
+          <div className="flex justify-center mb-6">
             <img 
-              src="/giftwave-icon.svg" 
-              alt="GiftWave" 
-              className="h-8 w-8"
+              src="/lovable-uploads/c34b64be-de23-45c2-9684-b5755b69dd4c.png"
+              alt="GiftWave"
+              className="h-16 w-auto drop-shadow-lg"
             />
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">Collect Your Gift</h1>
-          <p className="text-gray-600">Create an account to receive your gift in your GiftWave wallet</p>
+          <h1 className="text-2xl font-bold text-gray-900">
+            {isLoginMode ? "Welcome Back!" : "Collect Your Gift"}
+          </h1>
+          <p className="text-gray-600">
+            {isLoginMode 
+              ? "Sign in to receive your gift in your GiftWave wallet" 
+              : "Create an account to receive your gift in your GiftWave wallet"}
+          </p>
         </div>
 
-        <form onSubmit={handleSignup} className="space-y-4">
+        <form onSubmit={handleAuth} className="space-y-4">
           <div className="space-y-2">
             <Input
               type="email"
@@ -162,19 +112,19 @@ const CollectSignup = () => {
             className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white"
             disabled={isLoading}
           >
-            {isLoading ? "Creating Account..." : "Create Account & Collect Gift"}
+            {isLoading ? "Please wait..." : isLoginMode ? "Sign in" : "Create Account & Collect Gift"}
           </Button>
         </form>
 
         <p className="text-center text-sm text-gray-600">
-          Already have an account?{" "}
+          {isLoginMode ? "Don't have an account? " : "Already have an account? "}
           <Button
             variant="link"
             className="p-0 h-auto font-semibold"
-            onClick={handleLogin}
+            onClick={() => setIsLoginMode(!isLoginMode)}
             disabled={isLoading}
           >
-            Sign in
+            {isLoginMode ? "Sign up" : "Sign in"}
           </Button>
         </p>
       </Card>
