@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { Gift, Calendar, Heart, PartyPopper, DollarSign } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -28,68 +29,60 @@ export const MemoriesGrid = ({ gifts }: MemoriesGridProps) => {
   if (!gifts.length) {
     return (
       <div className="space-y-6">
-        <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            Your Gift Memories
-          </h2>
-          <p className="text-muted-foreground">No gifts found yet</p>
-        </div>
-        <Card className="p-8 text-center space-y-4">
-          <Gift className="h-12 w-12 mx-auto text-purple-500" />
-          <p className="text-lg text-muted-foreground">
-            You haven't received any gifts yet
-          </p>
+        <Card className="p-8 text-center space-y-4 bg-[#221F26]/50 border-gray-800 backdrop-blur-sm">
+          <Gift className="h-12 w-12 mx-auto text-[#0EA5E9]" />
+          <div className="space-y-2">
+            <h3 className="text-xl font-semibold text-white">No Gifts Yet</h3>
+            <p className="text-gray-400">
+              When you receive gifts, they'll appear here
+            </p>
+          </div>
         </Card>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-2">
-        <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-          Your Gift Memories
-        </h2>
-        <p className="text-muted-foreground">Tap on a gift to replay the memory</p>
-      </div>
-
+    <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {gifts.map((gift) => (
           <Card 
             key={gift.id}
-            className="p-6 hover:shadow-lg transition-all duration-300 animate-fade-in cursor-pointer group"
+            className="group bg-[#221F26]/50 border-gray-800 hover:border-[#0EA5E9]/50 backdrop-blur-sm
+                     transition-all duration-300 hover:shadow-lg hover:shadow-[#0EA5E9]/10 cursor-pointer
+                     animate-fade-in"
             onClick={() => handleGiftReplay(gift.id)}
           >
-            <div className="space-y-4">
+            <div className="p-6 space-y-4">
               {/* Header */}
               <div className="flex items-start justify-between">
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 bg-purple-100 rounded-full">
-                      <Gift className="h-4 w-4 text-purple-500" />
+                    <div className="p-2 bg-[#0EA5E9]/10 rounded-full">
+                      <Gift className="h-4 w-4 text-[#0EA5E9]" />
                     </div>
-                    <span className="font-medium text-lg">
+                    <span className="font-medium text-lg text-white">
                       {gift.sender?.full_name || "Anonymous"}
                     </span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-gray-400">
                     <Calendar className="h-4 w-4" />
                     <span>{new Date(gift.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>
-                <Badge variant="secondary" className="bg-green-100 text-green-700">
+                <Badge className="bg-[#0EA5E9]/10 text-[#0EA5E9] border-0">
                   <DollarSign className="h-4 w-4 mr-1" />
                   ${gift.amount}
                 </Badge>
               </div>
 
               {/* Preview */}
-              <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-purple-50 to-pink-50 p-4">
+              <div className="relative overflow-hidden rounded-lg bg-gradient-to-br from-[#2A2533] to-[#221F26] p-4 border border-gray-800/50">
                 <div className="absolute top-2 right-2">
-                  <PartyPopper className="h-5 w-5 text-purple-400" />
+                  <PartyPopper className="h-5 w-5 text-[#0EA5E9]" />
                 </div>
                 <div className="text-center space-y-2">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm text-gray-400">
                     This gift includes a special video message and memories
                   </p>
                 </div>
@@ -98,7 +91,7 @@ export const MemoriesGrid = ({ gifts }: MemoriesGridProps) => {
               {/* Action */}
               <Button 
                 variant="ghost" 
-                className="w-full group-hover:bg-purple-50 transition-colors"
+                className="w-full group-hover:bg-[#0EA5E9]/10 transition-colors text-white"
               >
                 <Heart className="h-4 w-4 mr-2 text-pink-500" />
                 <span className="text-sm">Tap to replay this memory</span>
