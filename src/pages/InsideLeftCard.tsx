@@ -9,7 +9,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { PageContainer } from "@/components/layout/PageContainer";
-import { ArrowLeft } from "lucide-react"; // Added missing import
 
 const InsideLeftCardContent = () => {
   const navigate = useNavigate();
@@ -31,42 +30,24 @@ const InsideLeftCardContent = () => {
   const token = localStorage.getItem('gift_draft_token');
 
   // Fetch the current gift design data with caching
-  const { data: giftDesign, error } = useQuery({
+  const { data: giftDesign } = useQuery({
     queryKey: ['gift-design', token],
     queryFn: async () => {
-      if (!token) {
-        console.error('No gift token found');
-        throw new Error('No gift token found');
-      }
+      if (!token) throw new Error('No gift token found');
 
       const { data, error } = await supabase
         .from('gift_designs')
         .select('*')
         .eq('token', token)
-        .maybeSingle();
+        .single();
 
-      if (error) {
-        console.error('Supabase error:', error);
-        throw error;
-      }
-
-      if (!data) {
-        console.error('No gift design found');
-        throw new Error('No gift design found');
-      }
-
+      if (error) throw error;
       return data;
     },
     enabled: !!token,
-    retry: 1
+    staleTime: Infinity, // Keep the data fresh indefinitely
+    gcTime: 1000 * 60 * 30 // Cache for 30 minutes before garbage collection
   });
-
-  useEffect(() => {
-    if (error) {
-      toast.error("Failed to load gift design");
-      console.error("Gift design error:", error);
-    }
-  }, [error]);
 
   // Set video from URL when gift design data is loaded
   useEffect(() => {
@@ -139,68 +120,27 @@ const InsideLeftCardContent = () => {
     }
   };
 
-  if (error) {
-    return (
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center">
-          <h2 className="text-xl font-semibold text-gray-800 mb-2">Unable to Load Gift</h2>
-          <p className="text-gray-600 mb-4">Please try again or start a new gift</p>
-          <button 
-            onClick={() => navigate('/frontcard')}
-            className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90"
-          >
-            Start New Gift
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <PageContainer>
-      <div className="min-h-screen bg-white">
-        <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-100">
-          <button 
-            onClick={() => navigate('/frontcard')}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
-          >
-            <ArrowLeft className="h-5 w-5 text-gray-600" />
-          </button>
-          <div></div>
-          <button 
-            onClick={() => navigate('/insiderightcard')}
-            className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
-          >
-            Next
-          </button>
-        </div>
-
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div 
-            className="backdrop-blur-xl bg-white/60 border border-white/20 shadow-lg rounded-2xl overflow-hidden w-full max-w-md aspect-[3/4] p-8"
-          >
-            <BlankCard
-              selectedThemeOption={selectedThemeOption}
-              messageVideo={messageVideo}
-              placedStickers={placedStickers}
-              selectedSticker={selectedSticker}
-              showStickers={showStickers}
-              stickerOptions={stickerOptions}
-              onBack={() => navigate(-1)}
-              onNext={() => navigate('/insiderightcard')}
-              onPatternChange={handlePatternChange}
-              onShowStickers={setShowStickers}
-              onStickerClick={handleStickerClick}
-              onStickerTap={handleStickerTap}
-              onStickerDragEnd={handleStickerDragEnd}
-              onStickerRemove={handleStickerRemove}
-              onStickerRotate={handleStickerRotate}
-              onFileChange={handleFileChange}
-              setMessageVideo={setMessageVideo}
-            />
-          </div>
-        </div>
-      </div>
+      <BlankCard
+        selectedThemeOption={selectedThemeOption}
+        messageVideo={messageVideo}
+        placedStickers={placedStickers}
+        selectedSticker={selectedSticker}
+        showStickers={showStickers}
+        stickerOptions={stickerOptions}
+        onBack={() => navigate(-1)}
+        onNext={() => navigate('/insiderightcard')}
+        onPatternChange={handlePatternChange}
+        onShowStickers={setShowStickers}
+        onStickerClick={handleStickerClick}
+        onStickerTap={handleStickerTap}
+        onStickerDragEnd={handleStickerDragEnd}
+        onStickerRemove={handleStickerRemove}
+        onStickerRotate={handleStickerRotate}
+        onFileChange={handleFileChange}
+        setMessageVideo={setMessageVideo}
+      />
     </PageContainer>
   );
 };

@@ -32,6 +32,7 @@ interface GiftDesign {
   user_id: string | null;
 }
 
+// Helper type guard to check if a value is a valid sticker object
 const isValidStickerObject = (value: any): value is { 
   id: string; 
   emoji: string; 
@@ -252,9 +253,20 @@ const FrontCardContent = () => {
   };
 
   return (
-    <ThemeProvider>
-      <div className="min-h-screen bg-white">
-        <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-100">
+    <div 
+      className="min-h-screen relative transition-colors duration-300"
+      style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+    >
+      <div className="absolute inset-0" 
+        style={{
+          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 10%, transparent 11%)',
+          backgroundSize: '30px 30px',
+          backgroundPosition: '0 0, 15px 15px'
+        }}
+      />
+      
+      <div className="relative z-10 min-h-screen flex flex-col">
+        <div className="flex items-center justify-between p-4">
           <button 
             onClick={handleBackClick}
             className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
@@ -276,10 +288,10 @@ const FrontCardContent = () => {
           </Button>
         </div>
 
-        <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="flex-1 flex items-center justify-center px-4">
           <div 
             ref={cardRef}
-            className="backdrop-blur-xl bg-white/60 border border-white/20 shadow-lg rounded-2xl overflow-hidden w-full max-w-md aspect-[3/4] p-8"
+            className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container overflow-hidden`}
           >
             <div 
               className="absolute inset-0 z-0" 
@@ -345,7 +357,7 @@ const FrontCardContent = () => {
           </div>
         </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 };
 

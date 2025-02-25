@@ -78,28 +78,26 @@ const SelectRecipientContent = () => {
 
   return (
     <PageContainer>
-      <div className="min-h-screen bg-white">
-        <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-100">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full w-10 h-10 hover:bg-gray-100"
-            onClick={handleBack}
-          >
-            <ArrowLeft className="h-5 w-5 text-gray-600" />
-          </Button>
-        </div>
+      <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
+        <Button
+          variant="ghost"
+          size="icon"
+          className="rounded-full w-10 h-10 hover:bg-gray-100"
+          onClick={handleBack}
+        >
+          <ArrowLeft className="h-5 w-5 text-gray-600" />
+        </Button>
+      </div>
 
-        <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto">
-          <RecipientStep 
-            phoneNumber={phoneNumber}
-            setPhoneNumber={setPhoneNumber}
-            recipientName={recipientName}
-            setRecipientName={setRecipientName}
-            onNext={handleNext}
-            onBack={handleBack}
-          />
-        </div>
+      <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto">
+        <RecipientStep 
+          phoneNumber={phoneNumber}
+          setPhoneNumber={setPhoneNumber}
+          recipientName={recipientName}
+          setRecipientName={setRecipientName}
+          onNext={handleNext}
+          onBack={handleBack}
+        />
       </div>
     </PageContainer>
   );
