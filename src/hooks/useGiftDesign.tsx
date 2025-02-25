@@ -6,7 +6,6 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Database } from '@/integrations/supabase/types';
 import { useGiftDesignRealtime } from './useGiftDesignRealtime';
 import { useGiftDesignStatus } from './useGiftDesignStatus';
-import { toast } from 'sonner';
 
 type GiftDesignRow = Database['public']['Tables']['gift_designs']['Row'];
 
@@ -44,17 +43,14 @@ export const useGiftDesign = (token: string | null) => {
         .from('gift_designs')
         .select('*')
         .eq('token', token)
-        .maybeSingle();
+        .single();
 
       if (error) {
         console.error('Error fetching gift design:', error);
         throw error;
       }
 
-      if (!data) {
-        console.error('No gift design found for token:', token);
-        throw new Error('No gift design found');
-      }
+      if (!data) throw new Error('No gift design found');
 
       // Parse JSON fields and handle nullables
       const frontCardStickers = data.front_card_stickers ? 
@@ -87,12 +83,7 @@ export const useGiftDesign = (token: string | null) => {
 
       return giftDesign;
     },
-    enabled: !!token,
-    retry: 1,
-    onError: (error) => {
-      console.error('Gift design query error:', error);
-      toast.error('Unable to load gift details');
-    }
+    enabled: !!token
   });
 
   // Get realtime updates
