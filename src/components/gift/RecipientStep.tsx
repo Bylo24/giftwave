@@ -1,3 +1,4 @@
+
 import { Phone, User } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -124,7 +125,7 @@ export const RecipientStep = ({
   ].sort((a, b) => a.label.localeCompare(b.label)); // Sort alphabetically by country code
 
   return (
-    <Card className="backdrop-blur-xl bg-white/60 border border-white/20 shadow-xl rounded-3xl p-8 space-y-6">
+    <Card className="p-6 space-y-6 bg-gradient-to-br from-pink-50 to-purple-50">
       <div className="flex items-center gap-3 mb-4">
         <div className="p-3 bg-primary/10 rounded-full">
           <User className="h-6 w-6 text-primary" />
@@ -143,7 +144,7 @@ export const RecipientStep = ({
               placeholder="Enter their name"
               value={recipientName}
               onChange={(e) => setRecipientName(e.target.value)}
-              className="text-lg backdrop-blur-xl bg-white/40 border-2 border-primary/20 focus:border-primary/40 transition-colors pl-4"
+              className="text-lg border-2 border-primary/20 focus:border-primary/40 transition-colors pl-4"
             />
           </div>
         </div>
@@ -152,7 +153,7 @@ export const RecipientStep = ({
           <label className="text-sm font-medium text-gray-600">Their Phone Number</label>
           <div className="flex gap-2">
             <Select defaultValue="+1">
-              <SelectTrigger className="w-[140px] backdrop-blur-xl bg-white/40">
+              <SelectTrigger className="w-[140px]">
                 <SelectValue placeholder="Country" />
               </SelectTrigger>
               <SelectContent className="max-h-[300px]">
@@ -169,7 +170,7 @@ export const RecipientStep = ({
               placeholder="Phone"
               value={phoneNumber}
               onChange={handlePhoneChange}
-              className="text-lg backdrop-blur-xl bg-white/40 border-2 border-primary/20 focus:border-primary/40 transition-colors flex-1"
+              className="text-lg border-2 border-primary/20 focus:border-primary/40 transition-colors flex-1"
               inputMode="numeric"
               pattern="[0-9]*"
             />
@@ -188,7 +189,7 @@ export const RecipientStep = ({
 
         <Button 
           variant="outline"
-          className="w-full backdrop-blur-xl bg-white/40"
+          className="w-full"
           onClick={onBack}
         >
           Go Back
