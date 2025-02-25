@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider, useTheme } from "@/contexts/ThemeContext";
@@ -122,25 +121,50 @@ const InsideLeftCardContent = () => {
 
   return (
     <PageContainer>
-      <BlankCard
-        selectedThemeOption={selectedThemeOption}
-        messageVideo={messageVideo}
-        placedStickers={placedStickers}
-        selectedSticker={selectedSticker}
-        showStickers={showStickers}
-        stickerOptions={stickerOptions}
-        onBack={() => navigate(-1)}
-        onNext={() => navigate('/insiderightcard')}
-        onPatternChange={handlePatternChange}
-        onShowStickers={setShowStickers}
-        onStickerClick={handleStickerClick}
-        onStickerTap={handleStickerTap}
-        onStickerDragEnd={handleStickerDragEnd}
-        onStickerRemove={handleStickerRemove}
-        onStickerRotate={handleStickerRotate}
-        onFileChange={handleFileChange}
-        setMessageVideo={setMessageVideo}
-      />
+      <div className="min-h-screen bg-white">
+        <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-100">
+          <button 
+            onClick={() => navigate('/frontcard')}
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
+          >
+            {/* You can add an icon here if you want */}
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </button>
+          <div></div> {/* Placeholder for potential content */}
+          <button 
+            onClick={() => navigate('/insiderightcard')}
+            className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
+          >
+            Next
+          </button>
+        </div>
+
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div 
+            className="backdrop-blur-xl bg-white/60 border border-white/20 shadow-lg rounded-2xl overflow-hidden w-full max-w-md aspect-[3/4] p-8"
+          >
+            <BlankCard
+              selectedThemeOption={selectedThemeOption}
+              messageVideo={messageVideo}
+              placedStickers={placedStickers}
+              selectedSticker={selectedSticker}
+              showStickers={showStickers}
+              stickerOptions={stickerOptions}
+              onBack={() => navigate(-1)}
+              onNext={() => navigate('/insiderightcard')}
+              onPatternChange={handlePatternChange}
+              onShowStickers={setShowStickers}
+              onStickerClick={handleStickerClick}
+              onStickerTap={handleStickerTap}
+              onStickerDragEnd={handleStickerDragEnd}
+              onStickerRemove={handleStickerRemove}
+              onStickerRotate={handleStickerRotate}
+              onFileChange={handleFileChange}
+              setMessageVideo={setMessageVideo}
+            />
+          </div>
+        </div>
+      </div>
     </PageContainer>
   );
 };

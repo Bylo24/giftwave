@@ -10,6 +10,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import type { Memory } from "@/types/gift";
 import { PageContainer } from "@/components/layout/PageContainer";
+import { ThemeProvider } from "next-themes";
 
 const InsideRightCard = () => {
   const navigate = useNavigate();
@@ -132,9 +133,9 @@ const InsideRightCard = () => {
   };
 
   return (
-    <PageContainer>
-      <div className="relative z-10">
-        <div className="flex justify-between items-center p-4">
+    <ThemeProvider>
+      <div className="min-h-screen bg-white">
+        <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-100">
           <Button
             variant="ghost"
             size="icon"
@@ -155,87 +156,91 @@ const InsideRightCard = () => {
           </Button>
         </div>
 
-        <div className="p-4 space-y-4">
-          <motion.div 
-            className="bg-white rounded-3xl p-6 space-y-4"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div 
+            className="backdrop-blur-xl bg-white/60 border border-white/20 shadow-lg rounded-2xl overflow-hidden w-full max-w-md aspect-[3/4] p-8"
           >
-            {!pendingImage ? (
-              <Button
-                variant="outline"
-                className="w-full py-6 border-2 border-dashed rounded-2xl"
-                onClick={() => document.getElementById('photo-upload')?.click()}
-              >
-                <Upload className="mr-2 h-5 w-5" />
-                Upload Photo
-              </Button>
-            ) : (
-              <div className="relative rounded-2xl overflow-hidden shadow-lg aspect-square mb-4">
-                <img 
-                  src={pendingImage} 
-                  alt="Pending upload"
-                  className="w-full h-full object-cover"
-                />
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="absolute top-2 right-2 bg-white/80 hover:bg-white"
-                  onClick={() => setPendingImage(undefined)}
-                >
-                  Change
-                </Button>
-              </div>
-            )}
-
-            <Input
-              id="photo-upload"
-              type="file"
-              accept="image/*"
-              className="hidden"
-              onChange={handleFileUpload}
-            />
-
-            <Input
-              placeholder="Add a caption..."
-              className="rounded-full bg-gray-50 border-0"
-              value={caption}
-              onChange={(e) => setCaption(e.target.value)}
-            />
-
-            <Button
-              className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-6"
-              onClick={handleAddMemory}
-              disabled={!pendingImage || !caption.trim()}
-            >
-              <Plus className="mr-2 h-5 w-5" />
-              Add Memory
-            </Button>
-          </motion.div>
-
-          <div className="flex items-center justify-center">
             <motion.div 
-              className="bg-white rounded-3xl p-6 w-full max-w-md aspect-[3/4]"
+              className="bg-white rounded-3xl p-6 space-y-4"
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
             >
-              <div className="h-full overflow-auto space-y-8">
-                {memories.map((memory) => (
-                  <MemoryStage key={memory.id} memory={memory} />
-                ))}
-                {memories.length === 0 && (
-                  <div className="flex flex-col items-center justify-center h-full text-gray-400">
-                    <Star className="h-12 w-12 mb-4" />
-                    <p>Add your first memory</p>
-                  </div>
-                )}
-              </div>
+              {!pendingImage ? (
+                <Button
+                  variant="outline"
+                  className="w-full py-6 border-2 border-dashed rounded-2xl"
+                  onClick={() => document.getElementById('photo-upload')?.click()}
+                >
+                  <Upload className="mr-2 h-5 w-5" />
+                  Upload Photo
+                </Button>
+              ) : (
+                <div className="relative rounded-2xl overflow-hidden shadow-lg aspect-square mb-4">
+                  <img 
+                    src={pendingImage} 
+                    alt="Pending upload"
+                    className="w-full h-full object-cover"
+                  />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="absolute top-2 right-2 bg-white/80 hover:bg-white"
+                    onClick={() => setPendingImage(undefined)}
+                  >
+                    Change
+                  </Button>
+                </div>
+              )}
+
+              <Input
+                id="photo-upload"
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleFileUpload}
+              />
+
+              <Input
+                placeholder="Add a caption..."
+                className="rounded-full bg-gray-50 border-0"
+                value={caption}
+                onChange={(e) => setCaption(e.target.value)}
+              />
+
+              <Button
+                className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-6"
+                onClick={handleAddMemory}
+                disabled={!pendingImage || !caption.trim()}
+              >
+                <Plus className="mr-2 h-5 w-5" />
+                Add Memory
+              </Button>
             </motion.div>
+
+            <div className="flex items-center justify-center">
+              <motion.div 
+                className="bg-white rounded-3xl p-6 w-full max-w-md aspect-[3/4]"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
+                <div className="h-full overflow-auto space-y-8">
+                  {memories.map((memory) => (
+                    <MemoryStage key={memory.id} memory={memory} />
+                  ))}
+                  {memories.length === 0 && (
+                    <div className="flex flex-col items-center justify-center h-full text-gray-400">
+                      <Star className="h-12 w-12 mb-4" />
+                      <p>Add your first memory</p>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>
-    </PageContainer>
+    </ThemeProvider>
   );
 };
 

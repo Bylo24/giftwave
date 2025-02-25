@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -72,7 +71,7 @@ const SelectAmountContent = () => {
 
   return (
     <PageContainer>
-      <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
+      <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-100">
         <Button
           variant="ghost"
           size="icon"
@@ -84,11 +83,13 @@ const SelectAmountContent = () => {
       </div>
 
       <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto">
-        <AmountStep 
-          amount={amount}
-          setAmount={setAmount}
-          onNext={setPreviewMode}
-        />
+        <div className="backdrop-blur-xl bg-white/60 border border-white/20 shadow-lg rounded-2xl overflow-hidden">
+          <AmountStep 
+            amount={amount}
+            setAmount={setAmount}
+            onNext={setPreviewMode}
+          />
+        </div>
       </div>
     </PageContainer>
   );
