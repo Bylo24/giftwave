@@ -78,26 +78,38 @@ const SelectRecipientContent = () => {
 
   return (
     <PageContainer>
-      <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-full w-10 h-10 hover:bg-gray-100"
-          onClick={handleBack}
-        >
-          <ArrowLeft className="h-5 w-5 text-gray-600" />
-        </Button>
-      </div>
+      {/* Background with subtle gradient */}
+      <div className="min-h-screen bg-white relative overflow-hidden">
+        {/* Subtle gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-50 via-white to-gray-50 pointer-events-none" />
+        
+        {/* Decorative circles */}
+        <div className="absolute top-[-20%] left-[-10%] w-96 h-96 bg-blue-100 rounded-full opacity-20 blur-3xl" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-96 h-96 bg-purple-100 rounded-full opacity-20 blur-3xl" />
 
-      <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto">
-        <RecipientStep 
-          phoneNumber={phoneNumber}
-          setPhoneNumber={setPhoneNumber}
-          recipientName={recipientName}
-          setRecipientName={setRecipientName}
-          onNext={handleNext}
-          onBack={handleBack}
-        />
+        {/* Header */}
+        <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-10 border-b border-gray-100">
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-full w-10 h-10 hover:bg-gray-100"
+            onClick={handleBack}
+          >
+            <ArrowLeft className="h-5 w-5 text-gray-600" />
+          </Button>
+        </div>
+
+        {/* Content */}
+        <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto relative z-10">
+          <RecipientStep 
+            phoneNumber={phoneNumber}
+            setPhoneNumber={setPhoneNumber}
+            recipientName={recipientName}
+            setRecipientName={setRecipientName}
+            onNext={handleNext}
+            onBack={handleBack}
+          />
+        </div>
       </div>
     </PageContainer>
   );
