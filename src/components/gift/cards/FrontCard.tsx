@@ -76,22 +76,13 @@ export const FrontCard = ({
 
   return (
     <div 
-      className="min-h-screen relative transition-colors duration-300"
-      style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+      className="min-h-screen bg-white relative"
     >
-      <div className="absolute inset-0" 
-        style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 10%, transparent 11%)',
-          backgroundSize: '30px 30px',
-          backgroundPosition: '0 0, 15px 15px'
-        }}
-      />
-      
       <div className="relative z-10 min-h-screen flex flex-col">
         <div className="flex items-center justify-between p-4">
           <button 
             onClick={handleBackClick}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
+            className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
@@ -104,7 +95,7 @@ export const FrontCard = ({
           
           <Button 
             onClick={onNext}
-            className="px-6 py-2 bg-white/90 backdrop-blur-sm rounded-full text-gray-800 font-medium shadow-lg hover:bg-white/95 transition-colors"
+            className="px-6 py-2 bg-white rounded-full text-gray-800 font-medium shadow-sm hover:shadow-md transition-shadow"
           >
             Next
           </Button>
@@ -158,17 +149,17 @@ export const FrontCard = ({
           <div className="relative">
             <button 
               onClick={() => onShowStickers(!showStickers)}
-              className="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg hover:bg-white/95 transition-colors"
+              className="w-12 h-12 flex items-center justify-center bg-white rounded-full shadow-sm hover:shadow-md transition-shadow"
             >
               <span className="text-2xl">⭐</span>
             </button>
             
             {showStickers && (
-              <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-white/90 backdrop-blur-sm rounded-2xl p-3 shadow-xl grid grid-cols-5 gap-2 min-w-[200px]">
+              <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 bg-white rounded-2xl p-3 shadow-xl grid grid-cols-5 gap-2 min-w-[200px]">
                 {stickerOptions.map((sticker, index) => (
                   <button 
                     key={index}
-                    className="w-10 h-10 flex items-center justify-center hover:bg-white/50 rounded-full transition-colors"
+                    className="w-10 h-10 flex items-center justify-center hover:bg-gray-50 rounded-full transition-colors"
                     onClick={() => onStickerClick(sticker.emoji)}
                   >
                     <span className="text-2xl">{sticker.emoji}</span>
