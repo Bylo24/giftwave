@@ -1,3 +1,4 @@
+
 import { useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { ThemeOption, Sticker, PatternType } from "@/types/gift";
@@ -255,13 +256,14 @@ const FrontCardContent = () => {
   return (
     <div 
       className="min-h-screen relative transition-colors duration-300"
-      style={{ backgroundColor: selectedThemeOption.screenBgColor }}
+      style={{ 
+        background: 'linear-gradient(90deg, hsla(277, 75%, 84%, 1) 0%, hsla(297, 50%, 51%, 1) 100%)'
+      }}
     >
       <div className="absolute inset-0" 
         style={{
-          backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.5) 10%, transparent 11%)',
-          backgroundSize: '30px 30px',
-          backgroundPosition: '0 0, 15px 15px'
+          background: 'radial-gradient(circle at 30% 40%, rgba(138, 43, 226, 0.4) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(72, 61, 139, 0.4) 0%, transparent 40%)',
+          filter: 'blur(30px)'
         }}
       />
       
@@ -269,7 +271,7 @@ const FrontCardContent = () => {
         <div className="flex items-center justify-between p-4">
           <button 
             onClick={handleBackClick}
-            className="w-10 h-10 flex items-center justify-center bg-white rounded-full"
+            className="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-sm rounded-full shadow-lg"
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </button>
