@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
@@ -132,7 +133,19 @@ const InsideRightCard = () => {
   };
 
   return (
-    <PageContainer>
+    <div 
+      className="min-h-screen relative transition-colors duration-300"
+      style={{ 
+        background: 'linear-gradient(90deg, hsla(277, 75%, 84%, 1) 0%, hsla(297, 50%, 51%, 1) 100%)'
+      }}
+    >
+      <div className="absolute inset-0" 
+        style={{
+          background: 'radial-gradient(circle at 30% 40%, rgba(138, 43, 226, 0.4) 0%, transparent 40%), radial-gradient(circle at 70% 60%, rgba(72, 61, 139, 0.4) 0%, transparent 40%)',
+          filter: 'blur(30px)'
+        }}
+      />
+      
       <div className="relative z-10">
         <div className="flex justify-between items-center p-4">
           <Button
@@ -235,7 +248,7 @@ const InsideRightCard = () => {
           </div>
         </div>
       </div>
-    </PageContainer>
+    </div>
   );
 };
 
