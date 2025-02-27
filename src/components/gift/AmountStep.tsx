@@ -48,10 +48,10 @@ export const AmountStep = ({ amount, setAmount, onNext }: AmountStepProps) => {
         animate={{ opacity: 1, y: 0 }}
         className="text-center space-y-2"
       >
-        <h2 className="text-2xl font-bold text-gray-900">
+        <h2 className="text-2xl font-bold text-white drop-shadow-md">
           Gift Amount
         </h2>
-        <p className="text-gray-500">
+        <p className="text-white/90 drop-shadow">
           Choose how much you'd like to send
         </p>
       </motion.div>
