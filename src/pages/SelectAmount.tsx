@@ -95,18 +95,18 @@ const SelectAmountContent = () => {
       />
       
       <div className="relative z-10">
-        <div className="fixed top-0 left-0 right-0 flex justify-between items-center p-4 bg-white/80 backdrop-blur-lg z-20">
+        <div className="p-4">
           <Button
             variant="ghost"
             size="icon"
-            className="rounded-full w-10 h-10 hover:bg-gray-100"
+            className="rounded-full w-10 h-10 bg-white/80 backdrop-blur-sm hover:bg-white"
             onClick={() => navigate(-1)}
           >
             <ArrowLeft className="h-5 w-5 text-gray-600" />
           </Button>
         </div>
 
-        <div className="min-h-screen pt-20 px-4 pb-4 max-w-md mx-auto">
+        <div className="px-4 pb-4 max-w-md mx-auto">
           <AmountStep 
             amount={amount}
             setAmount={setAmount}
