@@ -195,7 +195,7 @@ const FrontCardContent = () => {
         const { error } = await supabase
           .from('gift_designs')
           .update({
-            front_card_pattern: selectedThemeOption.pattern.type,
+            front_card_pattern: 'none', // Always set to 'none' to remove patterns
             front_card_stickers: stickersForDb,
             theme: selectedThemeOption.text,
             last_edited_at: new Date().toISOString()
@@ -207,7 +207,7 @@ const FrontCardContent = () => {
 
         queryClient.setQueryData(['gift-design', token], (oldData: any) => ({
           ...oldData,
-          front_card_pattern: selectedThemeOption.pattern.type,
+          front_card_pattern: 'none', // Always set to 'none' to remove patterns
           front_card_stickers: stickersForDb,
           theme: selectedThemeOption.text,
           last_edited_at: new Date().toISOString()
@@ -226,31 +226,6 @@ const FrontCardContent = () => {
 
   const handleBackClick = () => {
     navigate('/home');
-  };
-
-  const getPatternStyle = (pattern: ThemeOption['pattern']) => {
-    switch (pattern.type) {
-      case 'dots':
-        return {
-          backgroundImage: `radial-gradient(circle, ${pattern.color} 10%, transparent 11%)`,
-          backgroundSize: '20px 20px'
-        };
-      case 'grid':
-        return {
-          backgroundImage: `linear-gradient(to right, ${pattern.color} 1px, transparent 1px),
-                           linear-gradient(to bottom, ${pattern.color} 1px, transparent 1px)`,
-          backgroundSize: '20px 20px'
-        };
-      case 'waves':
-        return {
-          backgroundImage: `repeating-linear-gradient(45deg, ${pattern.color} 0px, ${pattern.color} 2px,
-                           transparent 2px, transparent 8px)`,
-          backgroundSize: '20px 20px'
-        };
-      case 'none':
-      default:
-        return {};
-    }
   };
 
   return (
@@ -295,11 +270,6 @@ const FrontCardContent = () => {
             ref={cardRef}
             className={`${selectedThemeOption.bgColor} rounded-lg aspect-[3/4] w-full max-w-md shadow-lg p-8 transition-colors duration-300 relative card-container overflow-hidden`}
           >
-            <div 
-              className="absolute inset-0 z-0" 
-              style={getPatternStyle(selectedThemeOption.pattern)}
-            />
-            
             <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8 pointer-events-none">
               <div className="text-center">
                 {selectedThemeOption.text.split('').map((letter, index) => (
@@ -328,11 +298,6 @@ const FrontCardContent = () => {
             />
           </div>
         </div>
-
-        <PatternSelector
-          currentPattern={selectedThemeOption.pattern.type}
-          onPatternChange={handlePatternChange}
-        />
 
         <div className="flex justify-center pb-8 relative">
           <div className="relative">
