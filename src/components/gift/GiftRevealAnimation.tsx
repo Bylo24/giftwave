@@ -3,6 +3,8 @@ import { useState } from 'react';
 import { GiftPreviewCard } from './GiftPreviewCard';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
+import { ThemeOption } from '@/types/gift';
+import { themeOptions } from '@/constants/giftOptions';
 
 interface GiftRevealAnimationProps {
   messageVideo: string;
@@ -15,13 +17,15 @@ interface GiftRevealAnimationProps {
   }>;
   memory: any; // Keep existing type
   onComplete: () => void;
+  theme?: ThemeOption;
 }
 
 export const GiftRevealAnimation = ({
   messageVideo,
   amount,
   memories,
-  onComplete
+  onComplete,
+  theme = themeOptions[0]
 }: GiftRevealAnimationProps) => {
   const [isRevealing, setIsRevealing] = useState(false);
 
@@ -30,7 +34,10 @@ export const GiftRevealAnimation = ({
   };
 
   return (
-    <div className="min-h-[500px] flex items-center justify-center p-4">
+    <div 
+      className="min-h-[500px] flex items-center justify-center p-4" 
+      style={{ backgroundColor: theme.screenBgColor }}
+    >
       <div className="w-full max-w-md">
         {!isRevealing ? (
           <motion.div
@@ -61,6 +68,8 @@ export const GiftRevealAnimation = ({
               messageVideo={messageVideo}
               amount={amount}
               memories={memories}
+              theme={theme}
+              onComplete={onComplete}
             />
           </motion.div>
         )}

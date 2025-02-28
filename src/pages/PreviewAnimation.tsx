@@ -1,6 +1,7 @@
+
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { PatternType } from "@/types/gift";
+import { PatternType, ThemeOption } from "@/types/gift";
 import { PreviewNavigationButtons } from "@/components/gift/preview/PreviewNavigationButtons";
 import { PreviewCard } from "@/components/gift/preview/PreviewCard";
 import { PreviewContainer } from "@/components/gift/preview/PreviewContainer";
@@ -14,6 +15,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { colorPalettes } from "@/constants/colorPalettes";
 import { supabase } from "@/integrations/supabase/client";
+import { themeOptions } from "@/constants/giftOptions";
 
 const ANIMATION_DURATION = 500;
 const CONFETTI_DURATION = 1500;
@@ -31,6 +33,7 @@ const PreviewAnimation = () => {
   const [selectedPaletteIndex, setSelectedPaletteIndex] = useState(0);
   const [bgColor, setBgColor] = useState(colorPalettes[0].screenBg);
   const [cardBgColor, setCardBgColor] = useState(colorPalettes[0].cardBg);
+  const [currentTheme, setCurrentTheme] = useState<ThemeOption>(themeOptions[0]);
   
   const isAnimatingRef = useRef(false);
   const pendingUpdateRef = useRef(false);
@@ -48,6 +51,17 @@ const PreviewAnimation = () => {
   } = useGiftDesign(token);
 
   const { handleProceedToPayment } = useGiftPayment();
+
+  // Load the saved theme from gift design
+  useEffect(() => {
+    if (giftDesign?.theme) {
+      const savedTheme = themeOptions.find(t => t.text === giftDesign.theme);
+      if (savedTheme) {
+        console.log("Loaded theme from gift design:", savedTheme.text);
+        setCurrentTheme(savedTheme);
+      }
+    }
+  }, [giftDesign?.theme]);
 
   const handlePaletteChange = async (index: number) => {
     const newPalette = colorPalettes[index];
@@ -297,16 +311,7 @@ const PreviewAnimation = () => {
             >
               <PreviewCard
                 pageIndex={pageIndex}
-                themeOption={{
-                  text: "Happy Birthday!",
-                  emoji: "🎉",
-                  bgColor: cardBgColor,
-                  textColors: ["text-purple-600"],
-                  pattern: {
-                    type: (giftDesign.front_card_pattern as PatternType) || "dots",
-                    color: "rgba(147, 51, 234, 0.1)"
-                  }
-                }}
+                themeOption={currentTheme}
                 getPatternStyle={getPatternStyle}
                 giftDesign={giftDesign}
               />
