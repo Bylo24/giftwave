@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -8,7 +7,6 @@ import { GiftVerificationForm } from "@/components/gift/GiftVerificationForm";
 import { GiftLoadingState } from "@/components/gift/GiftLoadingState";
 import { GiftNotFound } from "@/components/gift/GiftNotFound";
 import { toast } from "sonner";
-import { themeOptions } from "@/constants/giftOptions";
 
 const CollectGift = () => {
   const { giftId } = useParams();
@@ -35,17 +33,6 @@ const CollectGift = () => {
         throw giftError;
       }
 
-      // Fetch associated gift design to get theme
-      const { data: giftDesignData, error: designError } = await supabase
-        .from('gift_designs')
-        .select('*')
-        .eq('token', giftData.token)
-        .single();
-
-      if (designError) {
-        console.error("Error fetching gift design:", designError);
-      }
-
       // Fetch associated memories
       const { data: memoriesData, error: memoriesError } = await supabase
         .from('gift_memories')
@@ -64,20 +51,10 @@ const CollectGift = () => {
         caption: memory.caption,
         date: new Date(memory.date)
       }));
-      
-      // Find the theme that matches the gift design's theme
-      let theme = themeOptions[0]; // Default to first theme
-      if (giftDesignData?.theme) {
-        const foundTheme = themeOptions.find(t => t.text === giftDesignData.theme);
-        if (foundTheme) {
-          theme = foundTheme;
-        }
-      }
 
       return {
         ...giftData,
-        memories: formattedMemories,
-        theme: theme
+        memories: formattedMemories
       };
     },
   });
@@ -159,7 +136,6 @@ const CollectGift = () => {
             caption: "",
             date: new Date()
           }}
-          theme={gift.theme}
         />
       </div>
     );
