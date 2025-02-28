@@ -56,6 +56,61 @@ export const themeOptions: ThemeOption[] = [
       type: 'none',
       color: 'transparent'
     }
+  },
+  {
+    text: "HAPPY HOLIDAYS",
+    emoji: "🌟",
+    bgColor: "bg-[#F0F4FA]",
+    screenBgColor: "#FEF7CD",
+    textColors: ["text-[#C53030]", "text-[#1A365D]", "text-[#2F855A]", "text-[#C53030]", "text-[#1A365D]"],
+    pattern: {
+      type: 'none',
+      color: 'transparent'
+    }
+  },
+  {
+    text: "WITH LOVE",
+    emoji: "❤️",
+    bgColor: "bg-[#FFF0F3]",
+    screenBgColor: "#FDE1D3",
+    textColors: ["text-[#F56565]", "text-[#ED64A6]", "text-[#D53F8C]", "text-[#F56565]", "text-[#ED64A6]"],
+    pattern: {
+      type: 'none',
+      color: 'transparent'
+    }
+  },
+  {
+    text: "GET WELL SOON",
+    emoji: "🌈",
+    bgColor: "bg-[#F0FDFA]",
+    screenBgColor: "#D3E4FD",
+    textColors: ["text-[#0EA5E9]", "text-[#10B981]", "text-[#8B5CF6]", "text-[#0EA5E9]", "text-[#10B981]"],
+    pattern: {
+      type: 'none',
+      color: 'transparent'
+    }
+  },
+  {
+    text: "BEST WISHES",
+    emoji: "✨",
+    bgColor: "bg-[#F7F8FC]",
+    screenBgColor: "#E5DEFF",
+    textColors: ["text-[#805AD5]", "text-[#3182CE]", "text-[#D53F8C]", "text-[#805AD5]", "text-[#3182CE]"],
+    pattern: {
+      type: 'none',
+      color: 'transparent'
+    }
+  },
+  {
+    text: "HAPPY ANNIVERSARY",
+    emoji: "💍",
+    bgColor: "bg-[#FFF8F0]",
+    screenBgColor: "#FDE1D3",
+    textColors: ["text-[#DD6B20]", "text-[#C05621]", "text-[#B7791F]", "text-[#DD6B20]", "text-[#C05621]"],
+    pattern: {
+      type: 'none',
+      color: 'transparent'
+    }
   }
 ];
 

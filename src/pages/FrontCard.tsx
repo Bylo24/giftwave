@@ -252,7 +252,7 @@ const FrontCardContent = () => {
           </button>
           
           <ThemeSelector
-            themes={[selectedThemeOption]}
+            themes={themeOptions}
             selectedTheme={selectedThemeOption}
             onThemeChange={setSelectedThemeOption}
           />
