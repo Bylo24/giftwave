@@ -275,7 +275,8 @@ const FrontCardContent = () => {
                 {selectedThemeOption.text.split('').map((letter, index) => (
                   <span 
                     key={index} 
-                    className={`text-3xl sm:text-5xl md:text-8xl font-serif ${selectedThemeOption.textColors[index % selectedThemeOption.textColors.length]}`}
+                    className={`text-3xl sm:text-5xl md:text-8xl font-serif ${selectedThemeOption.textColors[index % selectedThemeOption.textColors.length]} drop-shadow-sm`}
+                    style={{textShadow: '0px 1px 2px rgba(0, 0, 0, 0.15)'}}
                   >
                     {letter}
                   </span>

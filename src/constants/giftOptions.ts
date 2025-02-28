@@ -7,7 +7,7 @@ export const themeOptions: ThemeOption[] = [
     emoji: "🎂",
     bgColor: "bg-[#FFF6E9]",
     screenBgColor: "#FEC6A1",
-    textColors: ["text-[#FF6B6B]", "text-[#4ECDC4]", "text-[#FFD93D]", "text-[#FF6B6B]", "text-[#4ECDC4]"],
+    textColors: ["text-[#D946EF]", "text-[#8B5CF6]", "text-[#F97316]", "text-[#D946EF]", "text-[#8B5CF6]"],
     pattern: {
       type: 'none',
       color: 'transparent'
