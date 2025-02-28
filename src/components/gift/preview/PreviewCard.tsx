@@ -54,11 +54,6 @@ export const PreviewCard = ({
 
   return (
     <div className={`${themeOption.bgColor} w-full h-full rounded-xl relative overflow-hidden`}>
-      <div 
-        className="absolute inset-0" 
-        style={getPatternStyle(themeOption.pattern)}
-      />
-      
       {pageIndex === 0 ? (
         // Front card
         <div className="relative z-10 h-full flex flex-col items-center justify-center space-y-8 p-4">
