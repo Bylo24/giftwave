@@ -60,7 +60,7 @@ const Home = () => {
       <div className="px-4 py-6 space-y-6 pb-24">
         {/* Hero Section */}
         <div className="text-center space-y-4">
-          <h1 className="text-2xl font-semibold text-gray-900">
+          <h1 className="text-2xl font-playfair font-semibold text-gray-900">
             Make Every Gift Meaningful
           </h1>
           <button
