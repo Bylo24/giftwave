@@ -61,7 +61,7 @@ const Home = () => {
         {/* Hero Section */}
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-semibold text-gray-900">
-            Send Money As A Gift, With A Personal Touch!
+            Make Every Gift Meaningful
           </h1>
           <button
             onClick={() => navigate("/frontcard")}
