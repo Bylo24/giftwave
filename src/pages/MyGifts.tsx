@@ -49,8 +49,8 @@ const MyGifts = () => {
 
   if (isLoading) {
     return (
-      <PageContainer>
-        <div className="min-h-screen bg-gradient-to-br from-[#FDE1D3] via-[#FEC6A1] to-[#FFDEE2]">
+      <PageContainer className="bg-gradient-to-br from-[#E5DEFF] via-[#9b87f5] to-[#D6BCFA]">
+        <div className="min-h-screen">
           <div className="animate-pulse space-y-4 p-4">
             <div className="h-12 bg-white/40 rounded-lg w-3/4" />
             <div className="h-24 bg-white/40 rounded-lg" />
@@ -66,9 +66,9 @@ const MyGifts = () => {
   }
 
   return (
-    <PageContainer>
+    <PageContainer className="bg-gradient-to-br from-[#E5DEFF] via-[#9b87f5] to-[#D6BCFA]">
       <PullToRefresh />
-      <div className="min-h-screen bg-gradient-to-br from-[#FDE1D3] via-[#FEC6A1] to-[#FFDEE2]">
+      <div className="min-h-screen">
         {/* Sticky Header */}
         <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-lg shadow-sm border-b border-gray-100">
           <div className="px-4 py-6 max-w-2xl mx-auto">
@@ -81,8 +81,8 @@ const MyGifts = () => {
                   Total received: ${totalAmount.toFixed(2)}
                 </p>
               </div>
-              <div className="h-12 w-12 rounded-full bg-blue-50 flex items-center justify-center">
-                <Gift className="h-6 w-6 text-blue-500" />
+              <div className="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
+                <Gift className="h-6 w-6 text-purple-500" />
               </div>
             </div>
           </div>

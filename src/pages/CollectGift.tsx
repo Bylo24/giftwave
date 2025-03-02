@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -126,7 +127,7 @@ const CollectGift = () => {
 
   if (!isAnimationComplete || isReplay) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] via-[#9b87f5] to-[#D6BCFA]">
         <GiftRevealAnimation
           messageVideo={gift.message_video_url}
           amount={gift.amount.toString()}
@@ -142,7 +143,7 @@ const CollectGift = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#E5DEFF] via-[#9b87f5] to-[#D6BCFA] flex items-center justify-center p-4">
       <GiftVerificationForm giftToken={gift.token} />
     </div>
   );
