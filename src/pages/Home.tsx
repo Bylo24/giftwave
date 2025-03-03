@@ -17,6 +17,18 @@ const Home = () => {
     navigate("/contacts");
   };
 
+  // Get user's first name from profile if available
+  const getUserName = () => {
+    if (!user) return "there";
+    
+    // Try to get name from user object or return friendly default
+    const email = user.email || "";
+    const nameFromEmail = email.split('@')[0];
+    const capitalizedName = nameFromEmail.charAt(0).toUpperCase() + nameFromEmail.slice(1);
+    
+    return capitalizedName || "there";
+  };
+
   return (
     <PageContainer className="bg-white">
       {/* Header */}
@@ -54,10 +66,10 @@ const Home = () => {
 
       {/* Main Content */}
       <div className="px-4 py-6 space-y-6 pb-24">
-        {/* Hero Section */}
+        {/* Welcome Message */}
         <div className="text-center space-y-6">
           <h1 className="text-3xl font-playfair font-bold text-gray-900">
-            Make Every Gift Meaningful
+            Hey {getUserName()}, welcome back!
           </h1>
           <button
             onClick={() => navigate("/frontcard")}
