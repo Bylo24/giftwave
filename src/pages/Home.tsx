@@ -67,7 +67,7 @@ const Home = () => {
       {/* Main Content */}
       <div className="px-4 py-6 space-y-6 pb-24">
         {/* Welcome Message */}
-        <div className="text-center space-y-6">
+        <div className="text-left space-y-6">
           <h1 className="text-2xl font-montserrat font-bold text-gray-900">
             Hey {getUserName()}, welcome back!
           </h1>
