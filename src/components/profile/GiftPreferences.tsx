@@ -21,6 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { updateGiftPreferences } from "@/utils/updateProfile";
 
 interface GiftPreferencesProps {
   userId: string;
@@ -58,17 +59,7 @@ export const GiftPreferences = ({ userId, profile }: GiftPreferencesProps) => {
         [key]: value
       };
       
-      const { error } = await supabase
-        .from('profiles')
-        .update({ 
-          gift_preferences: updatedPreferences
-        })
-        .eq('id', userId);
-        
-      if (error) throw error;
-      
-      // Show success toast
-      toast.success("Preferences updated");
+      await updateGiftPreferences(userId, updatedPreferences);
     } catch (error) {
       console.error("Error updating preferences:", error);
       toast.error("Failed to update preferences");
@@ -182,15 +173,10 @@ export const GiftPreferences = ({ userId, profile }: GiftPreferencesProps) => {
                   setPreferences(updatedPreferences);
                   
                   // Update in database
-                  supabase
-                    .from('profiles')
-                    .update({ gift_preferences: updatedPreferences })
-                    .eq('id', userId)
-                    .then(({ error }) => {
-                      if (error) {
-                        toast.error("Failed to update themes");
-                        console.error(error);
-                      }
+                  updateGiftPreferences(userId, updatedPreferences)
+                    .catch(error => {
+                      toast.error("Failed to update themes");
+                      console.error(error);
                     });
                 }}
               >
