@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,6 +11,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { ProfileLinks } from "@/components/profile/ProfileLinks";
+import { GiftPreferences } from "@/components/profile/GiftPreferences";
 import { Shield, Globe, Gift, ChevronDown } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
@@ -26,6 +28,7 @@ const Profile = () => {
   const [profile, setProfile] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [language, setLanguage] = useState("English (US)");
+  const [activeTab, setActiveTab] = useState("general"); // Add state for active tab
 
   const languages = [
     "English (US)",
@@ -141,67 +144,117 @@ const Profile = () => {
           <ProfileInfo user={user} profile={profile} />
         </Card>
 
-        <Card className="divide-y divide-border bg-card/80 backdrop-blur-lg border-border shadow-lg overflow-hidden">
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
-                <Globe className="h-5 w-5 text-green-600 dark:text-green-400" />
-              </div>
-              <div>
-                <p className="font-medium text-foreground">Language</p>
-                <p className="text-sm text-muted-foreground">Select your preferred language</p>
-              </div>
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button 
-                  variant="outline" 
-                  className="bg-card/80 backdrop-blur-lg border-border"
-                >
-                  {language}
-                  <ChevronDown className="ml-2 h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-[160px]">
-                {languages.map((lang) => (
-                  <DropdownMenuItem
-                    key={lang}
-                    onClick={() => handleLanguageChange(lang)}
-                    className="cursor-pointer"
-                  >
-                    {lang}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
+        {/* Tab Navigation */}
+        <div className="flex space-x-2 p-2 bg-gray-100/80 backdrop-blur-sm rounded-full mb-2">
+          <button
+            onClick={() => setActiveTab("general")}
+            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+              activeTab === "general"
+                ? "bg-white shadow"
+                : "text-gray-600 hover:bg-white/50"
+            }`}
+          >
+            General
+          </button>
+          <button
+            onClick={() => setActiveTab("preferences")}
+            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+              activeTab === "preferences"
+                ? "bg-white shadow"
+                : "text-gray-600 hover:bg-white/50"
+            }`}
+          >
+            Gift Preferences
+          </button>
+          <button
+            onClick={() => setActiveTab("security")}
+            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+              activeTab === "security"
+                ? "bg-white shadow"
+                : "text-gray-600 hover:bg-white/50"
+            }`}
+          >
+            Security
+          </button>
+        </div>
 
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-purple-100 dark:bg-purple-900 rounded-full">
-                <Gift className="h-5 w-5 text-purple-600 dark:text-purple-400" />
+        {/* General Tab */}
+        {activeTab === "general" && (
+          <>
+            <Card className="divide-y divide-border bg-card/80 backdrop-blur-lg border-border shadow-lg overflow-hidden">
+              <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
+                    <Globe className="h-5 w-5 text-green-600 dark:text-green-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Language</p>
+                    <p className="text-sm text-muted-foreground">Select your preferred language</p>
+                  </div>
+                </div>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="outline" 
+                      className="bg-card/80 backdrop-blur-lg border-border"
+                    >
+                      {language}
+                      <ChevronDown className="ml-2 h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-[160px]">
+                    {languages.map((lang) => (
+                      <DropdownMenuItem
+                        key={lang}
+                        onClick={() => handleLanguageChange(lang)}
+                        className="cursor-pointer"
+                      >
+                        {lang}
+                      </DropdownMenuItem>
+                    ))}
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
-              <div>
-                <p className="font-medium text-foreground">Gift Preferences</p>
-                <p className="text-sm text-muted-foreground">Customize your gifting experience</p>
-              </div>
-            </div>
-          </div>
 
-          <div className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
-                <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
+              <div className="p-4 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
+                    <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
+                  </div>
+                  <div>
+                    <p className="font-medium text-foreground">Privacy & Security</p>
+                    <p className="text-sm text-muted-foreground">Manage your account security</p>
+                  </div>
+                </div>
               </div>
-              <div>
-                <p className="font-medium text-foreground">Privacy & Security</p>
-                <p className="text-sm text-muted-foreground">Manage your account security</p>
-              </div>
-            </div>
-          </div>
-        </Card>
+            </Card>
 
-        <ProfileLinks />
+            <ProfileLinks />
+          </>
+        )}
+
+        {/* Gift Preferences Tab */}
+        {activeTab === "preferences" && user && (
+          <GiftPreferences userId={user.id} profile={profile} />
+        )}
+
+        {/* Security Tab */}
+        {activeTab === "security" && (
+          <Card className="divide-y divide-border bg-card/80 backdrop-blur-lg border-border shadow-lg overflow-hidden">
+            <div className="p-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
+                  <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">Two-Factor Authentication</p>
+                  <p className="text-sm text-muted-foreground">Enhance your account security</p>
+                </div>
+              </div>
+              <Switch />
+            </div>
+          </Card>
+        )}
 
         <div className="space-y-4">
           <Button 

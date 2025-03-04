@@ -1,3 +1,4 @@
+
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -16,5 +17,22 @@ export const updateUserProfile = async (userId: string, phoneNumber: string) => 
   }
 
   toast.success("Phone number updated successfully");
+  return true;
+};
+
+export const updateGiftPreferences = async (userId: string, preferences: any) => {
+  const { error } = await supabase
+    .from('profiles')
+    .update({ 
+      gift_preferences: preferences
+    })
+    .eq('id', userId);
+
+  if (error) {
+    toast.error("Failed to update gift preferences");
+    throw error;
+  }
+
+  toast.success("Gift preferences updated successfully");
   return true;
 };
