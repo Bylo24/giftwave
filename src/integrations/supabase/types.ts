@@ -416,6 +416,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string
           full_name: string | null
+          gift_preferences: Json | null
           id: string
           last_verification_attempt: string | null
           phone_number: string | null
@@ -431,6 +432,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
+          gift_preferences?: Json | null
           id: string
           last_verification_attempt?: string | null
           phone_number?: string | null
@@ -446,6 +448,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string
           full_name?: string | null
+          gift_preferences?: Json | null
           id?: string
           last_verification_attempt?: string | null
           phone_number?: string | null

@@ -28,11 +28,16 @@ interface GiftPreferencesProps {
 }
 
 export const GiftPreferences = ({ userId, profile }: GiftPreferencesProps) => {
+  const defaultPreferences = {
+    autoSaveDrafts: true,
+    notifyOnReminders: true,
+    showReceivedGifts: true,
+    favoriteThemes: [],
+  };
+
   const [preferences, setPreferences] = useState({
-    autoSaveDrafts: profile?.gift_preferences?.autoSaveDrafts || true,
-    notifyOnReminders: profile?.gift_preferences?.notifyOnReminders || true,
-    showReceivedGifts: profile?.gift_preferences?.showReceivedGifts || true,
-    favoriteThemes: profile?.gift_preferences?.favoriteThemes || [],
+    ...defaultPreferences,
+    ...(profile?.gift_preferences || {})
   });
   
   const [isUpdating, setIsUpdating] = useState(false);
@@ -48,13 +53,15 @@ export const GiftPreferences = ({ userId, profile }: GiftPreferencesProps) => {
       }));
       
       // Update preferences in the database
+      const updatedPreferences = {
+        ...preferences,
+        [key]: value
+      };
+      
       const { error } = await supabase
         .from('profiles')
         .update({ 
-          gift_preferences: {
-            ...preferences,
-            [key]: value
-          }
+          gift_preferences: updatedPreferences
         })
         .eq('id', userId);
         
@@ -167,17 +174,17 @@ export const GiftPreferences = ({ userId, profile }: GiftPreferencesProps) => {
                     ? preferences.favoriteThemes.filter((t: string) => t !== theme)
                     : [...preferences.favoriteThemes, theme];
                   
-                  setPreferences({ ...preferences, favoriteThemes: updatedThemes });
+                  const updatedPreferences = { 
+                    ...preferences, 
+                    favoriteThemes: updatedThemes 
+                  };
+                  
+                  setPreferences(updatedPreferences);
                   
                   // Update in database
                   supabase
                     .from('profiles')
-                    .update({ 
-                      gift_preferences: {
-                        ...preferences,
-                        favoriteThemes: updatedThemes
-                      }
-                    })
+                    .update({ gift_preferences: updatedPreferences })
                     .eq('id', userId)
                     .then(({ error }) => {
                       if (error) {
