@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,15 +13,24 @@
   @apply bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-purple-600 font-heading;
 }
 
+.gradient-text-secondary {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-amber-500 to-red-500 font-heading;
+}
+
+.gradient-text-success {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-green-500 to-emerald-500 font-heading;
+}
+
 .card-glow {
   box-shadow: 0 0 15px rgba(124, 58, 237, 0.15),
               0 0 30px rgba(124, 58, 237, 0.05);
-  transition: box-shadow 0.3s ease;
+  transition: box-shadow 0.3s ease, transform 0.2s ease;
 }
 
 .card-glow:hover {
   box-shadow: 0 0 20px rgba(124, 58, 237, 0.25),
               0 0 40px rgba(124, 58, 237, 0.1);
+  transform: translateY(-2px);
 }
 
 .gift-card {
@@ -56,6 +66,14 @@
   animation: float 3s ease-in-out infinite;
 }
 
+.float-slow {
+  animation: float 5s ease-in-out infinite;
+}
+
+.float-fast {
+  animation: float 2s ease-in-out infinite;
+}
+
 @keyframes pulse-subtle {
   0% { box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.3); }
   70% { box-shadow: 0 0 0 10px rgba(124, 58, 237, 0); }
@@ -81,8 +99,16 @@
   animation: shimmer 2s infinite;
 }
 
+button {
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
 button:active {
   transform: scale(0.97);
+}
+
+button:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
 input:focus, textarea:focus, select:focus {
@@ -141,4 +167,54 @@ input:focus, textarea:focus, select:focus {
 
 .rotate-on-hover:hover {
   transform: rotate(5deg);
+}
+
+/* Page transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
+}
+
+.page-exit {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.page-exit-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: opacity 300ms, transform 300ms;
+}
+
+/* Card variants */
+.card-primary {
+  @apply bg-gradient-to-br from-blue-50/90 to-purple-50/90 border-blue-200/30;
+}
+
+.card-secondary {
+  @apply bg-gradient-to-br from-amber-50/90 to-orange-50/90 border-amber-200/30;
+}
+
+.card-success {
+  @apply bg-gradient-to-br from-green-50/90 to-emerald-50/90 border-green-200/30;
+}
+
+.card-error {
+  @apply bg-gradient-to-br from-red-50/90 to-pink-50/90 border-red-200/30;
+}
+
+/* Interactive states */
+.interactive {
+  @apply transition-all duration-200 hover:scale-[1.02] active:scale-[0.98];
+}
+
+/* Skeleton loading */
+.skeleton {
+  @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
 }

@@ -1,3 +1,4 @@
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
 
@@ -61,15 +62,39 @@
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
-  h1, h2, h3 {
-    @apply font-heading tracking-tight;
+  h1 {
+    @apply font-heading text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight;
+  }
+  
+  h2 {
+    @apply font-heading text-2xl md:text-3xl lg:text-4xl font-semibold tracking-tight;
+  }
+  
+  h3 {
+    @apply font-heading text-xl md:text-2xl lg:text-3xl font-semibold tracking-tight;
   }
   
   h4, h5, h6 {
     @apply font-sans font-medium;
   }
   
-  p, span, div, button, input, textarea, select {
+  h4 {
+    @apply text-lg md:text-xl;
+  }
+  
+  h5 {
+    @apply text-base md:text-lg;
+  }
+  
+  h6 {
+    @apply text-sm md:text-base;
+  }
+  
+  p {
+    @apply font-sans text-base leading-relaxed;
+  }
+  
+  span, div, button, input, textarea, select {
     @apply font-sans;
   }
 }
@@ -106,6 +131,10 @@
   
   .text-gradient {
     @apply bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent;
+  }
+  
+  .text-gradient-secondary {
+    @apply bg-gradient-to-r from-amber-500 to-red-500 bg-clip-text text-transparent;
   }
   
   .animated-gradient-bg {
@@ -197,5 +226,37 @@
   
   .input-shine:focus-within::after {
     left: 100%;
+  }
+  
+  /* Status colors */
+  .success-gradient {
+    @apply bg-gradient-to-r from-green-500 to-emerald-500;
+  }
+  
+  .error-gradient {
+    @apply bg-gradient-to-r from-red-500 to-pink-500;
+  }
+  
+  .warning-gradient {
+    @apply bg-gradient-to-r from-yellow-500 to-amber-500;
+  }
+  
+  /* Interactive buttons */
+  .btn-interactive {
+    @apply transform transition-all duration-200 hover:scale-105 active:scale-95 hover:shadow-lg;
+  }
+  
+  /* Skeleton loading placeholders */
+  .skeleton-text {
+    @apply h-4 bg-gray-200 dark:bg-gray-700 rounded animate-pulse;
+  }
+  
+  .skeleton-image {
+    @apply bg-gray-200 dark:bg-gray-700 rounded animate-pulse;
+  }
+  
+  /* Page transition container */
+  .page-transition {
+    @apply transition-all duration-300 ease-in-out;
   }
 }
