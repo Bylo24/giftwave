@@ -12,8 +12,8 @@ export const ColorPaletteSelector = ({
 }: ColorPaletteSelectorProps) => {
   return (
     <div className="mb-8 w-[85vw] max-w-[360px]">
-      <div className="bg-white/80 backdrop-blur-md p-4 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.12)] border border-white/20">
-        <h3 className="text-sm font-medium bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-3">
+      <div className="glass-card p-4">
+        <h3 className="text-sm font-medium text-gradient mb-3 font-montserrat">
           Color Theme
         </h3>
         <div className="grid grid-cols-2 gap-2">
@@ -35,7 +35,7 @@ export const ColorPaletteSelector = ({
                 }`}
                 style={{ backgroundColor: palette.screenBg }}
               />
-              <span className={`text-xs transition-colors duration-300 ${
+              <span className={`text-xs font-montserrat transition-colors duration-300 ${
                 selectedPaletteIndex === index 
                   ? 'text-purple-700' 
                   : 'text-gray-600 group-hover:text-gray-800'

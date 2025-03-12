@@ -128,13 +128,13 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50/80 to-indigo-50/80 transition-colors duration-200 pb-24">
+    <div className="min-h-screen animated-gradient-bg transition-colors duration-200 pb-24">
       <div className="p-4 space-y-4 max-w-2xl mx-auto">
-        <div className="sticky top-0 z-10 backdrop-blur-lg bg-background/80 -mx-4 px-4 py-4 border-b border-border">
-          <h1 className="text-xl font-semibold text-foreground">Profile Settings</h1>
+        <div className="sticky top-0 z-10 glass-effect -mx-4 px-4 py-4 border-b border-white/20">
+          <h1 className="text-xl font-semibold text-foreground font-playfair">Profile Settings</h1>
         </div>
         
-        <Card className="p-6 bg-white/70 backdrop-blur-lg border border-white/20 shadow-xl rounded-3xl">
+        <Card className="p-6 glass-card border-white/20 shadow-xl rounded-3xl">
           <ProfileHeader 
             user={user}
             profile={profile}
@@ -145,33 +145,33 @@ const Profile = () => {
         </Card>
 
         {/* Tab Navigation */}
-        <div className="flex space-x-2 p-2 bg-gray-100/80 backdrop-blur-sm rounded-full mb-2">
+        <div className="flex space-x-2 p-2 glass-effect rounded-full mb-2">
           <button
             onClick={() => setActiveTab("general")}
-            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors font-montserrat ${
               activeTab === "general"
-                ? "bg-white shadow"
-                : "text-gray-600 hover:bg-white/50"
+                ? "bg-white/80 shadow text-blue-700"
+                : "text-gray-600 hover:bg-white/30"
             }`}
           >
             General
           </button>
           <button
             onClick={() => setActiveTab("preferences")}
-            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors font-montserrat ${
               activeTab === "preferences"
-                ? "bg-white shadow"
-                : "text-gray-600 hover:bg-white/50"
+                ? "bg-white/80 shadow text-blue-700"
+                : "text-gray-600 hover:bg-white/30"
             }`}
           >
             Gift Preferences
           </button>
           <button
             onClick={() => setActiveTab("security")}
-            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors ${
+            className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-colors font-montserrat ${
               activeTab === "security"
-                ? "bg-white shadow"
-                : "text-gray-600 hover:bg-white/50"
+                ? "bg-white/80 shadow text-blue-700"
+                : "text-gray-600 hover:bg-white/30"
             }`}
           >
             Security
@@ -181,14 +181,14 @@ const Profile = () => {
         {/* General Tab */}
         {activeTab === "general" && (
           <>
-            <Card className="divide-y divide-border bg-card/80 backdrop-blur-lg border-border shadow-lg overflow-hidden">
-              <div className="p-4 flex items-center justify-between">
+            <Card className="divide-y divide-border glass-card overflow-hidden">
+              <div className="p-4 flex items-center justify-between hover-lift hover:bg-blue-50/50">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-green-100 dark:bg-green-900 rounded-full">
                     <Globe className="h-5 w-5 text-green-600 dark:text-green-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Language</p>
+                    <p className="font-medium text-foreground font-montserrat">Language</p>
                     <p className="text-sm text-muted-foreground">Select your preferred language</p>
                   </div>
                 </div>
@@ -196,18 +196,18 @@ const Profile = () => {
                   <DropdownMenuTrigger asChild>
                     <Button 
                       variant="outline" 
-                      className="bg-card/80 backdrop-blur-lg border-border"
+                      className="glass-effect hover:bg-white/50 font-montserrat"
                     >
                       {language}
                       <ChevronDown className="ml-2 h-4 w-4" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-[160px]">
+                  <DropdownMenuContent align="end" className="w-[160px] glass-effect">
                     {languages.map((lang) => (
                       <DropdownMenuItem
                         key={lang}
                         onClick={() => handleLanguageChange(lang)}
-                        className="cursor-pointer"
+                        className="cursor-pointer font-montserrat hover:bg-blue-50/50"
                       >
                         {lang}
                       </DropdownMenuItem>
@@ -216,16 +216,17 @@ const Profile = () => {
                 </DropdownMenu>
               </div>
 
-              <div className="p-4 flex items-center justify-between">
+              <div className="p-4 flex items-center justify-between hover-lift hover:bg-red-50/50">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
                     <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
                   </div>
                   <div>
-                    <p className="font-medium text-foreground">Privacy & Security</p>
+                    <p className="font-medium text-foreground font-montserrat">Privacy & Security</p>
                     <p className="text-sm text-muted-foreground">Manage your account security</p>
                   </div>
                 </div>
+                <ChevronRight className="h-5 w-5 text-muted-foreground" />
               </div>
             </Card>
 
@@ -240,18 +241,18 @@ const Profile = () => {
 
         {/* Security Tab */}
         {activeTab === "security" && (
-          <Card className="divide-y divide-border bg-card/80 backdrop-blur-lg border-border shadow-lg overflow-hidden">
-            <div className="p-4 flex items-center justify-between">
+          <Card className="divide-y divide-border glass-card overflow-hidden">
+            <div className="p-4 flex items-center justify-between hover-lift hover:bg-red-50/50">
               <div className="flex items-center gap-3">
                 <div className="p-2 bg-red-100 dark:bg-red-900 rounded-full">
                   <Shield className="h-5 w-5 text-red-600 dark:text-red-400" />
                 </div>
                 <div>
-                  <p className="font-medium text-foreground">Two-Factor Authentication</p>
+                  <p className="font-medium text-foreground font-montserrat">Two-Factor Authentication</p>
                   <p className="text-sm text-muted-foreground">Enhance your account security</p>
                 </div>
               </div>
-              <Switch />
+              <Switch className="data-[state=checked]:bg-red-600" />
             </div>
           </Card>
         )}
@@ -259,13 +260,13 @@ const Profile = () => {
         <div className="space-y-4">
           <Button 
             variant="outline"
-            className="w-full bg-card/80 backdrop-blur-lg border-border text-foreground hover:bg-accent shadow-lg"
+            className="w-full glass-effect hover:bg-white/50 text-foreground font-montserrat shadow-lg"
             onClick={handleSignOut}
           >
             Sign Out
           </Button>
 
-          <p className="text-center text-sm text-muted-foreground">
+          <p className="text-center text-sm text-muted-foreground font-montserrat">
             Version 1.0.0
           </p>
         </div>

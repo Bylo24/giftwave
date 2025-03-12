@@ -9,13 +9,13 @@ export const LoginHeader = ({ isSignUp }: LoginHeaderProps) => {
       <img 
         src="/lovable-uploads/c34b64be-de23-45c2-9684-b5755b69dd4c.png"
         alt="GiftWave Logo"
-        className="h-16 w-auto drop-shadow-lg"
+        className="h-16 w-auto drop-shadow-lg floating"
       />
       <div className="text-center space-y-2">
-        <h1 className="text-2xl font-semibold bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
+        <h1 className="text-2xl font-semibold text-gradient font-playfair">
           Welcome to GiftWave
         </h1>
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-gray-600 font-montserrat">
           {isSignUp ? "Create an account" : "Sign in to your account"}
         </p>
       </div>
