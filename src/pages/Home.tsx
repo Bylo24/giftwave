@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { BottomNav } from "@/components/ui/bottom-nav";
 import { Search, Gift, Wallet, Plus, ArrowDown, UserPlus, Settings, Bell, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, CSSProperties } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { PageContainer } from "@/components/layout/PageContainer";
 import { ContentCard } from "@/components/layout/ContentCard";
@@ -42,7 +42,7 @@ const Home = () => {
   };
 
   // Animation delay for staggered items
-  const getStaggerDelay = (index: number) => {
+  const getStaggerDelay = (index: number): CSSProperties => {
     return { animationDelay: `${index * 100}ms` };
   };
 

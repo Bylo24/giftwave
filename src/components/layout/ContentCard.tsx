@@ -1,5 +1,6 @@
 
 import { cn } from "@/lib/utils";
+import { CSSProperties } from "react";
 
 interface ContentCardProps {
   children: React.ReactNode;
@@ -7,6 +8,7 @@ interface ContentCardProps {
   variant?: "default" | "elevated" | "primary" | "secondary" | "success" | "error" | "glass";
   interactive?: boolean;
   onClick?: () => void;
+  style?: CSSProperties;
 }
 
 export const ContentCard = ({ 
@@ -14,7 +16,8 @@ export const ContentCard = ({
   className = "", 
   variant = "default",
   interactive = false,
-  onClick
+  onClick,
+  style
 }: ContentCardProps) => {
   const variantClasses = {
     default: "bg-white/70 border-white/20",
@@ -37,6 +40,7 @@ export const ContentCard = ({
       onClick={interactive ? onClick : undefined}
       role={interactive ? "button" : undefined}
       tabIndex={interactive ? 0 : undefined}
+      style={style}
     >
       {children}
     </div>
