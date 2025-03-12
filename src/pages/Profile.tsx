@@ -12,7 +12,7 @@ import { ProfileHeader } from "@/components/profile/ProfileHeader";
 import { ProfileInfo } from "@/components/profile/ProfileInfo";
 import { ProfileLinks } from "@/components/profile/ProfileLinks";
 import { GiftPreferences } from "@/components/profile/GiftPreferences";
-import { Shield, Globe, Gift, ChevronDown } from "lucide-react";
+import { Shield, Globe, Gift, ChevronDown, ChevronRight } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import {
   DropdownMenu,
