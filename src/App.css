@@ -16,6 +16,7 @@
 .card-glow {
   box-shadow: 0 0 15px rgba(124, 58, 237, 0.15),
               0 0 30px rgba(124, 58, 237, 0.05);
+  transition: box-shadow 0.3s ease;
 }
 
 .card-glow:hover {
@@ -66,6 +67,30 @@
   animation: pulse-subtle 2s infinite;
 }
 
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+input:focus, textarea:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.3);
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -84,4 +109,37 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(124, 58, 237, 0.4);
+}
+
+.pulsate {
+  animation: pulsate 2s ease-out infinite;
+  opacity: 0.5;
+}
+
+@keyframes pulsate {
+  0% { 
+    opacity: 0.5; 
+  }
+  50% { 
+    opacity: 1.0; 
+  }
+  100% { 
+    opacity: 0.5; 
+  }
+}
+
+.scale-on-hover {
+  transition: transform 0.2s ease;
+}
+
+.scale-on-hover:hover {
+  transform: scale(1.03);
+}
+
+.rotate-on-hover {
+  transition: transform 0.3s ease;
+}
+
+.rotate-on-hover:hover {
+  transform: rotate(5deg);
 }

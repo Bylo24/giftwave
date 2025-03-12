@@ -9,7 +9,7 @@ interface AmountInputProps {
 
 export const AmountInput = ({ amount, onChange }: AmountInputProps) => {
   return (
-    <div className="relative">
+    <div className="relative input-shine">
       <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
       <Input
         type="number"
@@ -17,7 +17,7 @@ export const AmountInput = ({ amount, onChange }: AmountInputProps) => {
         onChange={(e) => onChange(e.target.value)}
         min="0.01"
         step="0.01"
-        className="pl-12 h-14 text-lg font-medium border-2 focus:ring-2 focus:ring-blue-500/20 transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+        className="pl-12 h-14 text-lg font-medium border-2 focus:ring-2 focus:ring-blue-500/20 transition-shadow [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none glass-effect"
         placeholder="Enter amount"
       />
     </div>

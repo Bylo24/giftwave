@@ -8,7 +8,7 @@ interface WalletBalanceProps {
 
 export const WalletBalance = ({ balance }: WalletBalanceProps) => {
   return (
-    <Card className="p-6 bg-gradient-to-br from-indigo-500 to-blue-600 text-white backdrop-blur-lg border border-white/10 shadow-xl rounded-xl hover:shadow-2xl transition-shadow duration-300">
+    <Card className="p-6 bg-gradient-to-br from-indigo-500 to-blue-600 text-white backdrop-blur-lg border border-white/10 shadow-xl rounded-xl hover:shadow-2xl transition-shadow duration-300 card-shine">
       <div className="flex items-center gap-3 mb-4">
         <div className="p-2 bg-white/20 rounded-full">
           <WalletIcon className="h-6 w-6" />

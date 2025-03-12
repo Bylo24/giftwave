@@ -60,6 +60,14 @@
     @apply bg-background text-foreground transition-colors duration-200;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-playfair tracking-tight;
+  }
+  
+  p, span, div, button, input, textarea, select {
+    @apply font-montserrat;
+  }
 }
 
 /* Custom utilities for 3D card effect */
@@ -102,6 +110,27 @@
     animation: gradientAnimation 15s ease infinite;
   }
   
+  .card-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card-shine::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to bottom right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 100%
+    );
+    transform: rotate(30deg);
+    pointer-events: none;
+  }
+  
   @keyframes gradientAnimation {
     0% {
       background-position: 0% 50%;
@@ -137,5 +166,32 @@
   .floating {
     animation: float 4s ease-in-out infinite;
   }
+  
+  .btn-gradient {
+    @apply bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white transition-all duration-300;
+  }
+  
+  .input-shine {
+    @apply relative overflow-hidden;
+  }
+  
+  .input-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+    transition: 0.3s;
+  }
+  
+  .input-shine:focus-within::after {
+    left: 100%;
+  }
 }
-

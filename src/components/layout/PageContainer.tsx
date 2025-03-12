@@ -6,7 +6,7 @@ interface PageContainerProps {
 
 export const PageContainer = ({ children, className = "" }: PageContainerProps) => {
   return (
-    <div className={`min-h-screen ${className}`}>
+    <div className={`min-h-screen overflow-x-hidden transition-colors duration-300 ${className}`}>
       {children}
     </div>
   );

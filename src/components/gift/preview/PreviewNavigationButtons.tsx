@@ -17,7 +17,7 @@ export const PreviewNavigationButtons = ({
       <button
         onClick={onPrevious}
         disabled={isFlipping}
-        className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 rounded-full glass-effect hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Previous page"
       >
         <ChevronLeft className="w-6 h-6 text-gray-600" />
@@ -26,7 +26,7 @@ export const PreviewNavigationButtons = ({
       <button
         onClick={onNext}
         disabled={isFlipping}
-        className="p-2 rounded-full bg-white/80 backdrop-blur-sm shadow-lg hover:bg-white/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        className="p-2 rounded-full glass-effect hover-lift disabled:opacity-50 disabled:cursor-not-allowed"
         aria-label="Next page"
       >
         <ChevronRight className="w-6 h-6 text-gray-600" />

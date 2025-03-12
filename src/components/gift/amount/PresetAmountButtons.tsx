@@ -21,10 +21,10 @@ export const PresetAmountButtons = ({
           variant="outline"
           onClick={() => onAmountSelect(preset.toString())}
           className={cn(
-            "h-12 border-2 font-medium transition-all",
+            "h-12 border-2 font-medium transition-all hover-lift",
             selectedAmount === preset.toString()
               ? "bg-blue-50 border-blue-500 text-blue-600"
-              : "hover:border-blue-200 hover:bg-blue-50/50"
+              : "glass-effect hover:border-blue-200 hover:bg-blue-50/50"
           )}
         >
           ${preset}
