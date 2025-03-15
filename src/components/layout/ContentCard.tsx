@@ -8,6 +8,7 @@ interface ContentCardProps {
   variant?: "default" | "glass" | "primary" | "secondary" | "success" | "error";
   interactive?: boolean;
   style?: CSSProperties;
+  onClick?: () => void;
 }
 
 export const ContentCard = ({ 
@@ -15,7 +16,8 @@ export const ContentCard = ({
   className = "", 
   variant = "default",
   interactive = false,
-  style
+  style,
+  onClick
 }: ContentCardProps) => {
   const variantClasses = {
     default: "bg-white border-gray-100",
@@ -35,6 +37,7 @@ export const ContentCard = ({
         className
       )}
       style={style}
+      onClick={onClick}
     >
       {children}
     </div>
