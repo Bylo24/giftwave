@@ -31,48 +31,48 @@ export const BottomNav = () => {
   const isActive = (path: string) => location.pathname === path;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 pb-safe-area">
-      <div className="px-4 py-2">
+    <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 pb-safe-area z-20">
+      <div className="px-2 py-2 max-w-screen-xl mx-auto">
         <div className="flex items-center justify-between relative">
           <button
             onClick={() => navigate("/home")}
-            className="p-2 flex flex-col items-center gap-1 text-gray-500 hover:text-gray-900 transition-colors"
+            className="p-2 flex flex-col items-center gap-1 text-gray-400 hover:text-blue-500 transition-colors"
           >
-            <HomeIcon className={`h-6 w-6 ${isActive('/home') ? 'text-blue-600' : ''}`} />
-            <span className={`text-xs ${isActive('/home') ? 'text-blue-600' : ''}`}>Home</span>
+            <HomeIcon className={`h-5 w-5 ${isActive('/home') ? 'text-blue-500' : ''}`} />
+            <span className={`text-xs ${isActive('/home') ? 'text-blue-500 font-medium' : ''}`}>Home</span>
           </button>
 
           <button
             onClick={() => navigate("/my-gifts")}
-            className="p-2 flex flex-col items-center gap-1 text-gray-500 hover:text-gray-900 transition-colors"
+            className="p-2 flex flex-col items-center gap-1 text-gray-400 hover:text-blue-500 transition-colors"
           >
-            <Gift className={`h-6 w-6 ${isActive('/my-gifts') ? 'text-blue-600' : ''}`} />
-            <span className={`text-xs ${isActive('/my-gifts') ? 'text-blue-600' : ''}`}>My Gifts</span>
+            <Gift className={`h-5 w-5 ${isActive('/my-gifts') ? 'text-blue-500' : ''}`} />
+            <span className={`text-xs ${isActive('/my-gifts') ? 'text-blue-500 font-medium' : ''}`}>My Gifts</span>
           </button>
 
           <div className="group">
             <button
               onClick={handleNewGift}
-              className="bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl p-4 shadow-lg group-hover:shadow-indigo-200/50 transition-all duration-200 -mt-2"
+              className="bg-blue-500 hover:bg-blue-600 rounded-full p-3.5 shadow-sm transition-colors"
             >
-              <Gift className="h-6 w-6 text-white" />
+              <Gift className="h-5 w-5 text-white" />
             </button>
           </div>
 
           <button
             onClick={() => navigate("/wallet")}
-            className="p-2 flex flex-col items-center gap-1 text-gray-500 hover:text-gray-900 transition-colors"
+            className="p-2 flex flex-col items-center gap-1 text-gray-400 hover:text-blue-500 transition-colors"
           >
-            <Wallet className={`h-6 w-6 ${isActive('/wallet') ? 'text-blue-600' : ''}`} />
-            <span className={`text-xs ${isActive('/wallet') ? 'text-blue-600' : ''}`}>Wallet</span>
+            <Wallet className={`h-5 w-5 ${isActive('/wallet') ? 'text-blue-500' : ''}`} />
+            <span className={`text-xs ${isActive('/wallet') ? 'text-blue-500 font-medium' : ''}`}>Wallet</span>
           </button>
 
           <button
             onClick={() => navigate("/profile")}
-            className="p-2 flex flex-col items-center gap-1 text-gray-500 hover:text-gray-900 transition-colors"
+            className="p-2 flex flex-col items-center gap-1 text-gray-400 hover:text-blue-500 transition-colors"
           >
-            <User className={`h-6 w-6 ${isActive('/profile') ? 'text-blue-600' : ''}`} />
-            <span className={`text-xs ${isActive('/profile') ? 'text-blue-600' : ''}`}>Profile</span>
+            <User className={`h-5 w-5 ${isActive('/profile') ? 'text-blue-500' : ''}`} />
+            <span className={`text-xs ${isActive('/profile') ? 'text-blue-500 font-medium' : ''}`}>Profile</span>
           </button>
         </div>
       </div>
